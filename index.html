@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ЭлектроТест - Подготовка ко 2 периоду</title>
+    <title>Тести</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -657,6 +657,16 @@
             updateQuizStartCount(); // Считаем вопросы по выбранной категории
         }
 
+        // Алгоритм Фишера-Йетса для идеального перемешивания массивов
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
         function startQuiz() {
             const selectedCat = document.getElementById('quizCategorySelect').value;
             let filteredQs = questions;
@@ -670,8 +680,28 @@
                 return showToast('Нет вопросов для теста', 'error');
             }
 
-            // Shuffle questions for quiz
-            quizState.questions = [...filteredQs].sort(() => Math.random() - 0.5);
+            // Создаем копию вопросов для текущей сессии и перемешиваем варианты ответов
+            let sessionQuestions = filteredQs.map(q => {
+                // Связываем текст варианта с флагом, правильный ли он
+                let optionsWithCorrectFlag = q.options.map((opt, idx) => ({ 
+                    text: opt, 
+                    isCorrect: idx === q.correctIndex 
+                }));
+                
+                // Перемешиваем варианты
+                let shuffledOptsObj = shuffleArray(optionsWithCorrectFlag);
+                
+                return {
+                    ...q,
+                    // Сохраняем новые перемешанные варианты для отображения
+                    shuffledOptions: shuffledOptsObj.map(o => o.text),
+                    // Находим новый индекс правильного ответа после перемешивания
+                    shuffledCorrectIndex: shuffledOptsObj.findIndex(o => o.isCorrect)
+                };
+            });
+
+            // Перемешиваем сами вопросы (надежным методом Фишера-Йетса)
+            quizState.questions = shuffleArray(sessionQuestions);
             quizState.answers = new Array(quizState.questions.length).fill(null);
             quizState.currentIdx = 0;
             quizState.active = true;
@@ -696,9 +726,9 @@
             // Question Text
             document.getElementById('quizQuestionText').innerText = q.text;
 
-            // Options
+            // Options (используем уже перемешанные варианты - shuffledOptions)
             const container = document.getElementById('quizOptionsContainer');
-            container.innerHTML = q.options.map((opt, idx) => {
+            container.innerHTML = q.shuffledOptions.map((opt, idx) => {
                 const isSelected = quizState.answers[quizState.currentIdx] === idx;
                 return `
                 <label class="flex items-center gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${isSelected ? 'border-electro-yellow bg-gray-800' : 'border-electro-border bg-electro-dark hover:border-gray-500'}">
@@ -753,7 +783,8 @@
 
             quizState.questions.forEach((q, idx) => {
                 const userAns = quizState.answers[idx];
-                const isCorrect = userAns === q.correctIndex;
+                // Проверяем по новому перемешанному индексу
+                const isCorrect = userAns === q.shuffledCorrectIndex;
                 if (isCorrect) correctCount++;
 
                 const statusColor = isCorrect ? 'border-electro-green' : (userAns === null ? 'border-yellow-600' : 'border-electro-red');
@@ -761,11 +792,12 @@
                     `<svg class="w-6 h-6 text-electro-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>` : 
                     `<svg class="w-6 h-6 text-electro-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
 
-                const optsHtml = q.options.map((opt, oIdx) => {
+                // Отрисовываем перемешанные варианты для экрана результатов
+                const optsHtml = q.shuffledOptions.map((opt, oIdx) => {
                     let oClass = "text-gray-400";
                     let icon = `<span class="w-4 h-4 shrink-0 inline-block"></span>`;
                     
-                    if (oIdx === q.correctIndex) {
+                    if (oIdx === q.shuffledCorrectIndex) {
                         oClass = "text-electro-green font-bold";
                         icon = `<svg class="w-4 h-4 text-electro-green shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
                     } else if (oIdx === userAns) {
