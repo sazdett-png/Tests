@@ -108,14 +108,12 @@
                     <h3 class="font-bold text-lg">База питань (<span id="qCount">0</span>)</h3>
                 </div>
                 
-                <!-- Новий зручний блок для кнопок -->
                 <div class="flex gap-3 mb-4">
                     <button onclick="exportJSON()" class="btn-secondary flex-1 py-3 rounded font-bold text-sm shadow">📥 Експорт (Зберегти)</button>
                     <button onclick="document.getElementById('importFile').click()" class="bg-green-700 hover:bg-green-600 text-white flex-1 py-3 rounded font-bold text-sm shadow">📤 Імпорт (Відкрити)</button>
                     <input type="file" id="importFile" class="hidden" accept=".json" onchange="importJSON(event)">
                 </div>
 
-                <!-- Зручний пошук на всю ширину -->
                 <input type="text" id="searchEditorInput" onkeyup="updateEditorList()" placeholder="🔍 Пошук по базі..." class="bg-gray-900 w-full mb-4 border-gray-600 rounded p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
                 
                 <div id="questionsList" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
@@ -617,15 +615,58 @@
             dlAnchorElem.setAttribute("download", "sait_quiz_backup.json"); dlAnchorElem.click();
         }
 
+        // РОЗУМНИЙ ІМПОРТ (ОНОВЛЕНО)
         function importJSON(event) {
             const file = event.target.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported)) { imported.forEach(q => { if (!q.id) q.id = Date.now().toString() + Math.random(); }); questions = imported; } 
-                    else if (imported.questions) { questions = imported.questions; if (imported.cheatSheet) { localStorage.setItem('quiz_cheatsheet', imported.cheatSheet); document.getElementById('cheatSheetContent').innerHTML = imported.cheatSheet; } }
-                    mistakeIds = []; saveData(); updateEditorList(); alert("База успішно оновлена!");
+                    let importedQuestions = [];
+                    let importedCheatSheet = null;
+
+                    if (Array.isArray(imported)) { 
+                        importedQuestions = imported; 
+                    } else if (imported.questions) { 
+                        importedQuestions = imported.questions; 
+                        if (imported.cheatSheet) importedCheatSheet = imported.cheatSheet; 
+                    }
+
+                    if (questions.length > 0) {
+                        const merge = confirm("Зберегти існуючі питання? \\n\\n[ОК] - Додати нові питання до поточної бази \\n[Скасувати] - Видалити старі і завантажити тільки нові");
+                        if (merge) {
+                            let addedCount = 0;
+                            importedQuestions.forEach(iq => {
+                                const exists = questions.some(q => q.text === iq.text);
+                                if (!exists) {
+                                    if (!iq.id) iq.id = Date.now().toString() + Math.random();
+                                    questions.unshift(iq);
+                                    addedCount++;
+                                }
+                            });
+                            alert("Базу оновлено! Додано нових питань: " + addedCount);
+                        } else {
+                            importedQuestions.forEach(q => { if (!q.id) q.id = Date.now().toString() + Math.random(); });
+                            questions = importedQuestions;
+                            mistakeIds = [];
+                            quizStats = {};
+                            alert("Базу повністю замінено!");
+                        }
+                    } else {
+                        importedQuestions.forEach(q => { if (!q.id) q.id = Date.now().toString() + Math.random(); });
+                        questions = importedQuestions;
+                        alert("Базу успішно завантажено!");
+                    }
+
+                    if (importedCheatSheet) {
+                        if (confirm("У файлі є збережений Довідник (Шпаргалка). Оновити твій поточний довідник?")) {
+                            localStorage.setItem('quiz_cheatsheet', importedCheatSheet); 
+                            document.getElementById('cheatSheetContent').innerHTML = importedCheatSheet;
+                        }
+                    }
+
+                    saveData(); updateEditorList();
+                    event.target.value = ''; // Скидаємо файл
                 } catch (err) { alert("Помилка читання файлу."); }
             };
             reader.readAsText(file);
