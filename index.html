@@ -2,11 +2,23 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⚡ Тести</title>
+    
+    <!-- PWA та Налаштування для телефонів (Щоб працювало як додаток) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SAIT Тести">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#111827">
+    
+    <!-- Іконка у вигляді блискавки для робочого столу -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23111827%22/><text y=%22.85em%22 x=%2210%22 font-size=%2280%22>⚡</text></svg>">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #111827; color: #f3f4f6; }
+        body { background-color: #111827; color: #f3f4f6; -webkit-tap-highlight-color: transparent; }
         .btn-primary { background-color: #eab308; color: #111827; font-weight: bold; transition: all 0.2s; }
         .btn-primary:hover { background-color: #facc15; }
         .btn-secondary { background-color: #374151; color: #f3f4f6; transition: all 0.2s; }
@@ -33,7 +45,7 @@
 </head>
 <body class="min-h-screen p-4 md:p-8">
 
-    <div class="max-w-3xl mx-auto">
+    <div class="max-w-3xl mx-auto mt-2">
         <!-- Шапка -->
         <header class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
             <h1 class="text-3xl font-bold text-yellow-500">⚡ Тести</h1>
@@ -249,7 +261,7 @@
         let currentQIndex = 0;
         let score = 0;
         let userMistakes = [];
-        let currentMode = 'quiz'; // 'quiz' або 'flashcards'
+        let currentMode = 'quiz';
 
         function shuffle(array) {
             let arr = [...array];
@@ -360,7 +372,7 @@
         function loadNextQuestion() {
             if (currentQIndex >= currentQuizQuestions.length) { finishSession(); return; }
             const q = currentQuizQuestions[currentQIndex];
-            const qType = q.type || 'choice'; // для старих питань
+            const qType = q.type || 'choice';
             
             document.getElementById('quizProgressBar').style.width = ((currentQIndex + 1) / currentQuizQuestions.length * 100) + '%';
             document.getElementById('quizProgress').innerText = `Питання ${currentQIndex + 1} / ${currentQuizQuestions.length}`;
@@ -392,13 +404,12 @@
                     <button id="quizInputSubmitBtn" class="btn-primary w-full py-4 rounded text-lg shadow">Відповісти</button>
                 `;
                 const inputField = document.getElementById('quizInputText');
-                inputField.focus(); // Автофокус (може не спрацювати на телефонах через політику браузера)
+                inputField.focus();
                 
                 const submitBtn = document.getElementById('quizInputSubmitBtn');
                 const checkFunction = () => {
                     const userVal = inputField.value.trim();
                     if (!userVal) return;
-                    // Перевірка на збіг з будь-яким варіантом (нечутливо до регістру)
                     const isCorrect = q.options.some(opt => opt.trim().toLowerCase() === userVal.toLowerCase());
                     processAnswer(isCorrect, q, userVal);
                 };
@@ -440,13 +451,11 @@
             if (q.imageUrl && q.imageUrl.trim() !== "") { imgEl.src = q.imageUrl; imgEl.classList.remove('hidden'); } 
             else { imgEl.classList.add('hidden'); imgEl.src = ''; }
 
-            // Скидання стану картки (ховати відповідь)
             document.getElementById('fcAnswerBox').classList.add('hidden');
             document.getElementById('fcTapHint').classList.remove('hidden');
             document.getElementById('fcCard').classList.remove('cursor-default');
             document.getElementById('fcCard').classList.add('cursor-pointer');
 
-            // Формуємо текст правильної відповіді (для input показуємо всі варіанти)
             const qType = q.type || 'choice';
             const correctText = (qType === 'input') ? q.options.join('  АБО  ') : q.options[q.answerIndex];
             document.getElementById('fcAnswerText').innerText = correctText;
@@ -459,7 +468,6 @@
         function flipFlashcard() {
             const answerBox = document.getElementById('fcAnswerBox');
             if(answerBox.classList.contains('hidden')) {
-                // Анімація
                 const card = document.getElementById('fcCard');
                 card.classList.add('flashcard-flip');
                 setTimeout(() => {
@@ -473,7 +481,7 @@
         }
 
         function recordFlashcard(isCorrect, event) {
-            event.stopPropagation(); // Забороняє кліку переходити на картку (щоб не було "помилкового" перевороту)
+            event.stopPropagation();
             const q = currentQuizQuestions[currentQIndex];
             
             if (!quizStats[q.id]) quizStats[q.id] = { c: 0, w: 0 };
@@ -510,7 +518,7 @@
                     <div class="border-l-2 border-red-500 pl-3 pb-2">
                         <p class="font-semibold">${q.text}</p>
                         ${q.imageUrl ? `<img src="${q.imageUrl}" class="h-20 object-contain rounded mt-2 mb-2">` : ''}
-                        <p class="text-red-400 mt-2 line-through opacity-80">❌ Твоя відповідь: ${selected}</p>
+                        <p class="text-red-400 mt-2 line-through opacity-80">❌ Відповідь: ${selected}</p>
                         <p class="text-green-400 mt-1">✅ Правильна: ${correctAns}</p>
                         ${q.explanation ? `<p class="text-gray-400 mt-2 text-xs italic bg-gray-800 p-2 rounded border border-gray-700">💡 ${q.explanation}</p>` : ''}
                     </div>
@@ -572,7 +580,6 @@
             }
         }
 
-        // Пошук і рендер списку в редакторі
         function updateEditorList() {
             const query = document.getElementById('searchEditorInput').value.toLowerCase();
             const filteredQuestions = questions.filter(q => 
