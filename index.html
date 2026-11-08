@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⚡ Тести</title>
-    <link rel="manifest" href="manifest.json">
-    <!-- PWA та Налаштування для телефонів (Щоб працювало як додаток) -->
+    
+    <!-- PWA та Налаштування для телефонів -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SAIT Тести">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#111827">
     
-    <!-- Іконка у вигляді блискавки для робочого столу -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23111827%22/><text y=%22.85em%22 x=%2210%22 font-size=%2280%22>⚡</text></svg>">
+    <link rel="manifest" href="manifest.json">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -29,7 +29,6 @@
         .hidden { display: none !important; }
         .progress-bar { transition: width 0.4s ease-out; }
         
-        /* Шпаргалка форматування */
         #cheatSheetContent h3 { color: #eab308; font-weight: bold; font-size: 1.125rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #374151; padding-bottom: 0.25rem; }
         #cheatSheetContent h3:first-child { margin-top: 0; }
         #cheatSheetContent ul { list-style-type: disc; padding-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 1rem; font-size: 0.875rem; }
@@ -38,7 +37,6 @@
         #cheatSheetContent hr { border-color: #374151; margin: 1rem 0; }
         #cheatSheetContent[contenteditable="true"] { background-color: #374151; padding: 1rem; border-radius: 0.5rem; outline: 2px solid #eab308; }
         
-        /* Анімація перевороту для флеш-карток */
         .flashcard-inner { transition: transform 0.3s ease; }
         .flashcard-flip { transform: scale(0.98); opacity: 0.8; }
     </style>
@@ -58,9 +56,7 @@
         <!-- ГОЛОВНИЙ ЕКРАН -->
         <div id="homeScreen" class="space-y-6">
             <h2 class="text-xl font-semibold mb-2">Виберіть теми:</h2>
-            <div id="categoriesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Картки генеруються через JS -->
-            </div>
+            <div id="categoriesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             <div class="flex flex-col md:flex-row gap-4 mt-6">
                 <button onclick="startMode('quiz')" class="btn-primary flex-1 py-4 rounded text-lg shadow-lg">📝 Почати Тест</button>
                 <button onclick="startMode('flashcards')" class="bg-purple-600 hover:bg-purple-500 text-white font-bold flex-1 py-4 rounded text-lg shadow-lg transition-colors">🃏 Флеш-картки</button>
@@ -78,10 +74,9 @@
             <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
                 <h3 class="font-bold mb-4 text-yellow-500">Додати нове питання</h3>
                 <div class="space-y-4">
-                    <input type="text" id="qCategory" list="categoryList" placeholder="Категорія (напр. Основи AC, CEC Rules)" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    <input type="text" id="qCategory" list="categoryList" placeholder="Категорія (напр. Основи AC)" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
                     <datalist id="categoryList"></datalist>
                     
-                    <!-- Вибір типу питання -->
                     <select id="qType" onchange="toggleQuestionTypeUI()" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
                         <option value="choice">Тест (Вибір 1 з 4 варіантів)</option>
                         <option value="input">Ввід тексту (Декілька можливих вірних варіантів)</option>
@@ -90,7 +85,6 @@
                     <textarea id="qText" placeholder="Текст питання..." class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white h-24 focus:outline-none focus:ring-2 focus:ring-yellow-500"></textarea>
                     <input type="url" id="qImage" class="w-full bg-gray-900 border-gray-600 rounded p-2 text-white text-sm" placeholder="🖼️ Посилання на картинку (URL) - необов'язково">
 
-                    <!-- Блок для типу "Тест (Варіанти)" -->
                     <div id="uiTypeChoice" class="space-y-2">
                         <input type="text" class="qOptionChoice w-full bg-gray-700 rounded p-2 text-white border border-green-700" placeholder="Варіант 1 (ВІРНИЙ)">
                         <input type="text" class="qOptionChoice w-full bg-gray-700 rounded p-2 text-white" placeholder="Варіант 2">
@@ -98,29 +92,32 @@
                         <input type="text" class="qOptionChoice w-full bg-gray-700 rounded p-2 text-white" placeholder="Варіант 4 (необов'язково)">
                     </div>
 
-                    <!-- Блок для типу "Ввід тексту" -->
                     <div id="uiTypeInput" class="space-y-2 hidden">
                         <input type="text" id="qOptionInput" class="w-full bg-gray-700 rounded p-3 text-white border border-green-700" placeholder="Вірні варіанти через кому (напр: 4, 4.0, чотири)">
                         <p class="text-xs text-gray-400">Система зарахує відповідь як правильну, якщо введене слово збігається з будь-яким із перелічених вище.</p>
                     </div>
 
                     <input type="text" id="qExplanation" class="w-full bg-gray-900 border-gray-600 rounded p-2 text-white text-sm" placeholder="💡 Пояснення, формула або номер правила CEC (необов'язково)">
-
                     <button onclick="addQuestion()" class="btn-primary px-6 py-2 rounded w-full mt-2">Зберегти питання</button>
                 </div>
             </div>
 
-            <!-- База питань із Пошуком -->
+            <!-- База питань (Великі кнопки імпорту/експорту) -->
             <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
-                    <h3 class="font-bold">База питань (<span id="qCount">0</span>)</h3>
-                    <div class="flex w-full md:w-auto space-x-2">
-                        <input type="text" id="searchEditorInput" onkeyup="updateEditorList()" placeholder="🔍 Пошук..." class="bg-gray-900 text-sm border-gray-600 rounded px-3 py-1 text-white focus:outline-none w-full md:w-48">
-                        <button onclick="exportJSON()" class="text-xs btn-secondary px-3 py-1 rounded">Експорт</button>
-                        <button onclick="document.getElementById('importFile').click()" class="text-xs btn-secondary px-3 py-1 rounded">Імпорт</button>
-                        <input type="file" id="importFile" class="hidden" accept=".json" onchange="importJSON(event)">
-                    </div>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg">База питань (<span id="qCount">0</span>)</h3>
                 </div>
+                
+                <!-- Новий зручний блок для кнопок -->
+                <div class="flex gap-3 mb-4">
+                    <button onclick="exportJSON()" class="btn-secondary flex-1 py-3 rounded font-bold text-sm shadow">📥 Експорт (Зберегти)</button>
+                    <button onclick="document.getElementById('importFile').click()" class="bg-green-700 hover:bg-green-600 text-white flex-1 py-3 rounded font-bold text-sm shadow">📤 Імпорт (Відкрити)</button>
+                    <input type="file" id="importFile" class="hidden" accept=".json" onchange="importJSON(event)">
+                </div>
+
+                <!-- Зручний пошук на всю ширину -->
+                <input type="text" id="searchEditorInput" onkeyup="updateEditorList()" placeholder="🔍 Пошук по базі..." class="bg-gray-900 w-full mb-4 border-gray-600 rounded p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                
                 <div id="questionsList" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
             </div>
         </div>
