@@ -1,662 +1,137 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚡ Тести</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        electro: {
-                            dark: '#121212',
-                            panel: '#1E1E1E',
-                            border: '#333333',
-                            yellow: '#FFD700',
-                            yellowHover: '#E6C200',
-                            red: '#FF4C4C',
-                            green: '#4CAF50'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        body {
-            background-color: #121212;
-            color: #E0E0E0;
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1E1E1E;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #FFD700;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #E6C200;
-        }
-
-        /* Custom Radio Button styling for a more industrial look */
-        .custom-radio {
-            appearance: none;
-            background-color: #1E1E1E;
-            margin: 0;
-            font: inherit;
-            color: currentColor;
-            width: 1.5em;
-            height: 1.5em;
-            border: 2px solid #555;
-            border-radius: 50%;
-            display: grid;
-            place-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-        }
-        .custom-radio::before {
-            content: "";
-            width: 0.75em;
-            height: 0.75em;
-            border-radius: 50%;
-            transform: scale(0);
-            transition: 120ms transform ease-in-out;
-            box-shadow: inset 1em 1em #121212;
-            background-color: #121212;
-        }
-        .custom-radio:checked {
-            background-color: #FFD700;
-            border-color: #FFD700;
-        }
-        .custom-radio:checked::before {
-            transform: scale(1);
-        }
-        .custom-radio:focus {
-            outline: 2px solid #FFD700;
-            outline-offset: 2px;
-        }
+        body { background-color: #111827; color: #f3f4f6; }
+        .btn-primary { background-color: #eab308; color: #111827; font-weight: bold; transition: all 0.2s; }
+        .btn-primary:hover { background-color: #facc15; }
+        .btn-secondary { background-color: #374151; color: #f3f4f6; transition: all 0.2s; }
+        .btn-secondary:hover { background-color: #4b5563; }
+        .card { background-color: #1f2937; border: 2px solid #374151; cursor: pointer; transition: all 0.2s; }
+        .card:hover { border-color: #4b5563; }
+        .card.active { border-color: #eab308; background-color: rgba(234, 179, 8, 0.1); }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans antialiased">
+<body class="min-h-screen p-4 md:p-8">
 
-    <!-- Header -->
-    <header class="bg-electro-panel border-b-4 border-electro-yellow p-4 shadow-md sticky top-0 z-10">
-        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <h1 class="text-3xl font-bold text-white tracking-wide">⚡ Тести</h1>
+    <div class="max-w-3xl mx-auto">
+        <!-- Шапка -->
+        <header class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
+            <h1 class="text-3xl font-bold text-yellow-500">⚡ Тести</h1>
+            <div id="navButtons">
+                <button onclick="showScreen('editorScreen')" class="text-sm btn-secondary px-4 py-2 rounded">Редактор</button>
             </div>
-            
-            <div class="flex gap-2 bg-electro-dark p-1 rounded-lg border border-electro-border">
-                <button id="btnNavEditor" class="px-4 py-2 rounded-md font-medium text-sm transition-colors bg-electro-border text-white" onclick="switchTab('editor')">
-                    Редактор
-                </button>
-                <button id="btnNavQuiz" class="px-4 py-2 rounded-md font-medium text-sm transition-colors text-gray-400 hover:text-white" onclick="switchTab('quiz')">
-                    Пройти тест
-                </button>
+        </header>
+
+        <!-- ГОЛОВНИЙ ЕКРАН (Вибір категорій) -->
+        <div id="homeScreen" class="space-y-6">
+            <h2 class="text-xl font-semibold mb-2">Виберіть теми для тесту:</h2>
+            <div id="categoriesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Картки генеруються через JS -->
             </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="flex-grow p-4 sm:p-6 md:p-8 max-w-5xl mx-auto w-full">
-        
-        <!-- ================= EDITOR VIEW ================= -->
-        <div id="viewEditor" class="space-y-8 animate-fade-in block">
-            
-            <!-- Data Management Panel -->
-            <div class="bg-electro-panel border border-electro-border rounded-xl p-4 flex flex-wrap justify-between items-center gap-4 shadow-sm">
-                <div>
-                    <h2 class="text-lg font-semibold text-white">Управление базой данных</h2>
-                    <p class="text-sm text-gray-400">Сохраните свои вопросы в файл или загрузите готовые.</p>
-                </div>
-                <div class="flex gap-3">
-                    <button onclick="exportJSON()" class="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        Экспорт
-                    </button>
-                    <label class="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                        Импорт
-                        <input type="file" id="importFile" accept=".json" class="hidden" onchange="importJSON(event)">
-                    </label>
-                </div>
-            </div>
-
-            <!-- Add Question Form -->
-            <div class="bg-electro-panel border border-electro-border rounded-xl p-6 shadow-sm relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-1 h-full bg-electro-yellow"></div>
-                <h2 class="text-xl font-bold text-white mb-6">Добавить новый вопрос</h2>
-                
-                <form id="addQuestionForm" onsubmit="addQuestion(event)" class="space-y-5">
-                    <div>
-                        <label for="qCategory" class="block text-sm font-medium text-gray-300 mb-2">Категория <span class="text-gray-500 font-normal">(выберите или введите новую)</span></label>
-                        <input type="text" id="qCategory" list="categoryList" required class="w-full bg-electro-dark border border-electro-border rounded-lg p-3 text-white focus:outline-none focus:border-electro-yellow focus:ring-1 focus:ring-electro-yellow transition-all" placeholder="Например: Трансформаторы">
-                        <datalist id="categoryList"></datalist>
-                    </div>
-
-                    <div>
-                        <label for="qText" class="block text-sm font-medium text-gray-300 mb-2">Текст вопроса <span class="text-electro-red">*</span></label>
-                        <textarea id="qText" required rows="3" class="w-full bg-electro-dark border border-electro-border rounded-lg p-3 text-white focus:outline-none focus:border-electro-yellow focus:ring-1 focus:ring-electro-yellow transition-all" placeholder="Например: Какова основная функция трансформатора?"></textarea>
-                    </div>
-
-                    <div class="space-y-3">
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Варианты ответов (заполните минимум два, отметьте один правильный) <span class="text-electro-red">*</span></label>
-                        
-                        <!-- Options Inputs -->
-                        <div class="flex items-center gap-3 bg-electro-dark p-2 rounded-lg border border-electro-border focus-within:border-gray-500">
-                            <input type="radio" name="correctOpt" id="isCorr0" value="0" class="custom-radio ml-2" checked>
-                            <input type="text" id="opt0" required class="flex-grow bg-transparent text-white p-2 focus:outline-none" placeholder="Вариант 1">
-                        </div>
-                        <div class="flex items-center gap-3 bg-electro-dark p-2 rounded-lg border border-electro-border focus-within:border-gray-500">
-                            <input type="radio" name="correctOpt" id="isCorr1" value="1" class="custom-radio ml-2">
-                            <input type="text" id="opt1" required class="flex-grow bg-transparent text-white p-2 focus:outline-none" placeholder="Вариант 2">
-                        </div>
-                        <div class="flex items-center gap-3 bg-electro-dark p-2 rounded-lg border border-electro-border focus-within:border-gray-500">
-                            <input type="radio" name="correctOpt" id="isCorr2" value="2" class="custom-radio ml-2">
-                            <input type="text" id="opt2" class="flex-grow bg-transparent text-white p-2 focus:outline-none" placeholder="Вариант 3 (необязательно)">
-                        </div>
-                        <div class="flex items-center gap-3 bg-electro-dark p-2 rounded-lg border border-electro-border focus-within:border-gray-500">
-                            <input type="radio" name="correctOpt" id="isCorr3" value="3" class="custom-radio ml-2">
-                            <input type="text" id="opt3" class="flex-grow bg-transparent text-white p-2 focus:outline-none" placeholder="Вариант 4 (необязательно)">
-                        </div>
-                    </div>
-
-                    <div class="pt-4">
-                        <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-electro-yellow hover:bg-electro-yellowHover text-black font-bold rounded-lg shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                            Сохранить вопрос
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Questions List -->
-            <div>
-                <h2 class="text-xl font-bold text-white mb-4 flex items-center justify-between">
-                    Список вопросов
-                    <span id="questionCountBadge" class="bg-gray-700 text-sm px-3 py-1 rounded-full">0</span>
-                </h2>
-                <div id="questionsList" class="space-y-4">
-                    <!-- Dynamic Content -->
-                </div>
-            </div>
-
+            <button onclick="startQuiz()" class="btn-primary w-full py-4 rounded text-lg mt-6 shadow-lg">Почати тест</button>
         </div>
 
-        <!-- ================= QUIZ VIEW ================= -->
-        <div id="viewQuiz" class="hidden">
-            
-            <!-- Quiz Start Screen -->
-            <div id="quizStartScreen" class="bg-electro-panel border border-electro-border rounded-xl p-8 text-center max-w-2xl mx-auto shadow-lg mt-10">
-                <svg class="w-20 h-20 text-electro-yellow mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <h2 class="text-3xl font-bold text-white mb-4">Готов к тесту?</h2>
-                
-                <div class="mb-6 max-w-sm mx-auto text-left">
-                    <label for="quizCategorySelect" class="block text-sm font-medium text-gray-400 mb-2 text-center">Категория вопросов:</label>
-                    <select id="quizCategorySelect" onchange="updateQuizStartCount()" class="w-full bg-electro-dark border border-electro-border rounded-lg p-3 text-white focus:outline-none focus:border-electro-yellow focus:ring-1 focus:ring-electro-yellow transition-all appearance-none text-center font-medium">
-                        <option value="all">Все категории</option>
-                    </select>
-                </div>
-
-                <p id="quizStartText" class="text-gray-400 mb-8 text-lg">Выбрано <span class="font-bold text-white" id="quizStartCount">0</span> вопросов.</p>
-                <button id="btnStartQuiz" onclick="startQuiz()" class="px-8 py-4 bg-electro-yellow hover:bg-electro-yellowHover text-black font-bold text-lg rounded-xl shadow-[0_0_15px_rgba(255,215,0,0.3)] transition-all active:scale-95 w-full sm:w-auto">
-                    Начать тестирование
-                </button>
+        <!-- ЕКРАН РЕДАКТОРА -->
+        <div id="editorScreen" class="hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-semibold">Редактор питань</h2>
+                <button onclick="showScreen('homeScreen')" class="text-sm btn-secondary px-4 py-2 rounded">На головну</button>
             </div>
 
-            <!-- Quiz Active Screen -->
-            <div id="quizActiveScreen" class="hidden max-w-3xl mx-auto mt-4">
-                
-                <!-- Progress Bar -->
-                <div class="mb-8">
-                    <div class="flex justify-between text-sm text-gray-400 mb-2 font-medium">
-                        <span id="quizProgressText">Вопрос 1 из 10</span>
-                        <span id="quizPercentage">10%</span>
-                    </div>
-                    <div class="w-full bg-gray-700 rounded-full h-2.5">
-                        <div id="quizProgressBar" class="bg-electro-yellow h-2.5 rounded-full transition-all duration-300" style="width: 10%"></div>
-                    </div>
-                </div>
-
-                <!-- Question Card -->
-                <div class="bg-electro-panel border border-electro-border rounded-xl p-6 sm:p-8 shadow-lg min-h-[300px] flex flex-col">
-                    <h3 id="quizQuestionText" class="text-xl sm:text-2xl font-semibold text-white mb-8 leading-relaxed">
-                        Текст вопроса
-                    </h3>
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                <h3 class="font-bold mb-4 text-yellow-500">Додати нове питання</h3>
+                <div class="space-y-4">
+                    <input type="text" id="qCategory" list="categoryList" placeholder="Категорія (напр. Основи AC, CEC Rules)" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    <datalist id="categoryList"></datalist>
                     
-                    <div id="quizOptionsContainer" class="space-y-3 flex-grow">
-                        <!-- Options generated dynamically -->
+                    <textarea id="qText" placeholder="Текст питання..." class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white h-24 focus:outline-none focus:ring-2 focus:ring-yellow-500"></textarea>
+                    
+                    <div id="optionsContainer" class="space-y-2">
+                        <input type="text" class="qOption w-full bg-gray-700 rounded p-2 text-white" placeholder="Варіант 1 (правильний)">
+                        <input type="text" class="qOption w-full bg-gray-700 rounded p-2 text-white" placeholder="Варіант 2">
+                        <input type="text" class="qOption w-full bg-gray-700 rounded p-2 text-white" placeholder="Варіант 3">
+                        <input type="text" class="qOption w-full bg-gray-700 rounded p-2 text-white" placeholder="Варіант 4">
                     </div>
-
-                    <!-- Navigation Buttons -->
-                    <div class="mt-10 flex justify-between items-center border-t border-electro-border pt-6">
-                        <button onclick="prevQuestion()" id="btnPrevQ" class="px-5 py-2.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                            Назад
-                        </button>
-                        <button onclick="nextQuestion()" id="btnNextQ" class="px-6 py-2.5 rounded-lg bg-electro-yellow hover:bg-electro-yellowHover text-black font-bold transition-colors">
-                            Далее
-                        </button>
-                    </div>
+                    <button onclick="addQuestion()" class="btn-primary px-6 py-2 rounded w-full">Зберегти питання</button>
                 </div>
             </div>
 
-            <!-- Quiz Results Screen -->
-            <div id="quizResultScreen" class="hidden max-w-4xl mx-auto mt-4">
-                <div class="bg-electro-panel border border-electro-border rounded-xl p-8 text-center shadow-lg mb-8">
-                    <h2 class="text-3xl font-bold text-white mb-2">Результаты тестирования</h2>
-                    <div class="inline-block my-6 p-6 rounded-full border-4 border-electro-border bg-electro-dark">
-                        <div class="text-5xl font-black text-electro-yellow" id="resultScore">80%</div>
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold">База питань (<span id="qCount">0</span>)</h3>
+                    <div>
+                        <button onclick="exportJSON()" class="text-xs btn-secondary px-2 py-1 rounded mr-2">Експорт</button>
+                        <button onclick="document.getElementById('importFile').click()" class="text-xs btn-secondary px-2 py-1 rounded">Імпорт</button>
+                        <input type="file" id="importFile" class="hidden" accept=".json" onchange="importJSON(event)">
                     </div>
-                    <p class="text-xl text-gray-300 mb-6">Правильных ответов: <span id="resultCount" class="font-bold text-white">8 из 10</span></p>
-                    <button onclick="switchTab('quiz')" class="px-8 py-3 bg-electro-yellow hover:bg-electro-yellowHover text-black font-bold rounded-lg transition-all active:scale-95 inline-flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        Пройти заново
-                    </button>
                 </div>
-
-                <h3 class="text-xl font-bold text-white mb-6 px-2">Разбор ошибок:</h3>
-                <div id="resultReviewContainer" class="space-y-6">
-                    <!-- Review items dynamically injected -->
-                </div>
+                <div id="questionsList" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
             </div>
-
         </div>
 
-    </main>
+        <!-- ЕКРАН ТЕСТУ -->
+        <div id="quizScreen" class="hidden space-y-6">
+            <div class="flex justify-between text-sm text-gray-400 mb-2">
+                <span id="quizProgress">Питання 1 / 10</span>
+                <button onclick="showScreen('homeScreen')" class="text-yellow-500 hover:underline">Перервати</button>
+            </div>
+            
+            <div class="bg-gray-800 p-6 md:p-8 rounded-lg border border-gray-700">
+                <h2 id="quizQuestionText" class="text-xl md:text-2xl font-semibold mb-6"></h2>
+                <div id="quizOptions" class="space-y-3">
+                    <!-- Варіанти відповідей -->
+                </div>
+            </div>
+        </div>
 
-    <!-- Toast Notifications Container -->
-    <div id="toastContainer" class="fixed bottom-4 right-4 flex flex-col gap-2 z-50"></div>
+        <!-- ЕКРАН РЕЗУЛЬТАТІВ -->
+        <div id="resultScreen" class="hidden space-y-6 text-center">
+            <div class="bg-gray-800 p-8 rounded-lg border border-gray-700">
+                <h2 class="text-3xl font-bold mb-4">Тест завершено!</h2>
+                <p class="text-xl mb-6">Твій результат: <span id="scoreText" class="text-yellow-500 font-bold"></span></p>
+                
+                <div id="mistakesReview" class="text-left bg-gray-900 p-4 rounded mb-6 hidden">
+                    <h3 class="font-bold text-red-400 mb-3">Помилки:</h3>
+                    <div id="mistakesList" class="space-y-4 text-sm"></div>
+                </div>
 
-    <!-- Modals / Custom Overlays -->
-    <div id="modalOverlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-electro-panel border border-electro-border rounded-xl p-6 max-w-sm w-full shadow-2xl scale-95 transition-transform duration-200" id="modalBox">
-            <h3 class="text-xl font-bold text-white mb-3" id="modalTitle">Подтверждение</h3>
-            <p class="text-gray-300 mb-6" id="modalText">Вы уверены?</p>
-            <div class="flex gap-3 justify-end">
-                <button onclick="closeModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors">Отмена</button>
-                <button id="modalConfirmBtn" class="px-4 py-2 bg-electro-red hover:bg-red-600 text-white font-medium rounded-lg transition-colors">Удалить</button>
+                <button onclick="showScreen('homeScreen')" class="btn-primary px-8 py-3 rounded text-lg">Повернутися на головну</button>
             </div>
         </div>
     </div>
 
-    <!-- Application Script -->
     <script>
-        // --- State Management ---
-        const STORAGE_KEY = 'electrotest_data';
-        
-        // Sample questions for initial load if empty
+        // Базові питання для 2 періоду SAIT (якщо база порожня)
         const defaultQuestions = [
-            {
-                id: 1,
-                category: "Основы электротехники",
-                text: "Как должны быть подключены вольтметр и амперметр в электрической цепи?",
-                options: [
-                    "Оба последовательно",
-                    "Оба параллельно",
-                    "Вольтметр параллельно, амперметр последовательно",
-                    "Вольтметр последовательно, амперметр параллельно"
-                ],
-                correctIndex: 2
-            },
-            {
-                id: 2,
-                category: "Трансформаторы",
-                text: "Какова основная функция трансформатора?",
-                options: [
-                    "Преобразование переменного тока в постоянный",
-                    "Изменение уровня напряжения переменного тока",
-                    "Накопление электрической энергии",
-                    "Усиление электрического сигнала"
-                ],
-                correctIndex: 1
-            }
+            { id: "1", category: "Основи AC", text: "Яке значення напруги показує звичайний цифровий мультиметр при вимірюванні змінного струму?", options: ["RMS (Ефективне значення)", "Пікове значення (Peak)", "Середнє значення (Average)", "Миттєве значення"], answerIndex: 0 },
+            { id: "2", category: "RLC Кола", text: "В ідеальному індуктивному колі (чиста індуктивність) як співвідносяться струм і напруга?", options: ["Струм відстає від напруги на 90°", "Струм випереджає напругу на 90°", "Збігаються по фазі", "Напруга відстає від струму на 90°"], answerIndex: 0 },
+            { id: "3", category: "CEC Rules", text: "Який мінімальний розмір мідного проводу (AWG) допускається канадським кодом (CEC) для стандартних побутових розеток на 15А?", options: ["14 AWG", "12 AWG", "16 AWG", "10 AWG"], answerIndex: 0 },
+            { id: "4", category: "RLC Кола", text: "Що відбувається із загальним опором кола при додаванні резисторів у паралельне з'єднання?", options: ["Зменшується", "Збільшується", "Залишається незмінним", "Дорівнює найбільшому резистору"], answerIndex: 0 }
         ];
 
-        let questions = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        if (!questions || !Array.isArray(questions)) {
-            questions = [...defaultQuestions];
+        let questions = JSON.parse(localStorage.getItem('quiz_questions'));
+        if (!questions || questions.length === 0) {
+            questions = defaultQuestions;
             saveData();
         }
+        
+        let mistakeIds = JSON.parse(localStorage.getItem('quiz_mistakes')) || [];
+        
+        let selectedCategories = new Set();
+        let currentQuizQuestions = [];
+        let currentQIndex = 0;
+        let score = 0;
+        let userMistakes = []; // Помилки поточного тесту
 
-        // Quiz State
-        let quizState = {
-            currentIdx: 0,
-            answers: [],
-            active: false
-        };
-
-        let currentModalAction = null;
-
-        // --- Initialization ---
-        document.addEventListener('DOMContentLoaded', () => {
-            updateCategoryLists();
-            renderEditorList();
-        });
-
-        // --- Core Functions ---
-        function updateCategoryLists() {
-            const categories = [...new Set(questions.map(q => q.category).filter(Boolean))];
-            
-            // Заполнение datalist для подсказок в редакторе
-            const datalist = document.getElementById('categoryList');
-            if (datalist) {
-                datalist.innerHTML = categories.map(c => `<option value="${escapeHTML(c)}">`).join('');
-            }
-            
-            // Заполнение селектора на экране начала теста
-            const select = document.getElementById('quizCategorySelect');
-            if (select) {
-                const currentVal = select.value;
-                select.innerHTML = `<option value="all">Все категории</option>` + 
-                    categories.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
-                
-                // Восстанавливаем выбранное значение, если оно все еще существует
-                if (categories.includes(currentVal) || currentVal === 'all') {
-                    select.value = currentVal;
-                } else {
-                    select.value = 'all';
-                }
-            }
-            
-            // Если мы на экране старта теста, обновим счетчик
-            if (typeof updateQuizStartCount === 'function' && !document.getElementById('viewQuiz').classList.contains('hidden')) {
-                updateQuizStartCount();
-            }
-        }
-
-        function saveData() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(questions));
-        }
-
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            
-            // Colors based on type
-            const bgClass = type === 'error' ? 'bg-electro-red text-white' : 
-                            type === 'warning' ? 'bg-yellow-500 text-black' : 
-                            'bg-electro-green text-white';
-
-            toast.className = `flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-y-10 opacity-0 ${bgClass} font-medium`;
-            
-            // Icon
-            const icon = type === 'error' ? `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>` : 
-                         `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-            
-            toast.innerHTML = `${icon} <span>${message}</span>`;
-            
-            container.appendChild(toast);
-            
-            // Animate in
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-y-10', 'opacity-0');
-            });
-
-            // Remove after 3 seconds
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-x-10');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // --- Navigation ---
-        function switchTab(tab) {
-            const vEditor = document.getElementById('viewEditor');
-            const vQuiz = document.getElementById('viewQuiz');
-            const btnEditor = document.getElementById('btnNavEditor');
-            const btnQuiz = document.getElementById('btnNavQuiz');
-
-            // Reset styles
-            btnEditor.className = "px-4 py-2 rounded-md font-medium text-sm transition-colors text-gray-400 hover:text-white";
-            btnQuiz.className = "px-4 py-2 rounded-md font-medium text-sm transition-colors text-gray-400 hover:text-white";
-            
-            if (tab === 'editor') {
-                vEditor.classList.remove('hidden');
-                vQuiz.classList.add('hidden');
-                btnEditor.classList.add('bg-electro-border', 'text-white');
-                btnEditor.classList.remove('text-gray-400', 'hover:text-white');
-                renderEditorList();
-            } else {
-                vEditor.classList.add('hidden');
-                vQuiz.classList.remove('hidden');
-                btnQuiz.classList.add('bg-electro-border', 'text-white');
-                btnQuiz.classList.remove('text-gray-400', 'hover:text-white');
-                initQuizHome();
-            }
-        }
-
-        // --- Editor Logic ---
-        function addQuestion(e) {
-            e.preventDefault();
-            
-            const qCategory = document.getElementById('qCategory').value.trim() || 'Без категории';
-            const qText = document.getElementById('qText').value.trim();
-            if (!qText) return showToast('Введите текст вопроса', 'error');
-
-            const rawOptions = [];
-            let checkedRawIndex = -1;
-
-            for(let i=0; i<4; i++) {
-                const val = document.getElementById(`opt${i}`).value.trim();
-                rawOptions.push(val);
-                if (document.getElementById(`isCorr${i}`).checked) {
-                    checkedRawIndex = i;
-                }
-            }
-
-            // Filter out empty options but keep track of correct index
-            const finalOptions = [];
-            let finalCorrectIndex = -1;
-
-            for(let i=0; i<4; i++) {
-                if(rawOptions[i] !== "") {
-                    finalOptions.push(rawOptions[i]);
-                    if(i === checkedRawIndex) {
-                        finalCorrectIndex = finalOptions.length - 1;
-                    }
-                }
-            }
-
-            if (finalOptions.length < 2) {
-                return showToast('Минимум 2 варианта ответа', 'error');
-            }
-            if (finalCorrectIndex === -1) {
-                return showToast('Выбранный правильный ответ пуст!', 'error');
-            }
-
-            const newQ = {
-                id: Date.now(),
-                category: qCategory,
-                text: qText,
-                options: finalOptions,
-                correctIndex: finalCorrectIndex
-            };
-
-            questions.unshift(newQ);
-            saveData();
-            updateCategoryLists(); // Обновляем списки категорий
-            
-            // Reset form
-            document.getElementById('addQuestionForm').reset();
-            document.getElementById('isCorr0').checked = true; // reset radio
-            
-            renderEditorList();
-            showToast('Вопрос успешно добавлен!');
-        }
-
-        function renderEditorList() {
-            const list = document.getElementById('questionsList');
-            document.getElementById('questionCountBadge').innerText = questions.length;
-            
-            if (questions.length === 0) {
-                list.innerHTML = `<div class="text-center p-8 bg-electro-dark border border-dashed border-gray-600 rounded-xl text-gray-400">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                    База вопросов пуста. Добавьте первый вопрос выше.
-                </div>`;
-                return;
-            }
-
-            list.innerHTML = questions.map((q, index) => `
-                <div class="bg-electro-dark border border-electro-border rounded-xl p-4 sm:p-5 hover:border-gray-500 transition-colors flex flex-col sm:flex-row gap-4 justify-between items-start group">
-                    <div class="flex-grow w-full">
-                        <div class="mb-2">
-                            <span class="bg-gray-800 text-electro-yellow border border-electro-yellow/30 text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider inline-block">${escapeHTML(q.category || 'Без категории')}</span>
-                        </div>
-                        <h4 class="text-white font-medium mb-3 text-lg"><span class="text-gray-500 mr-2">#${questions.length - index}</span> ${escapeHTML(q.text)}</h4>
-                        <ul class="space-y-1">
-                            ${q.options.map((opt, i) => `
-                                <li class="text-sm flex items-center gap-2 ${i === q.correctIndex ? 'text-electro-green font-medium' : 'text-gray-400'}">
-                                    ${i === q.correctIndex ? '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' : '<span class="w-4 inline-block text-center shrink-0">•</span>'}
-                                    <span class="break-words line-clamp-2">${escapeHTML(opt)}</span>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
-                    <button onclick="confirmDelete(${q.id})" class="text-gray-500 hover:text-electro-red p-2 rounded-lg bg-gray-800 hover:bg-red-900/30 transition-all shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        // Modal Logic for Deletion
-        function confirmDelete(id) {
-            currentModalAction = () => deleteQuestion(id);
-            document.getElementById('modalTitle').innerText = 'Удалить вопрос?';
-            document.getElementById('modalText').innerText = 'Это действие нельзя отменить.';
-            document.getElementById('modalConfirmBtn').innerText = 'Удалить';
-            document.getElementById('modalConfirmBtn').className = "px-4 py-2 bg-electro-red hover:bg-red-600 text-white font-medium rounded-lg transition-colors";
-            
-            const overlay = document.getElementById('modalOverlay');
-            overlay.classList.remove('hidden');
-            setTimeout(() => document.getElementById('modalBox').classList.remove('scale-95'), 10);
-        }
-
-        function closeModal() {
-            document.getElementById('modalBox').classList.add('scale-95');
-            setTimeout(() => {
-                document.getElementById('modalOverlay').classList.add('hidden');
-                currentModalAction = null;
-            }, 200);
-        }
-
-        document.getElementById('modalConfirmBtn').addEventListener('click', () => {
-            if (currentModalAction) {
-                currentModalAction();
-                closeModal();
-            }
-        });
-
-        function deleteQuestion(id) {
-            questions = questions.filter(q => q.id !== id);
-            saveData();
-            updateCategoryLists(); // Обновляем категории при удалении
-            renderEditorList();
-            showToast('Вопрос удален');
-        }
-
-        // --- Export / Import Logic ---
-        function exportJSON() {
-            if (questions.length === 0) return showToast('Нет данных для экспорта', 'warning');
-            
-            const dataStr = JSON.stringify(questions, null, 2);
-            const blob = new Blob([dataStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ElectroTest_Backup_${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast('Файл экспортирован');
-        }
-
-        function importJSON(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported) && imported.length > 0 && imported[0].hasOwnProperty('text')) {
-                        
-                        // Ask for confirmation to merge or overwrite
-                        currentModalAction = () => {
-                            questions = imported; // For simplicity, we overwrite. 
-                            saveData();
-                            updateCategoryLists(); // Обновляем категории после импорта
-                            renderEditorList();
-                            showToast('База успешно загружена');
-                        };
-                        document.getElementById('modalTitle').innerText = 'Заменить базу?';
-                        document.getElementById('modalText').innerText = `Будет загружено ${imported.length} вопросов. Текущие вопросы будут удалены!`;
-                        document.getElementById('modalConfirmBtn').innerText = 'Заменить';
-                        document.getElementById('modalConfirmBtn').className = "px-4 py-2 bg-electro-yellow text-black hover:bg-electro-yellowHover font-bold rounded-lg transition-colors";
-                        
-                        const overlay = document.getElementById('modalOverlay');
-                        overlay.classList.remove('hidden');
-                        setTimeout(() => document.getElementById('modalBox').classList.remove('scale-95'), 10);
-                        
-                    } else {
-                        showToast('Неверный формат файла', 'error');
-                    }
-                } catch (err) {
-                    showToast('Ошибка при чтении файла', 'error');
-                }
-                event.target.value = ''; // reset input
-            };
-            reader.readAsText(file);
-        }
-
-        // --- Quiz Logic ---
-        function updateQuizStartCount() {
-            const selectedCat = document.getElementById('quizCategorySelect').value;
-            let count = questions.length;
-            if (selectedCat !== 'all') {
-                count = questions.filter(q => q.category === selectedCat).length;
-            }
-            document.getElementById('quizStartCount').innerText = count;
-            
-            const btnStart = document.getElementById('btnStartQuiz');
-            if (count === 0) {
-                btnStart.disabled = true;
-                btnStart.classList.add('opacity-50', 'cursor-not-allowed');
-                btnStart.innerText = 'Нет вопросов';
-            } else {
-                btnStart.disabled = false;
-                btnStart.classList.remove('opacity-50', 'cursor-not-allowed');
-                btnStart.innerText = 'Начать тестирование';
-            }
-        }
-
-        function initQuizHome() {
-            document.getElementById('quizStartScreen').classList.remove('hidden');
-            document.getElementById('quizActiveScreen').classList.add('hidden');
-            document.getElementById('quizResultScreen').classList.add('hidden');
-            
-            updateCategoryLists(); // Синхронизируем выпадающий список
-            updateQuizStartCount(); // Считаем вопросы по выбранной категории
-        }
-
-        // Алгоритм Фишера-Йетса для идеального перемешивания массивов
-        function shuffleArray(array) {
-            const arr = [...array];
+        // Утиліта: Тасування масиву (Fisher-Yates)
+        function shuffle(array) {
+            let arr = [...array];
             for (let i = arr.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -664,184 +139,289 @@
             return arr;
         }
 
-        function startQuiz() {
-            const selectedCat = document.getElementById('quizCategorySelect').value;
-            let filteredQs = questions;
+        function saveData() {
+            localStorage.setItem('quiz_questions', JSON.stringify(questions));
+            localStorage.setItem('quiz_mistakes', JSON.stringify(mistakeIds));
+        }
+
+        // --- ЛОГІКА ГОЛОВНОГО ЕКРАНУ (КАТЕГОРІЇ) ---
+        function renderCategories() {
+            const grid = document.getElementById('categoriesGrid');
+            grid.innerHTML = '';
             
-            // Фильтруем вопросы, если выбрана конкретная категория
-            if (selectedCat !== 'all') {
-                filteredQs = questions.filter(q => q.category === selectedCat);
-            }
-
-            if (filteredQs.length === 0) {
-                return showToast('Нет вопросов для теста', 'error');
-            }
-
-            // Создаем копию вопросов для текущей сессии и перемешиваем варианты ответов
-            let sessionQuestions = filteredQs.map(q => {
-                // Связываем текст варианта с флагом, правильный ли он
-                let optionsWithCorrectFlag = q.options.map((opt, idx) => ({ 
-                    text: opt, 
-                    isCorrect: idx === q.correctIndex 
-                }));
-                
-                // Перемешиваем варианты
-                let shuffledOptsObj = shuffleArray(optionsWithCorrectFlag);
-                
-                return {
-                    ...q,
-                    // Сохраняем новые перемешанные варианты для отображения
-                    shuffledOptions: shuffledOptsObj.map(o => o.text),
-                    // Находим новый индекс правильного ответа после перемешивания
-                    shuffledCorrectIndex: shuffledOptsObj.findIndex(o => o.isCorrect)
-                };
+            // Збираємо статистику по категоріях
+            const catCounts = {};
+            questions.forEach(q => {
+                const c = q.category || 'Без категорії';
+                catCounts[c] = (catCounts[c] || 0) + 1;
             });
 
-            // Перемешиваем сами вопросы (надежным методом Фишера-Йетса)
-            quizState.questions = shuffleArray(sessionQuestions);
-            quizState.answers = new Array(quizState.questions.length).fill(null);
-            quizState.currentIdx = 0;
-            quizState.active = true;
+            // Картка "Всі питання"
+            grid.appendChild(createCategoryCard('Всі питання', questions.length, 'all'));
 
-            document.getElementById('quizStartScreen').classList.add('hidden');
-            document.getElementById('quizActiveScreen').classList.remove('hidden');
-            
-            renderQuizQuestion();
+            // Картки категорій
+            Object.keys(catCounts).sort().forEach(cat => {
+                grid.appendChild(createCategoryCard(cat, catCounts[cat], cat));
+            });
+
+            // Картка "Робота над помилками" (тільки якщо є помилки)
+            // Видаляємо неіснуючі ID з помилок
+            mistakeIds = mistakeIds.filter(id => questions.find(q => q.id === id));
+            saveData();
+
+            if (mistakeIds.length > 0) {
+                const errCard = createCategoryCard('🔥 Робота над помилками', mistakeIds.length, 'mistakes');
+                errCard.classList.add('border-red-900', 'bg-red-900/20');
+                grid.appendChild(errCard);
+            }
         }
 
-        function renderQuizQuestion() {
-            const q = quizState.questions[quizState.currentIdx];
-            const total = quizState.questions.length;
-            const current = quizState.currentIdx + 1;
+        function createCategoryCard(title, count, id) {
+            const div = document.createElement('div');
+            div.className = 'card p-4 rounded-lg flex flex-col justify-center items-center text-center h-28';
+            if (selectedCategories.has(id)) div.classList.add('active');
             
-            // Progress Update
-            document.getElementById('quizProgressText').innerText = `Вопрос ${current} из ${total}`;
-            const percent = Math.round((current / total) * 100);
-            document.getElementById('quizPercentage').innerText = `${percent}%`;
-            document.getElementById('quizProgressBar').style.width = `${percent}%`;
+            div.innerHTML = `
+                <span class="font-bold text-lg text-gray-100">${title}</span>
+                <span class="text-sm text-gray-400 mt-1">${count} питань</span>
+            `;
+            
+            div.onclick = () => {
+                // Логіка мульти-вибору
+                if (id === 'all') {
+                    selectedCategories.clear();
+                    selectedCategories.add('all');
+                } else {
+                    selectedCategories.delete('all');
+                    if (selectedCategories.has(id)) {
+                        selectedCategories.delete(id);
+                    } else {
+                        selectedCategories.add(id);
+                    }
+                }
+                renderCategories(); // Перемальовуємо, щоб оновити стилі
+            };
+            return div;
+        }
 
-            // Question Text
+        // --- ЛОГІКА ТЕСТУ ---
+        function startQuiz() {
+            if (selectedCategories.size === 0) {
+                alert("Вибери хоча б одну категорію для тесту!");
+                return;
+            }
+
+            let pool = [];
+            if (selectedCategories.has('all')) {
+                pool = [...questions];
+            } else if (selectedCategories.has('mistakes')) {
+                // Якщо вибрано тільки помилки або помилки + інші категорії
+                let filterCats = Array.from(selectedCategories).filter(c => c !== 'mistakes');
+                pool = questions.filter(q => {
+                    return mistakeIds.includes(q.id) || filterCats.includes(q.category || 'Без категорії');
+                });
+            } else {
+                let filterCats = Array.from(selectedCategories);
+                pool = questions.filter(q => filterCats.includes(q.category || 'Без категорії'));
+            }
+
+            if (pool.length === 0) {
+                alert("У вибраних категоріях немає питань.");
+                return;
+            }
+
+            currentQuizQuestions = shuffle(pool); // Випадковий порядок питань
+            currentQIndex = 0;
+            score = 0;
+            userMistakes = [];
+            
+            showScreen('quizScreen');
+            loadNextQuestion();
+        }
+
+        function loadNextQuestion() {
+            if (currentQIndex >= currentQuizQuestions.length) {
+                finishQuiz();
+                return;
+            }
+
+            const q = currentQuizQuestions[currentQIndex];
+            document.getElementById('quizProgress').innerText = `Питання ${currentQIndex + 1} / ${currentQuizQuestions.length} (${q.category})`;
             document.getElementById('quizQuestionText').innerText = q.text;
 
-            // Options (используем уже перемешанные варианты - shuffledOptions)
-            const container = document.getElementById('quizOptionsContainer');
-            container.innerHTML = q.shuffledOptions.map((opt, idx) => {
-                const isSelected = quizState.answers[quizState.currentIdx] === idx;
-                return `
-                <label class="flex items-center gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${isSelected ? 'border-electro-yellow bg-gray-800' : 'border-electro-border bg-electro-dark hover:border-gray-500'}">
-                    <input type="radio" name="quizOpt" value="${idx}" class="custom-radio shrink-0" onchange="selectAnswer(${idx})" ${isSelected ? 'checked' : ''}>
-                    <span class="text-white text-lg select-none">${escapeHTML(opt)}</span>
-                </label>
-            `}).join('');
+            // Готуємо варіанти відповідей з їх оригінальним індексом
+            let mappedOptions = q.options.map((optText, index) => {
+                return { text: optText, isCorrect: (index === q.answerIndex) };
+            });
 
-            // Buttons state
-            document.getElementById('btnPrevQ').disabled = quizState.currentIdx === 0;
-            
-            const btnNext = document.getElementById('btnNextQ');
-            if (current === total) {
-                btnNext.innerText = "Завершить";
-                btnNext.className = "px-6 py-2.5 rounded-lg bg-electro-green hover:bg-green-600 text-white font-bold transition-colors shadow-lg";
+            // Випадковий порядок варіантів відповідей
+            mappedOptions = shuffle(mappedOptions);
+
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+
+            mappedOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left bg-gray-700 hover:bg-gray-600 p-4 rounded border border-gray-600 transition-colors text-lg';
+                btn.innerText = opt.text;
+                btn.onclick = () => checkAnswer(opt.isCorrect, q);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(isCorrect, questionObj) {
+            if (isCorrect) {
+                score++;
+                // Якщо відповіли правильно — видаляємо з бази помилок
+                mistakeIds = mistakeIds.filter(id => id !== questionObj.id);
             } else {
-                btnNext.innerText = "Далее";
-                btnNext.className = "px-6 py-2.5 rounded-lg bg-electro-yellow hover:bg-electro-yellowHover text-black font-bold transition-colors";
+                userMistakes.push(questionObj);
+                // Якщо помилились — додаємо в базу помилок (без дублікатів)
+                if (!mistakeIds.includes(questionObj.id)) {
+                    mistakeIds.push(questionObj.id);
+                }
             }
-        }
-
-        function selectAnswer(optIdx) {
-            quizState.answers[quizState.currentIdx] = optIdx;
-            // Re-render to update selected styling
-            renderQuizQuestion();
-        }
-
-        function prevQuestion() {
-            if (quizState.currentIdx > 0) {
-                quizState.currentIdx--;
-                renderQuizQuestion();
-            }
-        }
-
-        function nextQuestion() {
-            // Check if last question
-            if (quizState.currentIdx === quizState.questions.length - 1) {
-                finishQuiz();
-            } else {
-                quizState.currentIdx++;
-                renderQuizQuestion();
-            }
+            saveData();
+            currentQIndex++;
+            loadNextQuestion();
         }
 
         function finishQuiz() {
-            quizState.active = false;
-            document.getElementById('quizActiveScreen').classList.add('hidden');
-            document.getElementById('quizResultScreen').classList.remove('hidden');
+            showScreen('resultScreen');
+            document.getElementById('scoreText').innerText = `${score} з ${currentQuizQuestions.length}`;
 
-            let correctCount = 0;
-            const reviewHtml = [];
-
-            quizState.questions.forEach((q, idx) => {
-                const userAns = quizState.answers[idx];
-                // Проверяем по новому перемешанному индексу
-                const isCorrect = userAns === q.shuffledCorrectIndex;
-                if (isCorrect) correctCount++;
-
-                const statusColor = isCorrect ? 'border-electro-green' : (userAns === null ? 'border-yellow-600' : 'border-electro-red');
-                const statusIcon = isCorrect ? 
-                    `<svg class="w-6 h-6 text-electro-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>` : 
-                    `<svg class="w-6 h-6 text-electro-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-
-                // Отрисовываем перемешанные варианты для экрана результатов
-                const optsHtml = q.shuffledOptions.map((opt, oIdx) => {
-                    let oClass = "text-gray-400";
-                    let icon = `<span class="w-4 h-4 shrink-0 inline-block"></span>`;
-                    
-                    if (oIdx === q.shuffledCorrectIndex) {
-                        oClass = "text-electro-green font-bold";
-                        icon = `<svg class="w-4 h-4 text-electro-green shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-                    } else if (oIdx === userAns) {
-                        oClass = "text-electro-red line-through";
-                        icon = `<svg class="w-4 h-4 text-electro-red shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
-                    }
-
-                    return `<li class="flex items-start gap-2 ${oClass}">${icon} <span class="break-words">${escapeHTML(opt)}</span></li>`;
-                }).join('');
-
-                reviewHtml.push(`
-                    <div class="bg-electro-dark border-l-4 ${statusColor} rounded-r-xl p-5 shadow-sm">
-                        <div class="flex items-start gap-3 mb-3">
-                            <div class="shrink-0 mt-1">${statusIcon}</div>
-                            <h4 class="text-white font-medium text-lg">${escapeHTML(q.text)}</h4>
-                        </div>
-                        <ul class="space-y-2 pl-9">
-                            ${userAns === null ? `<li class="text-yellow-600 font-medium mb-2">Ответ не был выбран</li>` : ''}
-                            ${optsHtml}
-                        </ul>
+            const reviewDiv = document.getElementById('mistakesReview');
+            const listDiv = document.getElementById('mistakesList');
+            
+            if (userMistakes.length > 0) {
+                reviewDiv.classList.remove('hidden');
+                listDiv.innerHTML = userMistakes.map(q => `
+                    <div class="border-l-2 border-red-500 pl-3">
+                        <p class="font-semibold">${q.text}</p>
+                        <p class="text-green-400">Правильна відповідь: ${q.options[q.answerIndex]}</p>
                     </div>
-                `);
+                `).join('');
+            } else {
+                reviewDiv.classList.add('hidden');
+            }
+        }
+
+        // --- ЛОГІКА РЕДАКТОРА ---
+        function addQuestion() {
+            const cat = document.getElementById('qCategory').value.trim() || 'Без категорії';
+            const text = document.getElementById('qText').value.trim();
+            const inputs = document.querySelectorAll('.qOption');
+            
+            let options = [];
+            inputs.forEach(input => {
+                if(input.value.trim() !== '') options.push(input.value.trim());
             });
 
-            const total = quizState.questions.length;
-            const percent = Math.round((correctCount / total) * 100);
+            if (!text || options.length < 2) {
+                alert("Введи питання та мінімум 2 варіанти відповіді!");
+                return;
+            }
 
-            document.getElementById('resultScore').innerText = `${percent}%`;
-            // Colorizing score
-            document.getElementById('resultScore').className = `text-5xl font-black ${percent >= 80 ? 'text-electro-green' : (percent >= 50 ? 'text-electro-yellow' : 'text-electro-red')}`;
+            questions.unshift({
+                id: Date.now().toString() + Math.floor(Math.random()*1000), // Унікальний ID
+                category: cat,
+                text: text,
+                options: options,
+                answerIndex: 0 // Перший введений варіант завжди правильний
+            });
+
+            saveData();
             
-            document.getElementById('resultCount').innerText = `${correctCount} из ${total}`;
-            document.getElementById('resultReviewContainer').innerHTML = reviewHtml.join('');
+            // Очищення полів
+            document.getElementById('qText').value = '';
+            inputs.forEach(i => i.value = '');
+            
+            updateEditorList();
         }
 
-        // --- Utils ---
-        function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, 
-                tag => ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    "'": '&#39;',
-                    '"': '&quot;'
-                }[tag] || tag)
-            );
+        function deleteQuestion(id) {
+            if(confirm("Точно видалити?")) {
+                questions = questions.filter(q => q.id !== id);
+                mistakeIds = mistakeIds.filter(mId => mId !== id);
+                saveData();
+                updateEditorList();
+            }
         }
+
+        function updateEditorList() {
+            document.getElementById('qCount').innerText = questions.length;
+            const list = document.getElementById('questionsList');
+            list.innerHTML = questions.map(q => `
+                <div class="bg-gray-700 p-3 rounded flex justify-between items-start">
+                    <div>
+                        <span class="text-xs font-bold text-yellow-500">[${q.category || 'Без категорії'}]</span>
+                        <p class="font-semibold text-sm mt-1">${q.text}</p>
+                    </div>
+                    <button onclick="deleteQuestion('${q.id}')" class="text-red-400 hover:text-red-300 ml-2">❌</button>
+                </div>
+            `).join('');
+
+            // Оновлення datalist для категорій
+            const datalist = document.getElementById('categoryList');
+            const uniqueCats = [...new Set(questions.map(q => q.category))].filter(c => c);
+            datalist.innerHTML = uniqueCats.map(c => `<option value="${c}">`).join('');
+        }
+
+        // --- ІМПОРТ / ЕКСПОРТ ---
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(questions));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "sait_quiz_backup.json");
+            dlAnchorElem.click();
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        // Переконуємось, що у всіх імпортованих питань є ID
+                        imported.forEach(q => {
+                            if (!q.id) q.id = Date.now().toString() + Math.floor(Math.random()*1000);
+                        });
+                        questions = imported;
+                        mistakeIds = []; // Скидаємо помилки при повному імпорті бази
+                        saveData();
+                        updateEditorList();
+                        alert("База питань успішно оновлена!");
+                    }
+                } catch (err) {
+                    alert("Помилка читання файлу.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- НАВІГАЦІЯ ---
+        function showScreen(screenId) {
+            document.getElementById('homeScreen').classList.add('hidden');
+            document.getElementById('editorScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('navButtons').classList.add('hidden');
+            
+            document.getElementById(screenId).classList.remove('hidden');
+            
+            if(screenId === 'homeScreen') {
+                document.getElementById('navButtons').classList.remove('hidden');
+                selectedCategories.clear();
+                renderCategories();
+            } else if (screenId === 'editorScreen') {
+                updateEditorList();
+            }
+        }
+
+        // Ініціалізація при старті
+        showScreen('homeScreen');
 
     </script>
 </body>
