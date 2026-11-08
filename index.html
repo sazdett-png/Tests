@@ -55,8 +55,10 @@
 
         <!-- ГОЛОВНИЙ ЕКРАН -->
         <div id="homeScreen" class="space-y-6">
-            <h2 class="text-xl font-semibold mb-2">Виберіть теми:</h2>
-            <div id="categoriesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <h2 class="text-xl font-semibold mb-2">Виберіть модулі для тесту:</h2>
+            <div id="categoriesGrid">
+                <!-- Категорії генеруються через JS -->
+            </div>
             <div class="flex flex-col md:flex-row gap-4 mt-6">
                 <button onclick="startMode('quiz')" class="btn-primary flex-1 py-4 rounded text-lg shadow-lg">📝 Почати Тест</button>
                 <button onclick="startMode('flashcards')" class="bg-purple-600 hover:bg-purple-500 text-white font-bold flex-1 py-4 rounded text-lg shadow-lg transition-colors">🃏 Флеш-картки</button>
@@ -74,8 +76,16 @@
             <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
                 <h3 class="font-bold mb-4 text-yellow-500">Додати нове питання</h3>
                 <div class="space-y-4">
-                    <input type="text" id="qCategory" list="categoryList" placeholder="Категорія (напр. Основи AC)" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                    <datalist id="categoryList"></datalist>
+                    <div class="flex flex-col md:flex-row gap-3">
+                        <div class="flex-1">
+                            <input type="text" id="qCategory" list="categoryList" placeholder="Головна категорія (напр. CE Code)" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                            <datalist id="categoryList"></datalist>
+                        </div>
+                        <div class="flex-1">
+                            <input type="text" id="qSubCategory" list="subCategoryList" placeholder="Підкатегорія / Модуль (напр. 105A)" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                            <datalist id="subCategoryList"></datalist>
+                        </div>
+                    </div>
                     
                     <select id="qType" onchange="toggleQuestionTypeUI()" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
                         <option value="choice">Тест (Вибір 1 з 4 варіантів)</option>
@@ -220,9 +230,9 @@
 
     <script>
         const defaultQuestions = [
-            { id: "1", type: "choice", category: "Основи AC", text: "Яке значення напруги показує звичайний цифровий мультиметр при вимірюванні змінного струму?", options: ["RMS (Ефективне значення)", "Пікове значення (Peak)", "Середнє значення (Average)", "Миттєве значення"], answerIndex: 0, explanation: "Більшість мультиметрів завжди відкалібровані для відображення RMS." },
-            { id: "2", type: "choice", category: "RLC Кола", text: "В ідеальному індуктивному колі як співвідносяться струм і напруга?", options: ["Струм відстає від напруги на 90°", "Струм випереджає напругу на 90°", "Збігаються по фазі", "Напруга відстає від струму на 90°"], answerIndex: 0, explanation: "Запам'ятай ELI the ICE man: В індуктивності (L) Voltage (E) випереджає Current (I)." },
-            { id: "3", type: "input", category: "Математика AC", text: "Розрахуй V(Peak), якщо мультиметр показує 120V AC (Введіть число, можна з десятичними)", options: ["169.7", "169.68", "169", "170"], answerIndex: 0, explanation: "V(Peak) = V(RMS) × 1.414 = 120 × 1.414 = 169.68V. Припустимі варіанти заокруглення додані як вірні." }
+            { id: "1", type: "choice", category: "AC Fundamentals", subCategory: "105A", text: "Яке значення напруги показує звичайний цифровий мультиметр при вимірюванні змінного струму?", options: ["RMS (Ефективне значення)", "Пікове значення (Peak)", "Середнє значення (Average)", "Миттєве значення"], answerIndex: 0, explanation: "Більшість мультиметрів завжди відкалібровані для відображення RMS." },
+            { id: "2", type: "choice", category: "AC Fundamentals", subCategory: "RLC Кола", text: "В ідеальному індуктивному колі як співвідносяться струм і напруга?", options: ["Струм відстає від напруги на 90°", "Струм випереджає напругу на 90°", "Збігаються по фазі", "Напруга відстає від струму на 90°"], answerIndex: 0, explanation: "Запам'ятай ELI the ICE man: В індуктивності (L) Voltage (E) випереджає Current (I)." },
+            { id: "3", type: "input", category: "CE Code", subCategory: "Section 10", text: "Таблиця для підбору автоматів захисту (Overcurrent)", options: ["14", "Table 14"], answerIndex: 0, explanation: "Table 14 використовується для вибору максимального номіналу автомату." }
         ];
 
         const defaultCheatSheet = `
@@ -304,33 +314,66 @@
             }
         }
 
-        // --- ГОЛОВНИЙ ЕКРАН ТА КАТЕГОРІЇ ---
+        // --- ГОЛОВНИЙ ЕКРАН ТА ІЄРАРХІЯ КАТЕГОРІЙ ---
         function renderCategories() {
-            const grid = document.getElementById('categoriesGrid');
-            grid.innerHTML = '';
-            const catCounts = {};
-            questions.forEach(q => { const c = q.category || 'Без категорії'; catCounts[c] = (catCounts[c] || 0) + 1; });
-            grid.appendChild(createCategoryCard('Всі питання', questions.length, 'all'));
-            Object.keys(catCounts).sort().forEach(cat => grid.appendChild(createCategoryCard(cat, catCounts[cat], cat)));
+            const container = document.getElementById('categoriesGrid');
+            container.innerHTML = '';
             
-            mistakeIds = mistakeIds.filter(id => questions.find(q => q.id === id));
-            if (mistakeIds.length > 0) {
-                const errCard = createCategoryCard('🔥 Помилки', mistakeIds.length, 'mistakes');
-                errCard.classList.add('border-red-900', 'bg-red-900/20'); grid.appendChild(errCard);
-            }
-            const hardestIds = questions.filter(q => { const s = quizStats[q.id]; return s && s.w > s.c; }).map(q => q.id);
-            if (hardestIds.length > 0) {
-                const hardCard = createCategoryCard('💀 Найскладніші', hardestIds.length, 'hardest');
-                hardCard.classList.add('border-purple-800', 'bg-purple-900/20'); grid.appendChild(hardCard);
-            }
+            // 1. Блок швидких режимів (Всі питання, Помилки, Найскладніші)
+            const specialDiv = document.createElement('div');
+            specialDiv.className = 'mb-6';
+            specialDiv.innerHTML = '<h3 class="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">Швидкий старт</h3><div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="specialGrid"></div>';
+            container.appendChild(specialDiv);
+            
+            const sGrid = specialDiv.querySelector('#specialGrid');
+            sGrid.appendChild(createCatCard('Всі питання', questions.length, 'all'));
+            
+            let validMistakes = mistakeIds.filter(id => questions.find(q => q.id === id));
+            if (validMistakes.length > 0) sGrid.appendChild(createCatCard('🔥 Помилки', validMistakes.length, 'mistakes', 'border-red-900 bg-red-900/20 text-red-100'));
+            
+            const hardestIds = questions.filter(q => quizStats[q.id] && quizStats[q.id].w > quizStats[q.id].c).map(q => q.id);
+            if (hardestIds.length > 0) sGrid.appendChild(createCatCard('💀 Найскладніші', hardestIds.length, 'hardest', 'border-purple-800 bg-purple-900/20 text-purple-100'));
+
+            // 2. Групування Головна -> Підкатегорія
+            const groups = {};
+            questions.forEach(q => {
+                const main = q.category || 'Без категорії';
+                const sub = q.subCategory || 'Загальні';
+                if (!groups[main]) groups[main] = {};
+                groups[main][sub] = (groups[main][sub] || 0) + 1;
+            });
+
+            // 3. Рендер Головних категорій як окремих блоків
+            Object.keys(groups).sort().forEach(main => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'mb-6 bg-gray-800 p-4 rounded-lg border border-gray-700';
+                
+                const title = document.createElement('h3');
+                title.className = 'text-lg font-bold text-yellow-500 mb-3 border-b border-gray-600 pb-2 flex items-center gap-2';
+                title.innerHTML = `📂 ${main}`;
+                groupDiv.appendChild(title);
+                
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-2 md:grid-cols-3 gap-3';
+                
+                Object.keys(groups[main]).sort().forEach(sub => {
+                    const count = groups[main][sub];
+                    const catId = `cat|${main}|${sub}`;
+                    grid.appendChild(createCatCard(sub, count, catId));
+                });
+                
+                groupDiv.appendChild(grid);
+                container.appendChild(groupDiv);
+            });
+            
             saveData();
         }
 
-        function createCategoryCard(title, count, id) {
+        function createCatCard(title, count, id, customClass = '') {
             const div = document.createElement('div');
-            div.className = 'card p-4 rounded-lg flex flex-col justify-center items-center text-center h-28';
+            div.className = `card p-3 rounded-lg flex flex-col justify-center items-center text-center min-h-[5rem] ${customClass}`;
             if (selectedCategories.has(id)) div.classList.add('active');
-            div.innerHTML = `<span class="font-bold text-lg text-gray-100">${title}</span><span class="text-sm text-gray-400 mt-1">${count} питань</span>`;
+            div.innerHTML = `<span class="font-bold text-sm text-gray-100">${title}</span><span class="text-xs text-gray-400 mt-1">${count} питань</span>`;
             div.onclick = () => {
                 if (id === 'all') { selectedCategories.clear(); selectedCategories.add('all'); } 
                 else {
@@ -344,15 +387,23 @@
 
         function startMode(mode) {
             currentMode = mode;
-            if (selectedCategories.size === 0) { alert("Виберіть хоча б одну категорію!"); return; }
+            if (selectedCategories.size === 0) { alert("Виберіть хоча б одну категорію чи модуль!"); return; }
             let pool = [];
-            if (selectedCategories.has('all')) { pool = [...questions]; } 
-            else {
-                let filterCats = Array.from(selectedCategories).filter(c => c !== 'mistakes' && c !== 'hardest');
+            
+            if (selectedCategories.has('all')) { 
+                pool = [...questions]; 
+            } else {
+                let filterCats = Array.from(selectedCategories).filter(c => c.startsWith('cat|'));
                 pool = questions.filter(q => {
-                    return (selectedCategories.has('mistakes') && mistakeIds.includes(q.id)) ||
-                           (selectedCategories.has('hardest') && quizStats[q.id] && quizStats[q.id].w > quizStats[q.id].c) ||
-                           filterCats.includes(q.category || 'Без категорії');
+                    const isMistake = selectedCategories.has('mistakes') && mistakeIds.includes(q.id);
+                    const isHard = selectedCategories.has('hardest') && quizStats[q.id] && quizStats[q.id].w > quizStats[q.id].c;
+                    
+                    const main = q.category || 'Без категорії';
+                    const sub = q.subCategory || 'Загальні';
+                    const catId = `cat|${main}|${sub}`;
+                    const isCat = filterCats.includes(catId);
+                    
+                    return isMistake || isHard || isCat;
                 });
             }
             if (pool.length === 0) return;
@@ -368,9 +419,10 @@
             if (currentQIndex >= currentQuizQuestions.length) { finishSession(); return; }
             const q = currentQuizQuestions[currentQIndex];
             const qType = q.type || 'choice';
+            const displayCat = `${q.category || 'Без категорії'} ${q.subCategory ? ' ➔ ' + q.subCategory : ''}`;
             
             document.getElementById('quizProgressBar').style.width = ((currentQIndex + 1) / currentQuizQuestions.length * 100) + '%';
-            document.getElementById('quizProgress').innerText = `Питання ${currentQIndex + 1} / ${currentQuizQuestions.length}`;
+            document.getElementById('quizProgress').innerText = `Питання ${currentQIndex + 1} / ${currentQuizQuestions.length} (${displayCat})`;
             document.getElementById('quizQuestionText').innerText = q.text;
             
             const stats = quizStats[q.id] || { c: 0, w: 0 };
@@ -408,7 +460,6 @@
                     const isCorrect = q.options.some(opt => opt.trim().toLowerCase() === userVal.toLowerCase());
                     processAnswer(isCorrect, q, userVal);
                 };
-                
                 submitBtn.onclick = checkFunction;
                 inputField.addEventListener('keypress', function (e) { if (e.key === 'Enter') checkFunction(); });
             }
@@ -434,9 +485,10 @@
         function loadNextFlashcard() {
             if (currentQIndex >= currentQuizQuestions.length) { finishSession(); return; }
             const q = currentQuizQuestions[currentQIndex];
+            const displayCat = `${q.category || 'Без категорії'} ${q.subCategory ? ' ➔ ' + q.subCategory : ''}`;
             
             document.getElementById('fcProgressBar').style.width = ((currentQIndex + 1) / currentQuizQuestions.length * 100) + '%';
-            document.getElementById('fcProgressText').innerText = `Картка ${currentQIndex + 1} / ${currentQuizQuestions.length}`;
+            document.getElementById('fcProgressText').innerText = `Картка ${currentQIndex + 1} / ${currentQuizQuestions.length} (${displayCat})`;
             document.getElementById('fcQuestion').innerText = q.text;
             
             const stats = quizStats[q.id] || { c: 0, w: 0 };
@@ -522,7 +574,7 @@
             } else { reviewDiv.classList.add('hidden'); }
         }
 
-        // --- РЕДАКТОР ---
+        // --- РЕДАКТОР ТА ІМПОРТ/ЕКСПОРТ ---
         function toggleQuestionTypeUI() {
             const type = document.getElementById('qType').value;
             if (type === 'input') {
@@ -536,6 +588,7 @@
 
         function addQuestion() {
             const cat = document.getElementById('qCategory').value.trim() || 'Без категорії';
+            const subCat = document.getElementById('qSubCategory').value.trim();
             const text = document.getElementById('qText').value.trim();
             const imageUrl = document.getElementById('qImage').value.trim();
             const explanation = document.getElementById('qExplanation').value.trim();
@@ -554,7 +607,7 @@
 
             questions.unshift({
                 id: Date.now().toString() + Math.floor(Math.random()*1000),
-                type: type, category: cat, text: text, imageUrl: imageUrl,
+                type: type, category: cat, subCategory: subCat, text: text, imageUrl: imageUrl,
                 options: options, answerIndex: 0, explanation: explanation
             });
             saveData();
@@ -578,7 +631,9 @@
         function updateEditorList() {
             const query = document.getElementById('searchEditorInput').value.toLowerCase();
             const filteredQuestions = questions.filter(q => 
-                q.text.toLowerCase().includes(query) || (q.category && q.category.toLowerCase().includes(query))
+                q.text.toLowerCase().includes(query) || 
+                (q.category && q.category.toLowerCase().includes(query)) ||
+                (q.subCategory && q.subCategory.toLowerCase().includes(query))
             );
 
             document.getElementById('qCount').innerText = questions.length;
@@ -587,11 +642,13 @@
             list.innerHTML = filteredQuestions.map(q => {
                 const stats = quizStats[q.id] || { c: 0, w: 0 };
                 const typeIcon = q.type === 'input' ? '⌨️' : '🔘';
+                const displayCat = `${q.category || 'Без категорії'}${q.subCategory ? ' ➔ ' + q.subCategory : ''}`;
+                
                 return `
                 <div class="bg-gray-700 p-3 rounded flex justify-between items-start">
                     <div class="flex-1">
                         <div class="flex items-center space-x-2">
-                            <span class="text-xs font-bold text-yellow-500">[${q.category || 'Без категорії'}]</span>
+                            <span class="text-xs font-bold text-yellow-500">[${displayCat}]</span>
                             <span class="text-xs" title="Тип питання">${typeIcon}</span>
                             <span class="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded border border-gray-600">
                                 ✅ ${stats.c} | ❌ ${stats.w}
@@ -606,6 +663,9 @@
 
             const uniqueCats = [...new Set(questions.map(q => q.category))].filter(c => c);
             document.getElementById('categoryList').innerHTML = uniqueCats.map(c => `<option value="${c}">`).join('');
+            
+            const uniqueSubCats = [...new Set(questions.map(q => q.subCategory))].filter(c => c);
+            document.getElementById('subCategoryList').innerHTML = uniqueSubCats.map(c => `<option value="${c}">`).join('');
         }
 
         function exportJSON() {
@@ -615,7 +675,6 @@
             dlAnchorElem.setAttribute("download", "sait_quiz_backup.json"); dlAnchorElem.click();
         }
 
-        // РОЗУМНИЙ ІМПОРТ (ОНОВЛЕНО)
         function importJSON(event) {
             const file = event.target.files[0]; if (!file) return;
             const reader = new FileReader();
@@ -633,7 +692,7 @@
                     }
 
                     if (questions.length > 0) {
-                        const merge = confirm("Зберегти існуючі питання? \\n\\n[ОК] - Додати нові питання до поточної бази \\n[Скасувати] - Видалити старі і завантажити тільки нові");
+                        const merge = confirm("Зберегти існуючі питання? \n\n[ОК] - Додати нові питання до поточної бази \n[Скасувати] - Видалити старі і завантажити тільки нові");
                         if (merge) {
                             let addedCount = 0;
                             importedQuestions.forEach(iq => {
@@ -666,7 +725,7 @@
                     }
 
                     saveData(); updateEditorList();
-                    event.target.value = ''; // Скидаємо файл
+                    event.target.value = ''; 
                 } catch (err) { alert("Помилка читання файлу."); }
             };
             reader.readAsText(file);
