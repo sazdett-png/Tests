@@ -133,11 +133,10 @@
                 </div>
             </div>
 
-            <!-- База питань -->
+            <!-- База питань (Оновлений Менеджер / Провідник) -->
             <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-lg">
-                <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-3">
+                <div class="flex justify-between items-center mb-4 pb-3">
                     <h3 class="font-bold text-lg">База питань (<span id="qCount">0</span>)</h3>
-                    <button onclick="openCategoryManager()" class="text-sm bg-blue-700 hover:bg-blue-600 text-white px-3 py-1.5 rounded shadow">🗂️ Керування категоріями</button>
                 </div>
                 
                 <div class="flex gap-3 mb-4">
@@ -146,9 +145,10 @@
                     <input type="file" id="importFile" class="hidden" accept=".json" onchange="importJSON(event)">
                 </div>
 
-                <input type="text" id="searchEditorInput" onkeyup="updateEditorList()" placeholder="🔍 Пошук по базі..." class="bg-gray-900 w-full mb-4 border-gray-600 rounded p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                <input type="text" id="searchEditorInput" onkeyup="updateEditorList()" placeholder="🔍 Пошук по базі (покаже всі знайдені одразу)..." class="bg-gray-900 w-full mb-4 border-gray-600 rounded p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
                 
-                <div id="questionsList" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
+                <!-- Провідник папок -->
+                <div id="questionsList" class="max-h-[60vh] overflow-y-auto pr-2"></div>
             </div>
         </div>
 
@@ -158,7 +158,6 @@
                 <div class="flex items-center space-x-3">
                     <span id="quizProgress" class="font-semibold"></span>
                     <span id="quizCurrentStats" class="text-xs bg-gray-900 text-gray-300 px-2 py-1 rounded border border-gray-600 shadow-inner"></span>
-                    <!-- Таймер для екзамену -->
                     <span id="examTimerDisplay" class="hidden text-xs bg-red-900 text-white px-2 py-1 rounded border border-red-700 font-mono font-bold animate-pulse"></span>
                 </div>
                 <div class="flex space-x-4">
@@ -183,7 +182,7 @@
             <div class="flex justify-between items-center text-sm text-gray-400 mb-2">
                 <div class="flex items-center space-x-3">
                     <span id="fcProgressText" class="font-semibold"></span>
-                    <span class="text-xs bg-purple-900/50 text-purple-200 px-2 py-1 rounded border border-purple-700 shadow-inner">Розумні інтервали активні</span>
+                    <span class="text-xs bg-purple-900/50 text-purple-200 px-2 py-1 rounded border border-purple-700 shadow-inner">Розумні інтервали</span>
                 </div>
                 <button onclick="showScreen('homeScreen')" class="text-purple-400 hover:underline">Перервати</button>
             </div>
@@ -222,41 +221,6 @@
         </div>
     </div>
 
-    <!-- ВІКНО МЕНЕДЖЕРА КАТЕГОРІЙ -->
-    <div id="categoryManagerModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4">
-        <div class="bg-gray-800 rounded-lg border border-gray-700 max-w-md w-full shadow-2xl overflow-hidden">
-            <div class="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-900">
-                <h2 class="text-lg font-bold text-white">🗂️ Керування категоріями</h2>
-                <button onclick="closeCategoryManager()" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
-            </div>
-            
-            <div class="p-5 space-y-6">
-                <!-- Блок 1: Зміна ГОЛОВНОЇ категорії -->
-                <div class="bg-gray-900 p-4 rounded border border-gray-700">
-                    <h3 class="font-bold text-blue-400 mb-3 text-sm">Перейменувати Головну категорію</h3>
-                    <select id="cmOldMain" class="w-full bg-gray-700 rounded p-2 text-white mb-2 text-sm"></select>
-                    <input type="text" id="cmNewMain" placeholder="Нова назва головної категорії..." class="w-full bg-gray-700 rounded p-2 text-white text-sm mb-3">
-                    <button onclick="applyRenameMain()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded text-sm transition">Зберегти назву</button>
-                </div>
-
-                <!-- Блок 2: Перенесення / Перейменування ПІДКАТЕГОРІЇ (Модуля) -->
-                <div class="bg-gray-900 p-4 rounded border border-gray-700">
-                    <h3 class="font-bold text-yellow-500 mb-3 text-sm">Перемістити/Перейменувати Модуль</h3>
-                    <p class="text-xs text-gray-400 mb-2">Виберіть існуючий модуль:</p>
-                    <select id="cmOldCombo" class="w-full bg-gray-700 rounded p-2 text-white mb-3 text-sm"></select>
-                    
-                    <p class="text-xs text-gray-400 mb-1">Перемістити у головну категорію:</p>
-                    <input type="text" id="cmNewSubParent" list="categoryList" placeholder="Нова головна..." class="w-full bg-gray-700 rounded p-2 text-white text-sm mb-2">
-                    
-                    <p class="text-xs text-gray-400 mb-1">Нова назва модуля:</p>
-                    <input type="text" id="cmNewSubName" placeholder="Нова назва модуля..." class="w-full bg-gray-700 rounded p-2 text-white text-sm mb-3">
-                    
-                    <button onclick="applyRenameSub()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 rounded text-sm transition">Застосувати зміни</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- ВІКНО ДОВІДНИКА -->
     <div id="cheatSheetModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4">
         <div class="bg-gray-800 rounded-lg border border-gray-700 max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl transition-all">
@@ -288,11 +252,9 @@
         // ДАНІ ТА СТАТИСТИКА
         let questions = JSON.parse(localStorage.getItem('quiz_questions'));
         if (!questions || questions.length === 0) questions = defaultQuestions;
-        let quizStats = JSON.parse(localStorage.getItem('quiz_stats')) || {}; // Стата тестів
-        let mistakeIds = JSON.parse(localStorage.getItem('quiz_mistakes')) || []; // Помилки тестів
-        
-        // НОВЕ: Spaced Repetition System (SRS) для карток та Загальна стата
-        let srsStats = JSON.parse(localStorage.getItem('quiz_srs')) || {}; // { id: { interval: днів, nextReview: timestamp } }
+        let quizStats = JSON.parse(localStorage.getItem('quiz_stats')) || {}; 
+        let mistakeIds = JSON.parse(localStorage.getItem('quiz_mistakes')) || []; 
+        let srsStats = JSON.parse(localStorage.getItem('quiz_srs')) || {}; 
         let appStats = JSON.parse(localStorage.getItem('app_stats')) || { streak: 0, lastVisit: null, totalQuizzes: 0 };
         
         document.getElementById('cheatSheetContent').innerHTML = localStorage.getItem('quiz_cheatsheet') || defaultCheatSheet;
@@ -301,9 +263,8 @@
         let currentQuizQuestions = [];
         let currentQIndex = 0, score = 0, userMistakes = [];
         let editingQuestionId = null;
-        let currentMode = 'quiz'; // 'quiz', 'flashcards', 'exam'
-        let examInterval = null;
-        let examTimeLeft = 0;
+        let currentMode = 'quiz'; 
+        let examInterval = null, examTimeLeft = 0;
 
         function shuffle(array) { let arr = [...array]; for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
         function saveData() { 
@@ -312,6 +273,14 @@
             localStorage.setItem('quiz_stats', JSON.stringify(quizStats)); 
             localStorage.setItem('quiz_srs', JSON.stringify(srsStats));
             localStorage.setItem('app_stats', JSON.stringify(appStats));
+        }
+
+        // ОЧИСТКА ВТРАЧЕНИХ ДАНИХ
+        function cleanOrphanStats() {
+            const validIds = new Set(questions.map(q => q.id));
+            mistakeIds = mistakeIds.filter(id => validIds.has(id));
+            Object.keys(quizStats).forEach(id => { if(!validIds.has(id)) delete quizStats[id]; });
+            Object.keys(srsStats).forEach(id => { if(!validIds.has(id)) delete srsStats[id]; });
         }
 
         // ЛОГІКА СТРИКА (STREAK)
@@ -374,9 +343,7 @@
         function updateDueCardsCount() {
             let filterCats = Array.from(selectedCategories).filter(c => c.startsWith('cat|'));
             let pool = questions;
-            if (!selectedCategories.has('all') && selectedCategories.size > 0) {
-                pool = questions.filter(q => filterCats.includes(`cat|${q.category || 'Без категорії'}|${q.subCategory || 'Загальні'}`));
-            }
+            if (!selectedCategories.has('all') && selectedCategories.size > 0) pool = questions.filter(q => filterCats.includes(`cat|${q.category || 'Без категорії'}|${q.subCategory || 'Загальні'}`));
             const now = Date.now();
             let dueCount = pool.filter(q => !srsStats[q.id] || srsStats[q.id].nextReview <= now).length;
             const badge = document.getElementById('dueCardsBadge');
@@ -401,14 +368,11 @@
             if (mode === 'flashcards') {
                 const now = Date.now();
                 let dueCards = pool.filter(q => !srsStats[q.id] || srsStats[q.id].nextReview <= now);
-                if (dueCards.length > 0) { pool = dueCards; } // Беремо тільки те, що треба повторити
-                else { alert("На сьогодні всі картки у цих модулях вивчені! Покажу випадкові для повторення."); }
+                if (dueCards.length > 0) { pool = dueCards; } else { alert("На сьогодні всі картки у цих модулях вивчені! Покажу випадкові для повторення."); }
             }
 
             if (pool.length === 0) return;
             currentQuizQuestions = shuffle(pool); currentQIndex = 0; score = 0; userMistakes = [];
-            
-            // Фіксуємо сесію
             appStats.totalQuizzes++; saveData(); checkStreak();
 
             document.getElementById('examTimerDisplay').classList.add('hidden');
@@ -420,17 +384,12 @@
         function startExamMode() {
             currentMode = 'exam'; clearInterval(examInterval);
             if (questions.length === 0) { alert("База питань порожня!"); return; }
-            
-            // Беремо випадкові 30 питань з УСІЄЇ БАЗИ
             currentQuizQuestions = shuffle([...questions]).slice(0, 30);
             currentQIndex = 0; score = 0; userMistakes = [];
-            
             appStats.totalQuizzes++; saveData(); checkStreak();
 
-            // Таймер: 2 хвилини на питання
             examTimeLeft = currentQuizQuestions.length * 120;
-            const tDisp = document.getElementById('examTimerDisplay');
-            tDisp.classList.remove('hidden');
+            document.getElementById('examTimerDisplay').classList.remove('hidden');
             updateExamTimerUI();
             
             examInterval = setInterval(() => {
@@ -450,12 +409,10 @@
         function loadNextQuestion() {
             if (currentQIndex >= currentQuizQuestions.length) { finishSession(); return; }
             const q = currentQuizQuestions[currentQIndex], type = q.type || 'choice';
-            
             document.getElementById('quizProgressBar').style.width = ((currentQIndex + 1) / currentQuizQuestions.length * 100) + '%';
             document.getElementById('quizProgress').innerText = `Питання ${currentQIndex + 1}/${currentQuizQuestions.length} (${q.category || 'Без категорії'})`;
             document.getElementById('quizQuestionText').innerText = q.text;
             
-            // У режимі екзамену ховаємо статистику питання
             const statUI = document.getElementById('quizCurrentStats');
             if (currentMode === 'exam') { statUI.classList.add('hidden'); } 
             else { statUI.classList.remove('hidden'); const stats = quizStats[q.id] || { c: 0, w: 0 }; statUI.innerText = `✅ ${stats.c} | ❌ ${stats.w}`; }
@@ -479,30 +436,19 @@
         }
 
         function processAnswer(isCorrect, qObj, selText) {
-            // Оновлюємо статистику ТІЛЬКИ в Практиці або Екзамені (не у флеш-картках)
             if (!quizStats[qObj.id]) quizStats[qObj.id] = { c: 0, w: 0 };
-            
-            if (isCorrect) {
-                score++;
-                mistakeIds = mistakeIds.filter(id => id !== qObj.id);
-                quizStats[qObj.id].c++;
-            } else {
-                userMistakes.push({ q: qObj, sel: selText });
-                if (!mistakeIds.includes(qObj.id)) mistakeIds.push(qObj.id);
-                quizStats[qObj.id].w++;
-            }
+            if (isCorrect) { score++; mistakeIds = mistakeIds.filter(id => id !== qObj.id); quizStats[qObj.id].c++; } 
+            else { userMistakes.push({ q: qObj, sel: selText }); if (!mistakeIds.includes(qObj.id)) mistakeIds.push(qObj.id); quizStats[qObj.id].w++; }
             saveData(); currentQIndex++; loadNextQuestion();
-            // В режимі екзамену користувач не бачить фідбеку миттєво, одразу йде наступне питання. Це круто!
         }
 
-        // ЛОГІКА ФЛЕШ-КАРТОК (РОЗУМНІ ІНТЕРВАЛИ)
+        // ЛОГІКА ФЛЕШ-КАРТОК
         function loadNextFlashcard() {
             if (currentQIndex >= currentQuizQuestions.length) { finishSession(); return; }
             const q = currentQuizQuestions[currentQIndex];
             document.getElementById('fcProgressBar').style.width = ((currentQIndex + 1) / currentQuizQuestions.length * 100) + '%';
             document.getElementById('fcProgressText').innerText = `Картка ${currentQIndex + 1}/${currentQuizQuestions.length} (${q.category || 'Без категорії'})`;
             document.getElementById('fcQuestion').innerText = q.text;
-            
             const imgEl = document.getElementById('fcImage'); q.imageUrl ? (imgEl.src = q.imageUrl, imgEl.classList.remove('hidden')) : imgEl.classList.add('hidden');
             
             document.getElementById('fcAnswerBox').classList.add('hidden'); document.getElementById('fcTapHint').classList.remove('hidden');
@@ -518,36 +464,18 @@
 
         function recordFlashcard(isCorrect, e) {
             e.stopPropagation(); const q = currentQuizQuestions[currentQIndex];
-            
-            // Флеш-картки більше не псують тест-статистику (quizStats)!
-            // Вони використовують незалежний алгоритм SRS (Spaced Repetition)
             let srs = srsStats[q.id] || { interval: 0, nextReview: 0 };
             
-            if (isCorrect) {
-                score++;
-                // Алгоритм збільшення інтервалу: 1 день -> 3 дні -> 7 днів -> 14 -> ...
-                if (srs.interval === 0) srs.interval = 1;
-                else if (srs.interval === 1) srs.interval = 3;
-                else srs.interval = Math.ceil(srs.interval * 2);
-            } else {
-                // Якщо забув — скидаємо на сьогодні
-                srs.interval = 0;
-                userMistakes.push({ q: q, sel: "Не згадав" });
-            }
+            if (isCorrect) { score++; if (srs.interval === 0) srs.interval = 1; else if (srs.interval === 1) srs.interval = 3; else srs.interval = Math.ceil(srs.interval * 2); } 
+            else { srs.interval = 0; userMistakes.push({ q: q, sel: "Не згадав" }); }
             
-            // Додаємо кількість днів у мілісекундах (1 день = 86400000 мс)
             srs.nextReview = Date.now() + (srs.interval * 86400000);
-            srsStats[q.id] = srs;
-            saveData();
-            
-            currentQIndex++; loadNextFlashcard();
+            srsStats[q.id] = srs; saveData(); currentQIndex++; loadNextFlashcard();
         }
 
         // ЗАВЕРШЕННЯ СЕСІЇ
         function finishSession() {
-            clearInterval(examInterval);
-            showScreen('resultScreen'); 
-            
+            clearInterval(examInterval); showScreen('resultScreen'); 
             const rTitle = document.getElementById('resultTitle');
             if (currentMode === 'exam') {
                 const percent = Math.round((score / currentQuizQuestions.length) * 100);
@@ -555,9 +483,7 @@
                 rTitle.className = percent >= 70 ? "text-3xl font-bold mb-4 text-green-500" : "text-3xl font-bold mb-4 text-red-500";
                 document.getElementById('scoreText').innerText = `${score} з ${currentQuizQuestions.length} (${percent}%)`;
             } else {
-                rTitle.innerText = "Сесію завершено!";
-                rTitle.className = "text-3xl font-bold mb-4";
-                document.getElementById('scoreText').innerText = `${score} з ${currentQuizQuestions.length}`;
+                rTitle.innerText = "Сесію завершено!"; rTitle.className = "text-3xl font-bold mb-4"; document.getElementById('scoreText').innerText = `${score} з ${currentQuizQuestions.length}`;
             }
             
             const rDiv = document.getElementById('mistakesReview'), lDiv = document.getElementById('mistakesList');
@@ -567,7 +493,7 @@
             } else { rDiv.classList.add('hidden'); }
         }
 
-        // РЕДАКТОР & CRUD
+        // РЕДАКТОР
         function toggleQuestionTypeUI() {
             const t = document.getElementById('qType').value;
             if (t === 'input') { document.getElementById('uiTypeChoice').classList.add('hidden'); document.getElementById('uiTypeInput').classList.remove('hidden'); }
@@ -603,13 +529,11 @@
         }
 
         function cancelEdit() {
-            editingQuestionId = null;
-            document.getElementById('editorFormTitle').innerText = 'Додати нове питання';
+            editingQuestionId = null; document.getElementById('editorFormTitle').innerText = 'Додати нове питання';
             document.getElementById('qCategory').value = ''; document.getElementById('qSubCategory').value = ''; document.getElementById('qText').value = ''; document.getElementById('qImage').value = ''; document.getElementById('qExplanation').value = '';
             document.querySelectorAll('.qOptionChoice').forEach(i => i.value = ''); document.getElementById('qOptionInput').value = '';
             const btn = document.getElementById('saveQuestionBtn');
-            btn.innerText = 'Зберегти питання'; btn.classList.replace('bg-green-600', 'btn-primary'); btn.classList.remove('text-white');
-            document.getElementById('cancelEditBtn').classList.add('hidden');
+            btn.innerText = 'Зберегти питання'; btn.classList.replace('bg-green-600', 'btn-primary'); btn.classList.remove('text-white'); document.getElementById('cancelEditBtn').classList.add('hidden');
         }
 
         function saveQuestion() {
@@ -623,60 +547,128 @@
             
             if (editingQuestionId) {
                 const idx = questions.findIndex(q => q.id === editingQuestionId);
-                if(idx !== -1) questions[idx] = newQ;
-                alert("Питання успішно оновлено!");
+                if(idx !== -1) questions[idx] = newQ; alert("Питання успішно оновлено!");
             } else { questions.unshift(newQ); }
             
             saveData(); cancelEdit(); updateEditorList();
         }
 
-        function deleteQuestion(id) { if(confirm("Точно видалити?")) { questions = questions.filter(q => q.id !== id); mistakeIds = mistakeIds.filter(mId => mId !== id); delete quizStats[id]; delete srsStats[id]; saveData(); updateEditorList(); } }
+        function deleteQuestion(id) { if(confirm("Точно видалити?")) { questions = questions.filter(q => q.id !== id); cleanOrphanStats(); saveData(); updateEditorList(); } }
+
+        // --- НОВИЙ ПРОВІДНИК ТА ШВИДКИЙ ПОШУК ---
+        function toggleFolder(el) { el.nextElementSibling.classList.toggle('hidden'); }
+
+        function renameCategoryPrompt(oldName) {
+            let newName = prompt(`Введіть нову назву для головної категорії "${oldName}":`, oldName);
+            if (newName && newName.trim() !== "" && newName !== oldName) {
+                questions.forEach(q => { if ((q.category || 'Без категорії') === oldName) q.category = newName.trim(); });
+                saveData(); updateEditorList();
+            }
+        }
+
+        function deleteCategoryPrompt(oldName) {
+            if (confirm(`⚠️ УВАГА! Ви точно хочете видалити категорію "${oldName}" та ВСІ питання в ній?`)) {
+                questions = questions.filter(q => (q.category || 'Без категорії') !== oldName);
+                cleanOrphanStats(); saveData(); updateEditorList();
+            }
+        }
+
+        function renameSubCategoryPrompt(main, oldSub) {
+            let newSub = prompt(`Введіть нову назву для модуля "${oldSub}":`, oldSub);
+            if (newSub && newSub.trim() !== "" && newSub !== oldSub) {
+                questions.forEach(q => { if ((q.category || 'Без категорії') === main && (q.subCategory || 'Загальні') === oldSub) q.subCategory = newSub.trim(); });
+                saveData(); updateEditorList();
+            }
+        }
+
+        function deleteSubCategoryPrompt(main, oldSub) {
+            if (confirm(`⚠️ УВАГА! Ви точно хочете видалити модуль "${oldSub}" та ВСІ питання в ньому?`)) {
+                questions = questions.filter(q => !((q.category || 'Без категорії') === main && (q.subCategory || 'Загальні') === oldSub));
+                cleanOrphanStats(); saveData(); updateEditorList();
+            }
+        }
+
+        function renderQuestionItem(q, isNested = false) {
+            const stats = quizStats[q.id] || { c: 0, w: 0 };
+            const typeIcon = q.type === 'input' ? '⌨️' : '🔘';
+            const displayCat = isNested ? '' : `<span class="text-xs font-bold text-yellow-500">[${q.category || 'Без категорії'}${q.subCategory?' ➔ '+q.subCategory:''}]</span>`;
+            return `
+            <div class="bg-gray-700 p-3 rounded flex justify-between items-start border border-gray-600">
+                <div class="flex-1">
+                    <div class="flex items-center space-x-2">
+                        ${displayCat}
+                        <span class="text-xs">${typeIcon}</span>
+                        <span class="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded border border-gray-600">✅ ${stats.c} | ❌ ${stats.w}</span>
+                    </div>
+                    <p class="font-semibold text-sm mt-1 text-gray-100">${q.text} ${q.imageUrl?'🖼️':''}</p>
+                </div>
+                <div class="flex flex-col ml-3 space-y-2">
+                    <button onclick="editQuestion('${q.id}')" class="text-blue-400 hover:text-blue-300 bg-gray-800 px-2 py-1 rounded border border-gray-600 text-xs shadow-sm">✏️</button>
+                    <button onclick="deleteQuestion('${q.id}')" class="text-red-400 hover:text-red-300 bg-gray-800 px-2 py-1 rounded border border-gray-600 text-xs shadow-sm">❌</button>
+                </div>
+            </div>`;
+        }
 
         function updateEditorList() {
             const query = document.getElementById('searchEditorInput').value.toLowerCase();
-            const filtered = questions.filter(q => q.text.toLowerCase().includes(query) || (q.category && q.category.toLowerCase().includes(query)) || (q.subCategory && q.subCategory.toLowerCase().includes(query)));
+            const list = document.getElementById('questionsList');
             document.getElementById('qCount').innerText = questions.length;
-            document.getElementById('questionsList').innerHTML = filtered.map(q => `
-                <div class="bg-gray-700 p-3 rounded flex justify-between items-start">
-                    <div class="flex-1">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xs font-bold text-yellow-500">[${q.category || 'Без категорії'}${q.subCategory?' ➔ '+q.subCategory:''}]</span>
-                            <span class="text-xs">${q.type==='input'?'⌨️':'🔘'}</span>
-                            <span class="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded border border-gray-600">✅ ${quizStats[q.id]?.c||0} | ❌ ${quizStats[q.id]?.w||0}</span>
+
+            if (query) {
+                // Якщо є текст у пошуку — показуємо плоский список знайденого
+                const filtered = questions.filter(q => q.text.toLowerCase().includes(query) || (q.category && q.category.toLowerCase().includes(query)) || (q.subCategory && q.subCategory.toLowerCase().includes(query)));
+                list.innerHTML = `<div class="space-y-3">` + filtered.map(q => renderQuestionItem(q, false)).join('') + `</div>`;
+            } else {
+                // Дерево категорій
+                const groups = {};
+                questions.forEach(q => {
+                    const main = q.category || 'Без категорії'; const sub = q.subCategory || 'Загальні';
+                    if (!groups[main]) groups[main] = {}; if (!groups[main][sub]) groups[main][sub] = [];
+                    groups[main][sub].push(q);
+                });
+
+                let html = '';
+                Object.keys(groups).sort().forEach(main => {
+                    const safeMain = escape(main);
+                    let qCountMain = 0; Object.values(groups[main]).forEach(arr => qCountMain += arr.length);
+                    
+                    html += `
+                    <div class="mb-3 bg-gray-900 rounded-lg border border-gray-700 shadow-sm overflow-hidden">
+                        <div class="p-3 bg-gray-800 flex justify-between items-center cursor-pointer border-b border-gray-700" onclick="toggleFolder(this)">
+                            <span class="font-bold text-yellow-500 text-base md:text-lg">📂 ${main} <span class="text-xs text-gray-400 ml-1 font-normal">(${qCountMain})</span></span>
+                            <div class="flex gap-2">
+                                <button onclick="event.stopPropagation(); renameCategoryPrompt(unescape('${safeMain}'))" class="text-blue-400 bg-gray-900 px-3 py-1 rounded border border-gray-700 shadow-sm">✏️</button>
+                                <button onclick="event.stopPropagation(); deleteCategoryPrompt(unescape('${safeMain}'))" class="text-red-400 bg-gray-900 px-3 py-1 rounded border border-gray-700 shadow-sm">❌</button>
+                            </div>
                         </div>
-                        <p class="font-semibold text-sm mt-1 text-gray-100">${q.text} ${q.imageUrl?'🖼️':''}</p>
-                    </div>
-                    <div class="flex flex-col ml-3 space-y-2">
-                        <button onclick="editQuestion('${q.id}')" class="text-blue-400 hover:text-blue-300 bg-gray-800 px-2 py-1 rounded border border-gray-600 text-xs">✏️ Редагувати</button>
-                        <button onclick="deleteQuestion('${q.id}')" class="text-red-400 hover:text-red-300 bg-gray-800 px-2 py-1 rounded border border-gray-600 text-xs">❌ Видалити</button>
-                    </div>
-                </div>`).join('');
+                        <div class="hidden flex flex-col gap-2 p-2 bg-gray-850">
+                    `;
+                    
+                    Object.keys(groups[main]).sort().forEach(sub => {
+                        const qs = groups[main][sub]; const safeSub = escape(sub);
+                        html += `
+                            <div class="bg-gray-800 rounded border border-gray-600">
+                                <div class="p-2 bg-gray-700 flex justify-between items-center cursor-pointer border-b border-gray-600" onclick="toggleFolder(this)">
+                                    <span class="font-semibold text-gray-200 text-sm pl-2">📁 ${sub} <span class="text-xs text-gray-400 ml-1 font-normal">(${qs.length})</span></span>
+                                    <div class="flex gap-2">
+                                        <button onclick="event.stopPropagation(); renameSubCategoryPrompt(unescape('${safeMain}'), unescape('${safeSub}'))" class="text-blue-400 px-2 py-1 bg-gray-900 rounded text-xs border border-gray-700">✏️</button>
+                                        <button onclick="event.stopPropagation(); deleteSubCategoryPrompt(unescape('${safeMain}'), unescape('${safeSub}'))" class="text-red-400 px-2 py-1 bg-gray-900 rounded text-xs border border-gray-700">❌</button>
+                                    </div>
+                                </div>
+                                <div class="hidden p-2 flex flex-col gap-2">
+                                    ${qs.map(q => renderQuestionItem(q, true)).join('')}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `</div></div>`;
+                });
+                list.innerHTML = html;
+            }
+
+            // Оновлюємо підказки при створенні
             document.getElementById('categoryList').innerHTML = [...new Set(questions.map(q => q.category))].filter(c => c).map(c => `<option value="${c}">`).join('');
             document.getElementById('subCategoryList').innerHTML = [...new Set(questions.map(q => q.subCategory))].filter(c => c).map(c => `<option value="${c}">`).join('');
-        }
-
-        // МЕНЕДЖЕР КАТЕГОРІЙ
-        function openCategoryManager() {
-            const mains = [...new Set(questions.map(q => q.category || 'Без категорії'))].sort();
-            document.getElementById('cmOldMain').innerHTML = mains.map(m => `<option value="${m}">${m}</option>`).join('');
-            const combos = [...new Set(questions.map(q => (q.category||'Без категорії') + '|' + (q.subCategory||'Загальні')))].sort();
-            document.getElementById('cmOldCombo').innerHTML = combos.map(c => `<option value="${c}">${c.replace('|', ' ➔ ')}</option>`).join('');
-            document.getElementById('categoryManagerModal').classList.remove('hidden');
-        }
-        function closeCategoryManager() { document.getElementById('categoryManagerModal').classList.add('hidden'); document.getElementById('cmNewMain').value = ''; document.getElementById('cmNewSubParent').value = ''; document.getElementById('cmNewSubName').value = ''; }
-        
-        function applyRenameMain() {
-            const oldM = document.getElementById('cmOldMain').value, newM = document.getElementById('cmNewMain').value.trim();
-            if(!newM) return alert("Введіть нову назву!");
-            let c=0; questions.forEach(q => { if((q.category||'Без категорії') === oldM) { q.category = newM; c++; } });
-            saveData(); updateEditorList(); closeCategoryManager(); alert(`Оновлено питань: ${c}`);
-        }
-        function applyRenameSub() {
-            const combo = document.getElementById('cmOldCombo').value.split('|'), oldM = combo[0], oldS = combo[1];
-            const newM = document.getElementById('cmNewSubParent').value.trim() || oldM, newS = document.getElementById('cmNewSubName').value.trim();
-            if(!newS) return alert("Введіть нову назву модуля!");
-            let c=0; questions.forEach(q => { if((q.category||'Без категорії') === oldM && (q.subCategory||'Загальні') === oldS) { q.category = newM; q.subCategory = newS; c++; } });
-            saveData(); updateEditorList(); closeCategoryManager(); alert(`Переміщено/Оновлено питань: ${c}`);
         }
 
         // ІМПОРТ/ЕКСПОРТ
