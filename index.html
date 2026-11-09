@@ -41,6 +41,12 @@
 </head>
 <body class="min-h-screen p-4 md:p-8">
 
+    <!-- ЗУМ КАРТИНОК (Lightbox) -->
+    <div id="imageZoomModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-2 backdrop-blur-sm" onclick="closeImageZoom()">
+        <button class="absolute top-4 right-6 text-white text-5xl font-bold opacity-70 hover:opacity-100">&times;</button>
+        <img id="imageZoomSrc" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" src="">
+    </div>
+
     <!-- Діалог вибору дій зі статистикою під час редагування питання -->
     <div id="questionStatsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true" aria-labelledby="questionStatsModalTitle">
         <div class="w-full max-w-md rounded-xl border border-gray-600 bg-gray-800 p-6 shadow-2xl">
@@ -167,6 +173,7 @@
         <div id="quizScreen" class="hidden space-y-6">
             <div class="flex justify-between items-center text-sm text-gray-400 mb-2">
                 <div class="flex items-center space-x-3">
+                    <button id="quizFavBtn" onclick="toggleCurrentFavorite()" class="text-xl leading-none hover:scale-110 transition-transform" title="Додати в обране">☆</button>
                     <span id="quizProgress" class="font-semibold"></span>
                     <span id="quizCurrentStats" class="text-xs bg-gray-900 text-gray-300 px-2 py-1 rounded border border-gray-600 shadow-inner"></span>
                     <span id="examTimerDisplay" class="hidden text-xs bg-red-900 text-white px-2 py-1 rounded border border-red-700 font-mono font-bold animate-pulse"></span>
@@ -183,7 +190,7 @@
 
             <div class="bg-gray-800 p-6 md:p-8 rounded-lg border border-gray-700">
                 <h2 id="quizQuestionText" class="text-xl md:text-2xl font-semibold mb-4"></h2>
-                <img id="quizImage" class="hidden w-full max-h-64 object-contain rounded mb-6 border border-gray-600 bg-gray-900" src="" alt="Схема">
+                <img id="quizImage" onclick="openImageZoom(this.src)" class="hidden w-full max-h-64 object-contain rounded mb-6 border border-gray-600 bg-gray-900 cursor-zoom-in" src="" alt="Схема">
                 <div id="quizOptions" class="space-y-3 mt-4"></div>
                 
                 <div id="quizFeedback" class="hidden mt-6 p-4 rounded-lg bg-gray-900 border border-gray-600 shadow-inner">
@@ -197,6 +204,7 @@
         <div id="flashcardScreen" class="hidden space-y-6">
             <div class="flex justify-between items-center text-sm text-gray-400 mb-2">
                 <div class="flex items-center space-x-3">
+                    <button id="fcFavBtn" onclick="toggleCurrentFavorite()" class="text-xl leading-none hover:scale-110 transition-transform" title="Додати в обране">☆</button>
                     <span id="fcProgressText" class="font-semibold"></span>
                     <span class="text-xs bg-purple-900/50 text-purple-200 px-2 py-1 rounded border border-purple-700 shadow-inner">Розумні інтервали</span>
                 </div>
@@ -209,8 +217,8 @@
 
             <div id="fcCard" onclick="flipFlashcard()" class="bg-gray-800 p-8 rounded-lg border border-gray-600 cursor-pointer shadow-xl text-center min-h-[300px] flex flex-col justify-center flashcard-inner">
                 <h2 id="fcQuestion" class="text-2xl md:text-3xl font-semibold mb-4"></h2>
-                <img id="fcImage" class="hidden w-full max-h-64 object-contain rounded mx-auto border border-gray-700 bg-gray-900 mb-4" src="">
-                <p id="fcTapHint" class="text-gray-500 animate-pulse mt-4 text-sm">👆 Натисніть, щоб побачити відповідь</p>
+                <img id="fcImage" onclick="event.stopPropagation(); openImageZoom(this.src)" class="hidden w-full max-h-64 object-contain rounded mx-auto border border-gray-700 bg-gray-900 mb-4 cursor-zoom-in" src="">
+                <p id="fcTapHint" class="text-gray-500 animate-pulse mt-4 text-sm">👆 Натисніть, щоб побачити відповідь (або свайпніть після)</p>
                 <div id="fcAnswerBox" class="hidden mt-6 pt-6 border-t border-gray-700 w-full">
                     <p class="text-sm text-gray-400 mb-1">Вірна відповідь:</p>
                     <p id="fcAnswerText" class="text-green-400 font-bold text-2xl mb-4"></p>
@@ -228,15 +236,19 @@
             <div class="bg-gray-800 p-8 rounded-lg border border-gray-700">
                 <h2 id="resultTitle" class="text-3xl font-bold mb-4">Сесію завершено!</h2>
                 <p class="text-xl mb-6">Твій результат: <span id="scoreText" class="text-yellow-500 font-bold text-2xl"></span></p>
+                
                 <div id="smartWorkoutReview" class="text-left bg-indigo-900/30 p-4 rounded border border-indigo-800 mb-6 hidden">
                     <h3 class="font-bold text-indigo-400 mb-2">Аналіз тренування:</h3>
                     <p class="text-sm text-gray-300" id="smartWorkoutText"></p>
                 </div>
+
                 <div id="mistakesReview" class="text-left bg-gray-900 p-4 rounded mb-6 hidden">
+                    <button id="retryMistakesBtn" onclick="retryCurrentMistakes()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded text-lg mb-4 shadow border border-orange-800 transition">🔄 Повторити помилки цієї сесії</button>
                     <h3 class="font-bold text-red-400 mb-3">Розбір помилок:</h3>
                     <div id="mistakesList" class="space-y-5 text-sm"></div>
                 </div>
-                <button onclick="showScreen('homeScreen')" class="btn-primary px-8 py-3 rounded text-lg">На головну</button>
+                
+                <button onclick="showScreen('homeScreen')" class="btn-primary px-8 py-3 rounded text-lg w-full md:w-auto">На головну</button>
             </div>
         </div>
     </div>
@@ -286,7 +298,6 @@
 
     <!-- ВІКНО ДОВІДНИКА -->
     <div id="cheatSheetModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4">
-        <!-- Код довідника без змін -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl transition-all">
             <div class="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-900 rounded-t-lg">
                 <h2 class="text-xl font-bold text-blue-400">📘 Шпаргалка</h2>
@@ -315,15 +326,14 @@
 
         // ДАНІ ТА СТАТИСТИКА
         let questions = JSON.parse(localStorage.getItem('quiz_questions'));
-        if (!Array.isArray(questions)) questions = defaultQuestions; // Порожня база — це теж валідний стан
+        if (!Array.isArray(questions)) questions = defaultQuestions;
         let quizStats = JSON.parse(localStorage.getItem('quiz_stats')) || {}; 
         let mistakeIds = JSON.parse(localStorage.getItem('quiz_mistakes')) || []; 
+        let favoriteIds = JSON.parse(localStorage.getItem('quiz_favorites')) || []; // НОВЕ: Збереження обраного
         let srsStats = JSON.parse(localStorage.getItem('quiz_srs')) || {}; 
         let examHistory = JSON.parse(localStorage.getItem('quiz_exam_history')) || [];
         
-        // НОВА ЛОГІКА СТРИКА
         const storedAppStats = JSON.parse(localStorage.getItem('app_stats')) || {};
-        // Старий формат зберігав лише дату відкриття, а не навчання — його streak не можна вважати підтвердженим.
         let appStats = { streak: storedAppStats.lastStudyDate && Number.isFinite(storedAppStats.streak) ? storedAppStats.streak : 0, lastStudyDate: storedAppStats.lastStudyDate || null, questionsDate: storedAppStats.questionsDate || null, questionsToday: storedAppStats.lastStudyDate && Number.isFinite(storedAppStats.questionsToday) ? storedAppStats.questionsToday : 0, streakUpdatedToday: !!storedAppStats.lastStudyDate && !!storedAppStats.streakUpdatedToday, totalQuizzes: Number.isFinite(storedAppStats.totalQuizzes) ? storedAppStats.totalQuizzes : 0 };
         
         function escapeHtml(value) { return String(value ?? '').replace(/[&<>\"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch])); }
@@ -352,20 +362,48 @@
         let pendingQuestionSave = null;
         let currentMode = 'quiz'; 
         let examInterval = null, examTimeLeft = 0;
-        let examPassTarget = 70; // Зберігаємо прохідний бал
+        let examPassTarget = 70;
 
         function shuffle(array) { let arr = [...array]; for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
         
         function saveData() { 
             localStorage.setItem('quiz_questions', JSON.stringify(questions)); 
             localStorage.setItem('quiz_mistakes', JSON.stringify(mistakeIds)); 
+            localStorage.setItem('quiz_favorites', JSON.stringify(favoriteIds)); 
             localStorage.setItem('quiz_stats', JSON.stringify(quizStats)); 
             localStorage.setItem('quiz_srs', JSON.stringify(srsStats));
             localStorage.setItem('quiz_exam_history', JSON.stringify(examHistory));
             localStorage.setItem('app_stats', JSON.stringify(appStats));
         }
 
-        // --- СТРИК: зараховується лише день, коли реально дано 5 відповідей ---
+        // --- ЛОГІКА ОБРАНОГО ---
+        function toggleFavorite(id, e) {
+            if (e && e.stopPropagation) e.stopPropagation();
+            if (favoriteIds.includes(id)) {
+                favoriteIds = favoriteIds.filter(f => f !== id);
+            } else {
+                favoriteIds.push(id);
+            }
+            saveData();
+            if (!document.getElementById('editorScreen').classList.contains('hidden')) updateEditorList();
+        }
+
+        function toggleCurrentFavorite() {
+            if (currentQIndex < currentQuizQuestions.length) {
+                const qId = currentQuizQuestions[currentQIndex].id;
+                toggleFavorite(qId);
+                updateFavoriteUI(qId);
+            }
+        }
+
+        function updateFavoriteUI(id) {
+            const isFav = favoriteIds.includes(id);
+            const favStr = isFav ? '⭐' : '☆';
+            const qBtn = document.getElementById('quizFavBtn'); if (qBtn) qBtn.innerText = favStr;
+            const fcBtn = document.getElementById('fcFavBtn'); if (fcBtn) fcBtn.innerText = favStr;
+        }
+
+        // --- СТРИК ---
         function checkDailyProgress() {
             const today = new Date().toDateString();
             if (appStats.questionsDate !== today) {
@@ -420,8 +458,14 @@
             
             const sGrid = specialDiv.querySelector('#specialGrid');
             sGrid.appendChild(createCatCard('Всі питання', questions.length, 'all'));
+            
+            // Нова картка для Обраного
+            let validFavorites = favoriteIds.filter(id => questions.find(q => q.id === id));
+            if (validFavorites.length > 0) sGrid.appendChild(createCatCard('⭐ Обране', validFavorites.length, 'favorites', 'border-yellow-600 bg-yellow-900/20 text-yellow-100'));
+            
             let validMistakes = mistakeIds.filter(id => questions.find(q => q.id === id));
-            if (validMistakes.length > 0) sGrid.appendChild(createCatCard('🔥 Помилки', validMistakes.length, 'mistakes', 'border-red-900 bg-red-900/20 text-red-100'));
+            if (validMistakes.length > 0) sGrid.appendChild(createCatCard('🔥 Помилки (Всі)', validMistakes.length, 'mistakes', 'border-red-900 bg-red-900/20 text-red-100'));
+            
             const hardestIds = questions.filter(q => quizStats[q.id] && quizStats[q.id].w > quizStats[q.id].c).map(q => q.id);
             if (hardestIds.length > 0) sGrid.appendChild(createCatCard('💀 Найскладніші', hardestIds.length, 'hardest', 'border-purple-800 bg-purple-900/20 text-purple-100'));
 
@@ -515,6 +559,7 @@
                 let filterCats = Array.from(selectedCategories).filter(c => c.startsWith('cat|'));
                 pool = questions.filter(q => {
                     return (selectedCategories.has('mistakes') && mistakeIds.includes(q.id)) ||
+                           (selectedCategories.has('favorites') && favoriteIds.includes(q.id)) ||
                            (selectedCategories.has('hardest') && quizStats[q.id] && quizStats[q.id].w > quizStats[q.id].c) ||
                            filterCats.includes(`cat|${q.category || 'Без категорії'}|${q.subCategory || 'Загальні'}`);
                 });
@@ -529,7 +574,6 @@
             if (pool.length === 0) return;
             currentQuizQuestions = shuffle(pool); currentQIndex = 0; score = 0; userMistakes = [];
             
-            // Лічильник тестів збільшуватимемо ТІЛЬКИ в кінці сесії (finishSession)
             document.getElementById('examTimerDisplay').classList.add('hidden');
             document.getElementById('quizFeedback').classList.add('hidden');
             if (mode === 'quiz') { showScreen('quizScreen'); loadNextQuestion(); }
@@ -541,30 +585,43 @@
             currentMode = 'smart'; clearInterval(examInterval);
             if (questions.length < 10) { alert("Мало питань у базі для цього режиму!"); return; }
 
-            // 1. Слабкі місця (де помилок більше або дорівнює правильним)
             let weakPool = questions.filter(q => quizStats[q.id] && quizStats[q.id].w > 0 && quizStats[q.id].w >= quizStats[q.id].c);
-            // 2. Нові (жодного разу не відповідав)
-            let unseenPool = questions.filter(q => !quizStats[q.id]);
-            // 3. Інші (закріплення)
-            let randomPool = questions.filter(q => !weakPool.includes(q) && !unseenPool.includes(q));
+            weakPool.sort((a, b) => {
+                let pA = quizStats[a.id].w / (quizStats[a.id].w + quizStats[a.id].c);
+                let pB = quizStats[b.id].w / (quizStats[b.id].w + quizStats[b.id].c);
+                return pB - pA;
+            });
+            weakPool = shuffle(weakPool.slice(0, 20));
 
-            weakPool = shuffle(weakPool); unseenPool = shuffle(unseenPool); randomPool = shuffle(randomPool);
+            let unseenPool = shuffle(questions.filter(q => !quizStats[q.id]));
+            let randomPool = shuffle(questions.filter(q => !weakPool.includes(q) && !unseenPool.includes(q)));
 
-            // Формуємо мікс (намагаємось 10 слабких, 6 нових, 4 рандом)
-            let targetTotal = 20, mix = [];
+            let targetTotal = 20;
             let wCount = Math.min(10, weakPool.length);
-            let uCount = Math.min(6 + (10 - wCount), unseenPool.length); // якщо слабких мало, беремо більше нових
-            let rCount = targetTotal - wCount - uCount; // решту забиваємо рандомом (навіть якщо їх треба багато)
+            let uCount = Math.min(6 + (10 - wCount), unseenPool.length);
+            let rCount = targetTotal - wCount - uCount;
 
-            mix = [...weakPool.slice(0, wCount), ...unseenPool.slice(0, uCount), ...randomPool.slice(0, rCount)];
+            let mix = [...weakPool.slice(0, wCount), ...unseenPool.slice(0, uCount), ...randomPool.slice(0, rCount)];
             
-            // Якщо бази не вистачило навіть на 20, просто беремо скільки є
             currentQuizQuestions = shuffle(mix);
             currentQIndex = 0; score = 0; userMistakes = [];
 
             document.getElementById('examTimerDisplay').classList.add('hidden');
             document.getElementById('quizFeedback').classList.add('hidden');
             showScreen('quizScreen'); loadNextQuestion();
+        }
+
+        // ПОВТОРЕННЯ ПОТОЧНИХ ПОМИЛОК
+        function retryCurrentMistakes() {
+            if (userMistakes.length === 0) return;
+            currentMode = 'retry'; 
+            currentQuizQuestions = shuffle(userMistakes.map(m => m.q));
+            currentQIndex = 0; score = 0; userMistakes = [];
+            
+            document.getElementById('examTimerDisplay').classList.add('hidden');
+            document.getElementById('quizFeedback').classList.add('hidden');
+            showScreen('quizScreen'); 
+            loadNextQuestion();
         }
 
         // --- ЕКЗАМЕН З НАЛАШТУВАННЯМИ ---
@@ -614,7 +671,6 @@
 
         function updateExamTimerUI() { let m = Math.floor(examTimeLeft / 60), s = examTimeLeft % 60; document.getElementById('examTimerDisplay').innerText = `⏱️ ${m}:${s.toString().padStart(2, '0')}`; }
 
-        // Нормалізація відповіді: ігноруємо пробіли, регістр і різні типи тире; підтримуємо десяткову кому.
         function normalizeAnswer(value) { return String(value ?? '').trim().replace(/[\s\u00A0]+/g, '').replace(/[−–—]/g, '-').replace(',', '.').toLocaleLowerCase(); }
         function answersMatch(userValue, acceptedValue) {
             const a = normalizeAnswer(userValue), b = normalizeAnswer(acceptedValue);
@@ -632,6 +688,8 @@
             document.getElementById('quizProgress').innerText = `Питання ${currentQIndex + 1}/${currentQuizQuestions.length} (${q.category || 'Без категорії'})`;
             document.getElementById('quizQuestionText').innerText = q.text;
             
+            updateFavoriteUI(q.id);
+
             const statUI = document.getElementById('quizCurrentStats');
             if (currentMode === 'exam') { statUI.classList.add('hidden'); } 
             else { statUI.classList.remove('hidden'); const stats = quizStats[q.id] || { c: 0, w: 0 }; statUI.innerText = `✅ ${stats.c} | ❌ ${stats.w}`; }
@@ -659,7 +717,7 @@
             if (isCorrect) { score++; mistakeIds = mistakeIds.filter(id => id !== qObj.id); quizStats[qObj.id].c++; } 
             else { userMistakes.push({ q: qObj, sel: selText }); if (!mistakeIds.includes(qObj.id)) mistakeIds.push(qObj.id); quizStats[qObj.id].w++; }
             
-            addProgressPoint(); // Оновлення стрика
+            addProgressPoint(); 
 
             if (currentMode === 'exam') {
                 currentQIndex++; loadNextQuestion();
@@ -714,6 +772,9 @@
             document.getElementById('fcProgressBar').style.width = ((currentQIndex + 1) / currentQuizQuestions.length * 100) + '%';
             document.getElementById('fcProgressText').innerText = `Картка ${currentQIndex + 1}/${currentQuizQuestions.length} (${q.category || 'Без категорії'})`;
             document.getElementById('fcQuestion').innerText = q.text;
+            
+            updateFavoriteUI(q.id);
+
             const imgEl = document.getElementById('fcImage'); (q.imageUrl && /^https?:\/\//i.test(q.imageUrl)) ? (imgEl.src = q.imageUrl, imgEl.classList.remove('hidden')) : (imgEl.removeAttribute('src'), imgEl.classList.add('hidden'));
             
             document.getElementById('fcAnswerBox').classList.add('hidden'); document.getElementById('fcTapHint').classList.remove('hidden');
@@ -728,13 +789,14 @@
         }
 
         function recordFlashcard(isCorrect, e) {
-            e.stopPropagation(); const q = currentQuizQuestions[currentQIndex];
+            if (e && e.stopPropagation) e.stopPropagation();
+            const q = currentQuizQuestions[currentQIndex];
             let srs = srsStats[q.id] || { interval: 0, nextReview: 0 };
             
             if (isCorrect) { score++; if (srs.interval === 0) srs.interval = 1; else if (srs.interval === 1) srs.interval = 3; else srs.interval = Math.ceil(srs.interval * 2); } 
             else { srs.interval = 0; userMistakes.push({ q: q, sel: "Не згадав" }); }
             
-            addProgressPoint(); // Флеш картки теж качають стрик
+            addProgressPoint(); 
 
             srs.nextReview = Date.now() + (srs.interval * 86400000);
             srsStats[q.id] = srs; saveData(); currentQIndex++; loadNextFlashcard();
@@ -744,7 +806,6 @@
         function finishSession() {
             clearInterval(examInterval); document.getElementById('quizFeedback').classList.add('hidden'); 
             
-            // ДОДАЄМО ДО ПРОЙДЕНИХ ТЕСТІВ ТІЛЬКИ ТЕСТИ/ЕКЗАМЕНИ (не картки)
             if (currentMode === 'quiz' || currentMode === 'exam' || currentMode === 'smart') {
                 appStats.totalQuizzes++; saveData();
             }
@@ -764,7 +825,7 @@
                 rTitle.className = passed ? "text-3xl font-bold mb-4 text-green-500" : "text-3xl font-bold mb-4 text-red-500";
                 document.getElementById('scoreText').innerText = `${score} з ${currentQuizQuestions.length} (${percent}%)`;
             } else {
-                rTitle.innerText = currentMode === 'smart' ? "🧠 Тренування завершено!" : "Сесію завершено!"; 
+                rTitle.innerText = currentMode === 'smart' ? "🧠 Тренування завершено!" : (currentMode === 'retry' ? "🔄 Робота над помилками завершена!" : "Сесію завершено!"); 
                 rTitle.className = "text-3xl font-bold mb-4 text-indigo-400"; 
                 document.getElementById('scoreText').innerText = `${score} з ${currentQuizQuestions.length}`;
                 
@@ -788,7 +849,10 @@
             }
             
             const rDiv = document.getElementById('mistakesReview'), lDiv = document.getElementById('mistakesList');
+            const retryBtn = document.getElementById('retryMistakesBtn');
+            
             if (userMistakes.length > 0) {
+                retryBtn.classList.remove('hidden');
                 rDiv.classList.remove('hidden');
                 lDiv.replaceChildren();
                 userMistakes.forEach(m => {
@@ -800,7 +864,10 @@
                     if (m.q.explanation) { const exp = document.createElement('p'); exp.className = 'text-gray-400 mt-2 text-xs italic bg-gray-800 p-2 rounded'; exp.textContent = `💡 ${m.q.explanation}`; item.appendChild(exp); }
                     lDiv.appendChild(item);
                 });
-            } else { rDiv.classList.add('hidden'); }
+            } else { 
+                retryBtn.classList.add('hidden');
+                rDiv.classList.add('hidden'); 
+            }
         }
 
         // --- РЕДАКТОР ---
@@ -890,7 +957,7 @@
             saveData(); cancelEdit(); updateEditorList();
         }
 
-        function deleteQuestion(id) { if(confirm("Точно видалити?")) { questions = questions.filter(q => q.id !== id); saveData(); updateEditorList(); } }
+        function deleteQuestion(id) { if(confirm("Точно видалити?")) { questions = questions.filter(q => q.id !== id); favoriteIds = favoriteIds.filter(f => f !== id); saveData(); updateEditorList(); } }
 
         function toggleFolder(el) { el.nextElementSibling.classList.toggle('hidden'); }
         function renameCategoryPrompt(oldName) { let newName = prompt(`Введіть нову назву для головної категорії "${oldName}":`, oldName); if (newName && newName.trim() !== "" && newName !== oldName) { questions.forEach(q => { if ((q.category || 'Без категорії') === oldName) q.category = newName.trim(); }); saveData(); updateEditorList(); } }
@@ -901,9 +968,19 @@
         function renderQuestionItem(q, isNested = false) {
             const stats = quizStats[q.id] || { c: 0, w: 0 }, typeIcon = q.type === 'input' ? '⌨️' : '🔘';
             const categoryText = `[${q.category || 'Без категорії'}${q.subCategory ? ' ➔ ' + q.subCategory : ''}]`;
+            const favStr = favoriteIds.includes(q.id) ? '⭐' : '<span class="text-gray-500 hover:text-yellow-500">☆</span>';
+            
             return `
             <div class="bg-gray-700 p-3 rounded flex justify-between items-start border border-gray-600">
-                <div class="flex-1"><div class="flex items-center space-x-2">${isNested ? '' : `<span class="text-xs font-bold text-yellow-500">${escapeHtml(categoryText)}</span>`}<span class="text-xs">${typeIcon}</span><span class="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded border border-gray-600">✅ ${stats.c} | ❌ ${stats.w}</span></div><p class="font-semibold text-sm mt-1 text-gray-100">${escapeHtml(q.text)} ${q.imageUrl?'🖼️':''}</p></div>
+                <div class="flex-1">
+                    <div class="flex items-center space-x-2">
+                        <button onclick="toggleFavorite(${escapeHtml(JSON.stringify(String(q.id)))}, event)" class="text-lg leading-none" title="Додати в обране">${favStr}</button>
+                        ${isNested ? '' : `<span class="text-xs font-bold text-yellow-500">${escapeHtml(categoryText)}</span>`}
+                        <span class="text-xs">${typeIcon}</span>
+                        <span class="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded border border-gray-600">✅ ${stats.c} | ❌ ${stats.w}</span>
+                    </div>
+                    <p class="font-semibold text-sm mt-1 text-gray-100">${escapeHtml(q.text)} ${q.imageUrl?'🖼️':''}</p>
+                </div>
                 <div class="flex flex-col ml-3 space-y-2"><button onclick="editQuestion(${escapeHtml(JSON.stringify(String(q.id)))})" class="text-blue-400 hover:text-blue-300 bg-gray-800 px-2 py-1 rounded border border-gray-600 text-xs shadow-sm">✏️</button><button onclick="deleteQuestion(${escapeHtml(JSON.stringify(String(q.id)))})" class="text-red-400 hover:text-red-300 bg-gray-800 px-2 py-1 rounded border border-gray-600 text-xs shadow-sm">❌</button></div>
             </div>`;
         }
@@ -942,6 +1019,7 @@
                 cheatSheet: document.getElementById('cheatSheetContent').innerHTML,
                 quizStats: quizStats,
                 mistakeIds: mistakeIds,
+                favoriteIds: favoriteIds,
                 srsStats: srsStats,
                 examHistory: examHistory,
                 appStats: appStats
@@ -982,6 +1060,7 @@
             if (data.quizStats !== undefined) for (const [id, st] of Object.entries(data.quizStats)) if (!st || typeof st !== 'object' || !Number.isFinite(st.c) || st.c < 0 || !Number.isFinite(st.w) || st.w < 0) return `quizStats для питання ${id}: c і w мають бути невід’ємними числами.`;
             if (data.srsStats !== undefined) for (const [id, st] of Object.entries(data.srsStats)) if (!st || typeof st !== 'object' || !Number.isFinite(st.interval) || st.interval < 0 || !Number.isFinite(st.nextReview) || st.nextReview < 0) return `srsStats для питання ${id}: interval і nextReview мають бути невід’ємними числами.`;
             if (data.mistakeIds !== undefined && (!Array.isArray(data.mistakeIds) || !data.mistakeIds.every(x => typeof x === 'string' || typeof x === 'number'))) return 'Поле mistakeIds має бути масивом ID.';
+            if (data.favoriteIds !== undefined && (!Array.isArray(data.favoriteIds) || !data.favoriteIds.every(x => typeof x === 'string' || typeof x === 'number'))) return 'Поле favoriteIds має бути масивом ID.';
             if (data.examHistory !== undefined && (!Array.isArray(data.examHistory) || !data.examHistory.every(h => h && typeof h === 'object' && Number.isFinite(h.perc) && Number.isFinite(h.total) && Number.isFinite(h.score) && Number.isFinite(h.targetPass) && (h.date === undefined || typeof h.date === 'string')))) return 'Поле examHistory має містити записи з числовими perc, total, score і targetPass та текстовою датою.';
             if (data.cheatSheet !== undefined && typeof data.cheatSheet !== 'string') return 'Поле cheatSheet має бути текстом HTML.';
             if (data.appStats !== undefined) {
@@ -1000,14 +1079,10 @@
                 try {
                     const imp = JSON.parse(evt.target.result);
                     const validationError = validateBackup(imp);
-                    if (validationError) { alert(`Backup не імпортовано.
-
-Що не так: ${validationError}
-
-Поточна база не змінена.`); return; }
+                    if (validationError) { alert(`Backup не імпортовано.\n\nЩо не так: ${validationError}\n\nПоточна база не змінена.`); return; }
                     if (!confirm('⚠️ УВАГА! Це повністю перепише всю базу, статистику і стрик на ті, що у файлі. Продовжити?')) return;
                     if (Array.isArray(imp)) {
-                        questions = imp; mistakeIds = []; quizStats = {}; srsStats = {}; examHistory = [];
+                        questions = imp; mistakeIds = []; favoriteIds = []; quizStats = {}; srsStats = {}; examHistory = [];
                         appStats = { streak: 0, lastStudyDate: null, questionsDate: null, questionsToday: 0, streakUpdatedToday: false, totalQuizzes: 0 };
                         alert('Завантажено тільки питання (старий формат). Статистика скинута.');
                     } else {
@@ -1017,7 +1092,7 @@
                             localStorage.setItem('quiz_cheatsheet', clean);
                             document.getElementById('cheatSheetContent').innerHTML = clean;
                         }
-                        quizStats = imp.quizStats || {}; mistakeIds = imp.mistakeIds || []; srsStats = imp.srsStats || {}; examHistory = imp.examHistory || [];
+                        quizStats = imp.quizStats || {}; mistakeIds = imp.mistakeIds || []; favoriteIds = imp.favoriteIds || []; srsStats = imp.srsStats || {}; examHistory = imp.examHistory || [];
                         if (imp.appStats) {
                             appStats = { streak: Number.isFinite(imp.appStats.streak) ? imp.appStats.streak : 0, lastStudyDate: imp.appStats.lastStudyDate || null, questionsDate: imp.appStats.questionsDate || null, questionsToday: imp.appStats.lastStudyDate && Number.isFinite(imp.appStats.questionsToday) ? imp.appStats.questionsToday : 0, streakUpdatedToday: !!imp.appStats.lastStudyDate && !!imp.appStats.streakUpdatedToday, totalQuizzes: Number.isFinite(imp.appStats.totalQuizzes) ? imp.appStats.totalQuizzes : 0 };
                         } else appStats = { streak: 0, lastStudyDate: null, questionsDate: null, questionsToday: 0, streakUpdatedToday: false, totalQuizzes: 0 };
@@ -1025,11 +1100,7 @@
                     }
                     saveData(); updateEditorList(); checkDailyProgress();
                 } catch(err) {
-                    alert(`Не вдалося прочитати backup.
-
-Причина: ${err.message || 'Невідома помилка'}.
-
-Поточна база не змінена.`);
+                    alert(`Не вдалося прочитати backup.\n\nПричина: ${err.message || 'Невідома помилка'}.\n\nПоточна база не змінена.`);
                 } finally { e.target.value = ''; }
             };
             r.onerror = function() { alert('Не вдалося прочитати вибраний файл. Поточна база не змінена.'); e.target.value = ''; };
@@ -1044,6 +1115,44 @@
             else if (screenId === 'statsScreen') { renderStatsScreen(); }
         }
         
+        // --- ЛОГІКА ЗУМУ КАРТИНОК ---
+        function openImageZoom(src) {
+            if (!src) return;
+            document.getElementById('imageZoomSrc').src = src;
+            document.getElementById('imageZoomModal').classList.remove('hidden');
+        }
+        function closeImageZoom() {
+            document.getElementById('imageZoomModal').classList.add('hidden');
+            document.getElementById('imageZoomSrc').src = "";
+        }
+
+        // --- СВАЙПИ ДЛЯ ФЛЕШ-КАРТОК ---
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const fcCardElement = document.getElementById('fcCard');
+
+        fcCardElement.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        fcCardElement.addEventListener('touchend', e => {
+            if (document.getElementById('fcAnswerBox').classList.contains('hidden')) return;
+            
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const deltaX = touchEndX - touchStartX;
+            const swipeThreshold = 60;
+
+            if (deltaX < -swipeThreshold) {
+                recordFlashcard(false, { stopPropagation: () => {} });
+            } else if (deltaX > swipeThreshold) {
+                recordFlashcard(true, { stopPropagation: () => {} });
+            }
+        }
+
         saveData();
         checkDailyProgress();
         showScreen('homeScreen');
