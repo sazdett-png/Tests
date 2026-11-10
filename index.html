@@ -292,7 +292,7 @@
     <div id="cheatSheetModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4">
         <div class="bg-gray-800 rounded-lg border border-gray-700 max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl transition-all">
             <div class="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-900 rounded-t-lg">
-                <h2 class="text-xl font-bold text-blue-400">📘 Шпаргалка</h2>
+                <h2 class="text-xl font-bold text-blue-400">📘 Шпаргалка (<span id="cheatSheetPeriodLabel"></span>)</h2>
                 <div class="flex items-center space-x-3">
                     <button id="editCheatSheetBtn" onclick="toggleEditCheatSheet()" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded border border-gray-600">✏️ Редагувати</button>
                     <button onclick="toggleCheatSheet()" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
@@ -306,7 +306,7 @@
             </div>
             <div id="cheatSheetContent" class="p-5 overflow-y-auto space-y-2 text-gray-200 min-h-[50vh]"></div>
             <div class="p-4 border-t border-gray-700 flex justify-between items-center bg-gray-900 rounded-b-lg">
-                <button id="resetCheatSheetBtn" onclick="resetCheatSheet()" class="hidden text-xs text-red-400 hover:underline">Скинути</button>
+                <button id="resetCheatSheetBtn" onclick="resetCheatSheet()" class="hidden text-xs text-red-400 hover:underline">Скинути до стандартної</button>
                 <button onclick="toggleCheatSheet()" class="bg-gray-600 hover:bg-gray-500 text-white px-6 py-2 rounded font-bold ml-auto">Закрити</button>
             </div>
         </div>
@@ -316,16 +316,18 @@
         const PUBLIC_GIST_ID = '5ee027de84d344fbe11d2a496246d8ea'; 
 
         const defaultQuestions = [{ id: "1", period: "2nd period", type: "choice", category: "AC Fundamentals", subCategory: "105A", text: "Яке значення показує мультиметр при вимірюванні AC?", options: ["RMS", "Peak", "Average", "Миттєве"], answerIndex: 0, explanation: "Завжди RMS." }];
-        const defaultCheatSheet = `<div><h3>⚡ AC</h3><ul><li><b>V(RMS)</b> = V(Peak) × 0.707</li></ul></div>`;
+        
+        // Шаблоны шпаргалок для каждого периода
+        const defaultCheatSheets = {
+            '1st period': `<div><h3>⚡ 1st Period Основи</h3><ul><li>Запиши сюди формули для першого року...</li></ul></div>`,
+            '2nd period': `<div><h3>⚡ AC (2nd Period)</h3><ul><li><b>V(RMS)</b> = V(Peak) × 0.707</li></ul></div>`,
+            '3rd period': `<div><h3>⚡ 3rd Period</h3><ul><li>Мотори та трансформатори (твої нотатки)...</li></ul></div>`,
+            '4th period': `<div><h3>⚡ 4th Period</h3><ul><li>Канадський електрокод та складні системи...</li></ul></div>`
+        };
 
         let questions = JSON.parse(localStorage.getItem('quiz_questions'));
         if (!Array.isArray(questions)) questions = defaultQuestions;
-        
-        // МИГРАЦИЯ: Назначаем всем старым вопросам 2-й период, если у них его нет
-        questions = questions.map(q => {
-            if (!q.period) q.period = '2nd period';
-            return q;
-        });
+        questions = questions.map(q => { if (!q.period) q.period = '2nd period'; return q; });
 
         let activePeriod = localStorage.getItem('quiz_active_period') || '2nd period';
 
@@ -353,8 +355,14 @@
             }
             clean(doc.body); return doc.body.innerHTML;
         }
-        const savedCheatSheet = localStorage.getItem('quiz_cheatsheet') || defaultCheatSheet;
-        document.getElementById('cheatSheetContent').innerHTML = sanitizeRichHtml(savedCheatSheet);
+
+        // Завантаження шпаргалки для активного періоду
+        function loadCheatSheet() {
+            const saved = localStorage.getItem('quiz_cheatsheet_' + activePeriod);
+            const content = saved || defaultCheatSheets[activePeriod] || defaultCheatSheets['2nd period'];
+            document.getElementById('cheatSheetContent').innerHTML = sanitizeRichHtml(content);
+            document.getElementById('cheatSheetPeriodLabel').innerText = activePeriod;
+        }
 
         let selectedCategories = new Set();
         let currentQuizQuestions = [];
@@ -381,6 +389,7 @@
             selectedCategories.clear();
             updatePeriodTabsUI();
             renderCategories();
+            loadCheatSheet();
         }
 
         function updatePeriodTabsUI() {
@@ -427,12 +436,9 @@
                 let cloudContent = data.files['questions.json'].content;
                 let cloudQuestions = JSON.parse(cloudContent);
                 let finalQuestions = cloudQuestions.filter(q => !deletedCloudIds.includes(q.id));
-                
-                // На всякий случай назначаем период скачанным, если вдруг у них его нет
                 finalQuestions = finalQuestions.map(q => { if (!q.period) q.period = '2nd period'; return q; });
 
                 let cloudMap = {}; cloudQuestions.forEach(q => cloudMap[q.id] = true);
-                
                 questions.forEach(localQ => { if (!cloudMap[localQ.id] && localQ.isCustom && !deletedCloudIds.includes(localQ.id)) { finalQuestions.push(localQ); } });
                 
                 questions = finalQuestions; saveData(); updateEditorList();
@@ -481,15 +487,30 @@
 
         // ДОВІДНИК
         function toggleCheatSheet() { const m = document.getElementById('cheatSheetModal'); if (m.classList.contains('hidden')) { m.classList.remove('hidden'); } else { const c = document.getElementById('cheatSheetContent'); if (c.isContentEditable) toggleEditCheatSheet(); m.classList.add('hidden'); } }
-        function toggleEditCheatSheet() { const c = document.getElementById('cheatSheetContent'), b = document.getElementById('editCheatSheetBtn'), r = document.getElementById('resetCheatSheetBtn'), t = document.getElementById('cheatSheetToolbar'); if (c.isContentEditable) { c.contentEditable = "false"; t.classList.add('hidden'); b.innerHTML = "✏️ Редагувати"; b.classList.replace('bg-green-600', 'bg-gray-700'); r.classList.add('hidden'); const cleanHtml = sanitizeRichHtml(c.innerHTML); c.innerHTML = cleanHtml; localStorage.setItem('quiz_cheatsheet', cleanHtml); } else { c.contentEditable = "true"; t.classList.remove('hidden'); b.innerHTML = "💾 Зберегти"; b.classList.replace('bg-gray-700', 'bg-green-600'); r.classList.remove('hidden'); c.focus(); } }
+        function toggleEditCheatSheet() { 
+            const c = document.getElementById('cheatSheetContent'), b = document.getElementById('editCheatSheetBtn'), r = document.getElementById('resetCheatSheetBtn'), t = document.getElementById('cheatSheetToolbar'); 
+            if (c.isContentEditable) { 
+                c.contentEditable = "false"; t.classList.add('hidden'); b.innerHTML = "✏️ Редагувати"; b.classList.replace('bg-green-600', 'bg-gray-700'); r.classList.add('hidden'); 
+                const cleanHtml = sanitizeRichHtml(c.innerHTML); c.innerHTML = cleanHtml; 
+                localStorage.setItem('quiz_cheatsheet_' + activePeriod, cleanHtml); 
+            } else { 
+                c.contentEditable = "true"; t.classList.remove('hidden'); b.innerHTML = "💾 Зберегти"; b.classList.replace('bg-gray-700', 'bg-green-600'); r.classList.remove('hidden'); c.focus(); 
+            } 
+        }
         function formatText(cmd, val = null) { document.execCommand(cmd, false, val); document.getElementById('cheatSheetContent').focus(); }
-        function resetCheatSheet() { if(confirm("Повернути стандартний довідник?")) { document.getElementById('cheatSheetContent').innerHTML = sanitizeRichHtml(defaultCheatSheet); localStorage.removeItem('quiz_cheatsheet'); toggleEditCheatSheet(); } }
+        function resetCheatSheet() { 
+            if(confirm(`Повернути стандартний довідник для ${activePeriod}? Всі ваші особисті записи в цьому періоді будуть видалені.`)) { 
+                const def = defaultCheatSheets[activePeriod] || defaultCheatSheets['2nd period'];
+                document.getElementById('cheatSheetContent').innerHTML = sanitizeRichHtml(def); 
+                localStorage.removeItem('quiz_cheatsheet_' + activePeriod); 
+                toggleEditCheatSheet(); 
+            } 
+        }
 
         // ГОЛОВНИЙ ЕКРАН
         function renderCategories() {
             const container = document.getElementById('categoriesGrid'); container.innerHTML = '';
             
-            // Фильтруем вопросы ТОЛЬКО для активного периода
             const periodQuestions = questions.filter(q => q.period === activePeriod);
 
             const specialDiv = document.createElement('div'); specialDiv.className = 'mb-6';
@@ -819,7 +840,6 @@
             const stats = quizStats[q.id] || { c: 0, w: 0 }, typeIcon = q.type === 'input' ? '⌨️' : '🔘';
             const categoryText = `[${q.category || 'Без категорії'}${q.subCategory ? ' ➔ ' + q.subCategory : ''}]`;
             const favStr = favoriteIds.includes(q.id) ? '⭐' : '<span class="text-gray-500 hover:text-yellow-500">☆</span>';
-            // В редакторе добавляем бейдж с периодом, если выбран фильтр "Всі періоди"
             const filterVal = document.getElementById('editorPeriodFilter').value;
             const periodBadge = (filterVal === 'all' && !isNested) ? `<span class="text-[9px] bg-purple-900 text-purple-200 px-1 py-0.5 rounded border border-purple-700 ml-1">${q.period.split(' ')[0]}</span>` : '';
 
@@ -832,10 +852,7 @@
             const list = document.getElementById('questionsList');
             
             let listToRender = questions;
-            if (filterPeriod !== 'all') {
-                listToRender = questions.filter(q => q.period === filterPeriod);
-            }
-            
+            if (filterPeriod !== 'all') { listToRender = questions.filter(q => q.period === filterPeriod); }
             document.getElementById('qCount').innerText = listToRender.length;
             
             if (query) {
@@ -860,7 +877,11 @@
         }
 
         function exportFullData() { 
-            const dataToSave = { questions: questions, cheatSheet: document.getElementById('cheatSheetContent').innerHTML, quizStats: quizStats, mistakeIds: mistakeIds, favoriteIds: favoriteIds, srsStats: srsStats, examHistory: examHistory, appStats: appStats };
+            let allCheatSheets = {};
+            ['1st period', '2nd period', '3rd period', '4th period'].forEach(p => {
+                allCheatSheets[p] = localStorage.getItem('quiz_cheatsheet_' + p) || defaultCheatSheets[p];
+            });
+            const dataToSave = { questions: questions, cheatSheets: allCheatSheets, quizStats: quizStats, mistakeIds: mistakeIds, favoriteIds: favoriteIds, srsStats: srsStats, examHistory: examHistory, appStats: appStats };
             const dl = document.createElement('a'); dl.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToSave))); dl.setAttribute("download", "sait_quiz_FULL_backup.json"); dl.click(); 
         }
 
@@ -876,12 +897,21 @@
                         alert('Завантажено тільки питання (старий формат). Статистика скинута.');
                     } else {
                         questions = imp.questions.map(q => { if (!q.period) q.period = '2nd period'; return q; });
-                        if (imp.cheatSheet !== undefined) { const clean = sanitizeRichHtml(imp.cheatSheet); localStorage.setItem('quiz_cheatsheet', clean); document.getElementById('cheatSheetContent').innerHTML = clean; }
+                        
+                        if (imp.cheatSheets) {
+                            Object.keys(imp.cheatSheets).forEach(p => {
+                                localStorage.setItem('quiz_cheatsheet_' + p, sanitizeRichHtml(imp.cheatSheets[p]));
+                            });
+                        } else if (imp.cheatSheet !== undefined) { 
+                            // підтримуємо старі бекапи де була одна шпаргалка
+                            localStorage.setItem('quiz_cheatsheet_2nd period', sanitizeRichHtml(imp.cheatSheet)); 
+                        }
+
                         quizStats = imp.quizStats || {}; mistakeIds = imp.mistakeIds || []; favoriteIds = imp.favoriteIds || []; srsStats = imp.srsStats || {}; examHistory = imp.examHistory || [];
                         if (imp.appStats) { appStats = { streak: Number.isFinite(imp.appStats.streak) ? imp.appStats.streak : 0, lastStudyDate: imp.appStats.lastStudyDate || null, questionsDate: imp.appStats.questionsDate || null, questionsToday: imp.appStats.lastStudyDate && Number.isFinite(imp.appStats.questionsToday) ? imp.appStats.questionsToday : 0, streakUpdatedToday: !!imp.appStats.lastStudyDate && !!imp.appStats.streakUpdatedToday, totalQuizzes: Number.isFinite(imp.appStats.totalQuizzes) ? imp.appStats.totalQuizzes : 0 }; } else appStats = { streak: 0, lastStudyDate: null, questionsDate: null, questionsToday: 0, streakUpdatedToday: false, totalQuizzes: 0 };
                         alert('Повну копію успішно відновлено!');
                     }
-                    saveData(); updateEditorList(); checkDailyProgress(); updatePeriodTabsUI(); renderCategories();
+                    saveData(); updateEditorList(); checkDailyProgress(); updatePeriodTabsUI(); renderCategories(); loadCheatSheet();
                 } catch(err) { alert(`Не вдалося прочитати backup.\n\nПоточна база не змінена.`); } finally { e.target.value = ''; }
             };
             r.onerror = function() { alert('Не вдалося прочитати вибраний файл.'); e.target.value = ''; }; r.readAsText(f);
@@ -903,7 +933,7 @@
         fcCardElement.addEventListener('touchend', e => { if (document.getElementById('fcAnswerBox').classList.contains('hidden')) return; touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, { passive: true });
         function handleSwipe() { const deltaX = touchEndX - touchStartX; const swipeThreshold = 60; if (deltaX < -swipeThreshold) { recordFlashcard(false, { stopPropagation: () => {} }); } else if (deltaX > swipeThreshold) { recordFlashcard(true, { stopPropagation: () => {} }); } }
 
-        saveData(); checkDailyProgress(); checkAdminMode(); updatePeriodTabsUI(); showScreen('homeScreen'); autoSyncOnLoad();
+        saveData(); checkDailyProgress(); checkAdminMode(); updatePeriodTabsUI(); showScreen('homeScreen'); loadCheatSheet(); autoSyncOnLoad();
     </script>
 </body>
 </html>
