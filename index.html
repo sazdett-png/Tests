@@ -387,7 +387,7 @@
 
         async function autoSyncOnLoad() {
             if (!PUBLIC_GIST_ID || PUBLIC_GIST_ID === '') return;
-            if (adminSettings.token) return; // Админ качает базу только вручную, чтобы не стереть свои труды
+            if (adminSettings.token) return; 
             await performCloudSync(PUBLIC_GIST_ID);
         }
 
@@ -403,7 +403,7 @@
 
         async function performCloudSync(targetGistId) {
             try {
-                let res = await fetch(`https://api.github.com/gists/${targetGistId}`);
+                let res = await fetch(`https://api.github.com/gists/${targetGistId}?t=${Date.now()}`);
                 if (!res.ok) throw new Error("Network response not ok");
                 let data = await res.json();
                 
@@ -415,9 +415,10 @@
                 let finalQuestions = cloudQuestions.filter(q => !deletedCloudIds.includes(q.id));
                 let cloudMap = {}; cloudQuestions.forEach(q => cloudMap[q.id] = true);
                 
-                // Зберігаємо локальні питання, яких немає у хмарі (кастомні питання юзера)
                 questions.forEach(localQ => {
-                    if (!cloudMap[localQ.id] && !deletedCloudIds.includes(localQ.id)) {
+                    // ИСПРАВЛЕНИЕ: Мы оставляем локальный вопрос ТОЛЬКО если он был создан юзером (isCustom: true).
+                    // Если его нет в облаке и он не кастомный — значит Админ удалил его из базы. Удаляем.
+                    if (!cloudMap[localQ.id] && localQ.isCustom && !deletedCloudIds.includes(localQ.id)) {
                         finalQuestions.push(localQ);
                     }
                 });
@@ -440,7 +441,12 @@
             btn.innerText = "⏳ Відправка...";
             
             try {
-                const payload = { files: { 'questions.json': { content: JSON.stringify(questions, null, 2) } } };
+                // ИСПРАВЛЕНИЕ: Перед отправкой стираем метку isCustom, чтобы для всех других пользователей это был "официальный" вопрос
+                const cloudReadyQuestions = questions.map(q => {
+                    const { isCustom, ...rest } = q;
+                    return rest;
+                });
+                const payload = { files: { 'questions.json': { content: JSON.stringify(cloudReadyQuestions, null, 2) } } };
                 
                 let res = await fetch(`https://api.github.com/gists/${adminSettings.gistId}`, {
                     method: 'PATCH',
@@ -449,7 +455,6 @@
                 });
                 
                 if (!res.ok) throw new Error("Помилка відправки (перевірте токен)");
-                
                 alert("✅ Базу успішно опубліковано у хмару!");
             } catch(e) {
                 alert("❌ Помилка: " + e.message);
@@ -783,13 +788,26 @@
             const btn = document.getElementById('saveQuestionBtn'); btn.innerText = 'Зберегти питання'; btn.classList.replace('bg-green-600', 'btn-primary'); btn.classList.remove('text-white'); document.getElementById('cancelEditBtn').classList.add('hidden');
         }
 
+        // ИСПРАВЛЕНИЕ: При сохранении присваиваем метку isCustom
         function saveQuestion() {
             const cat = document.getElementById('qCategory').value.trim() || 'Без категорії', sub = document.getElementById('qSubCategory').value.trim();
             const txt = document.getElementById('qText').value.trim(), img = document.getElementById('qImage').value.trim(), expl = document.getElementById('qExplanation').value.trim(), type = document.getElementById('qType').value;
             let opts = [];
             if (type === 'choice') { document.querySelectorAll('.qOptionChoice').forEach(i => { if(i.value.trim()!=='') opts.push(i.value.trim()); }); if (!txt || opts.length < 2) { alert("Введи питання та мін. 2 варіанти!"); return; } }
             else { opts = document.getElementById('qOptionInput').value.split(',').map(s=>s.trim()).filter(s=>s!==''); if (!txt || opts.length === 0) { alert("Введи питання та мін. 1 вірний варіант!"); return; } }
-            const newQ = { id: editingQuestionId || (Date.now().toString() + Math.floor(Math.random()*1000)), type: type, category: cat, subCategory: sub, text: txt, imageUrl: img, options: opts, answerIndex: 0, explanation: expl };
+            
+            let isCustomVal = true;
+            if (editingQuestionId) {
+                const idx = questions.findIndex(q => q.id === editingQuestionId);
+                if (idx !== -1 && questions[idx].isCustom !== undefined) {
+                    isCustomVal = questions[idx].isCustom;
+                } else if (idx !== -1) {
+                    isCustomVal = false;
+                }
+            }
+
+            const newQ = { id: editingQuestionId || (Date.now().toString() + Math.floor(Math.random()*1000)), isCustom: isCustomVal, type: type, category: cat, subCategory: sub, text: txt, imageUrl: img, options: opts, answerIndex: 0, explanation: expl };
+            
             if (editingQuestionId) {
                 const idx = questions.findIndex(q => q.id === editingQuestionId); if (idx === -1) { alert('Не вдалося знайти питання. Онови список і спробуй ще раз.'); return; }
                 const oldQ = questions[idx], oldType = oldQ.type || 'choice', oldCorrect = oldType === 'choice' ? (oldQ.options || [])[oldQ.answerIndex] : null, newCorrect = newQ.type === 'choice' ? newQ.options[newQ.answerIndex] : null, oldOptionsKey = JSON.stringify([...(oldQ.options || [])].sort()), newOptionsKey = JSON.stringify([...newQ.options].sort());
@@ -812,9 +830,33 @@
 
         function toggleFolder(el) { el.nextElementSibling.classList.toggle('hidden'); }
         function renameCategoryPrompt(oldName) { let newName = prompt(`Введіть нову назву для головної категорії "${oldName}":`, oldName); if (newName && newName.trim() !== "" && newName !== oldName) { questions.forEach(q => { if ((q.category || 'Без категорії') === oldName) q.category = newName.trim(); }); saveData(); updateEditorList(); } }
-        function deleteCategoryPrompt(oldName) { if (confirm(`⚠️ УВАГА! Ви точно хочете видалити категорію "${oldName}" та ВСІ питання в ній?`)) { questions = questions.filter(q => (q.category || 'Без категорії') !== oldName); saveData(); updateEditorList(); } }
+        
+        // ИСПРАВЛЕНИЕ: Добавление удаленных категорий в черный список
+        function deleteCategoryPrompt(oldName) { 
+            if (confirm(`⚠️ УВАГА! Ви точно хочете видалити категорію "${oldName}" та ВСІ питання в ній?`)) { 
+                questions.forEach(q => {
+                    if ((q.category || 'Без категорії') === oldName) {
+                        if (!deletedCloudIds.includes(q.id)) deletedCloudIds.push(q.id);
+                    }
+                });
+                questions = questions.filter(q => (q.category || 'Без категорії') !== oldName); 
+                saveData(); updateEditorList(); 
+            } 
+        }
         function renameSubCategoryPrompt(main, oldSub) { let newSub = prompt(`Введіть нову назву для модуля "${oldSub}":`, oldSub); if (newSub && newSub.trim() !== "" && newSub !== oldSub) { questions.forEach(q => { if ((q.category || 'Без категорії') === main && (q.subCategory || 'Загальні') === oldSub) q.subCategory = newSub.trim(); }); saveData(); updateEditorList(); } }
-        function deleteSubCategoryPrompt(main, oldSub) { if (confirm(`⚠️ УВАГА! Ви точно хочете видалити модуль "${oldSub}" та ВСІ питання в ньому?`)) { questions = questions.filter(q => !((q.category || 'Без категорії') === main && (q.subCategory || 'Загальні') === oldSub)); saveData(); updateEditorList(); } }
+        
+        // ИСПРАВЛЕНИЕ: Добавление удаленных модулей в черный список
+        function deleteSubCategoryPrompt(main, oldSub) { 
+            if (confirm(`⚠️ УВАГА! Ви точно хочете видалити модуль "${oldSub}" та ВСІ питання в ньому?`)) { 
+                questions.forEach(q => {
+                    if ((q.category || 'Без категорії') === main && (q.subCategory || 'Загальні') === oldSub) {
+                        if (!deletedCloudIds.includes(q.id)) deletedCloudIds.push(q.id);
+                    }
+                });
+                questions = questions.filter(q => !((q.category || 'Без категорії') === main && (q.subCategory || 'Загальні') === oldSub)); 
+                saveData(); updateEditorList(); 
+            } 
+        }
 
         function renderQuestionItem(q, isNested = false) {
             const stats = quizStats[q.id] || { c: 0, w: 0 }, typeIcon = q.type === 'input' ? '⌨️' : '🔘';
