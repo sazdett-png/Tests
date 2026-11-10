@@ -39,6 +39,9 @@
         
         .flashcard-inner { transition: transform 0.3s ease; }
         .flashcard-flip { transform: scale(0.98); opacity: 0.8; }
+        
+        /* Спеціальний клас для кругового графіка */
+        .donut-chart { transition: background 0.5s ease-out; }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
@@ -47,6 +50,19 @@
     <div id="imageZoomModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-2 backdrop-blur-sm" onclick="closeImageZoom()">
         <button class="absolute top-4 right-6 text-white text-5xl font-bold opacity-70 hover:opacity-100">&times;</button>
         <img id="imageZoomSrc" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" src="">
+    </div>
+
+    <!-- ВІКНО РЕПОРТУ -->
+    <div id="reportModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[60] p-4">
+        <div class="bg-gray-800 rounded-lg border border-gray-700 max-w-sm w-full shadow-2xl p-5">
+            <h3 class="text-lg font-bold text-red-400 mb-2">🚩 Повідомити про помилку</h3>
+            <p class="text-xs text-gray-400 mb-4">Знайшли хибу? Напишіть, як має бути, і автор виправить це в загальній базі.</p>
+            <textarea id="reportText" class="w-full bg-gray-900 border border-gray-600 rounded p-3 text-white h-24 mb-4 focus:ring-2 focus:ring-red-500" placeholder="Ваш варіант або коментар..."></textarea>
+            <div class="flex gap-3">
+                <button onclick="sendReport()" id="sendReportBtn" class="bg-red-700 hover:bg-red-600 text-white flex-1 py-3 rounded font-bold shadow transition">Відправити</button>
+                <button onclick="document.getElementById('reportModal').classList.add('hidden')" class="bg-gray-600 hover:bg-gray-500 text-white flex-1 py-3 rounded font-bold transition">Скасувати</button>
+            </div>
+        </div>
     </div>
 
     <div id="questionStatsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" role="dialog">
@@ -73,7 +89,6 @@
 
         <!-- ГОЛОВНИЙ ЕКРАН -->
         <div id="homeScreen" class="space-y-5">
-            
             <div class="flex justify-between items-center bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-md">
                 <div>
                     <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Ударний режим</p>
@@ -108,19 +123,43 @@
             </div>
         </div>
 
-        <!-- ЕКРАН СТАТИСТИКИ -->
+        <!-- ОНОВЛЕНИЙ ЕКРАН СТАТИСТИКИ (DASHBOARD) -->
         <div id="statsScreen" class="hidden space-y-6">
             <div class="flex justify-between items-center mb-2">
-                <h2 class="text-2xl font-bold text-white">📊 Статистика (<span id="statsPeriodLabel"></span>)</h2>
-                <button onclick="showScreen('homeScreen')" class="text-sm btn-secondary px-4 py-2 rounded">На головну</button>
+                <h2 class="text-2xl font-bold text-white">📊 Аналітика (<span id="statsPeriodLabel"></span>)</h2>
+                <button onclick="showScreen('homeScreen')" class="text-sm btn-secondary px-4 py-2 rounded font-bold shadow">На головну</button>
             </div>
-            <div class="bg-gray-800 p-5 rounded-lg border border-gray-700 shadow-md">
-                <h3 class="text-lg font-bold text-yellow-500 mb-4 border-b border-gray-700 pb-2">Знання по модулях</h3>
-                <div id="moduleStatsList" class="space-y-4"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Загальний прогрес (Doughnut Chart) -->
+                <div class="bg-gray-800 p-5 rounded-lg border border-gray-700 shadow-md flex items-center gap-6">
+                    <div id="statDonut" class="relative w-28 h-28 rounded-full flex items-center justify-center flex-shrink-0 donut-chart" style="background: conic-gradient(#10b981 0% 0%, #ef4444 0% 100%);">
+                        <div class="absolute w-20 h-20 bg-gray-800 rounded-full"></div>
+                        <span id="statTotalPerc" class="relative z-10 text-xl font-bold text-white">0%</span>
+                    </div>
+                    <div class="flex-1 space-y-2">
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Точність відповідей</h3>
+                        <p class="text-sm">Всього відповідей: <b id="statTotalAnswers" class="text-white">0</b></p>
+                        <p class="text-sm text-green-400">✅ Вірно: <b id="statTotalCorrect">0</b></p>
+                        <p class="text-sm text-red-400">❌ Помилок: <b id="statTotalWrong">0</b></p>
+                    </div>
+                </div>
+
+                <!-- Графік останніх екзаменів (Bar Chart) -->
+                <div class="bg-gray-800 p-5 rounded-lg border border-gray-700 shadow-md flex flex-col justify-between">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Останні 7 екзаменів</h3>
+                    <div id="examBarChart" class="flex items-end gap-3 md:gap-5 h-32 w-full px-2 border-b border-gray-700 pb-1">
+                        <!-- Стовпчики генеруються через JS -->
+                    </div>
+                </div>
             </div>
+
+            <!-- Детальний розбір модулів -->
             <div class="bg-gray-800 p-5 rounded-lg border border-gray-700 shadow-md">
-                <h3 class="text-lg font-bold text-blue-400 mb-4 border-b border-gray-700 pb-2">Журнал екзаменів</h3>
-                <div id="examHistoryList" class="space-y-2"></div>
+                <h3 class="text-lg font-bold text-yellow-500 mb-4 border-b border-gray-700 pb-2">Детальний розбір модулів</h3>
+                <div id="moduleStatsList" class="space-y-4">
+                    <!-- Модулі генеруються через JS -->
+                </div>
             </div>
         </div>
 
@@ -128,7 +167,7 @@
         <div id="editorScreen" class="hidden space-y-6">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-semibold">Редактор питань</h2>
-                <button onclick="showScreen('homeScreen')" class="text-sm btn-secondary px-4 py-2 rounded">На головну</button>
+                <button onclick="cancelEdit(); showScreen('homeScreen')" class="text-sm btn-secondary px-4 py-2 rounded">На головну</button>
             </div>
 
             <!-- АДМИН ПАНЕЛЬ -->
@@ -166,8 +205,8 @@
                     <div id="uiTypeInput" class="space-y-2 hidden"><input type="text" id="qOptionInput" class="w-full bg-gray-700 rounded p-3 text-white border border-green-700" placeholder="Вірні варіанти через кому"></div>
                     <input type="text" id="qExplanation" class="w-full bg-gray-900 border-gray-600 rounded p-2 text-white text-sm" placeholder="💡 Пояснення, формула (необов'язково)">
                     <div class="flex gap-3 mt-2">
-                        <button id="saveQuestionBtn" onclick="saveQuestion()" class="btn-primary flex-1 px-6 py-3 rounded text-lg">Зберегти питання</button>
-                        <button id="cancelEditBtn" onclick="cancelEdit()" class="hidden bg-gray-600 hover:bg-gray-500 text-white px-6 py-3 rounded font-bold">Скасувати</button>
+                        <button id="saveQuestionBtn" onclick="saveQuestion()" class="btn-primary flex-1 px-6 py-3 rounded text-lg shadow">Зберегти питання</button>
+                        <button id="cancelEditBtn" onclick="cancelEdit()" class="hidden bg-gray-600 hover:bg-gray-500 text-white px-6 py-3 rounded font-bold shadow">Скасувати</button>
                     </div>
                 </div>
             </div>
@@ -200,13 +239,17 @@
             <div class="flex justify-between items-center text-sm text-gray-400 mb-2">
                 <div class="flex items-center space-x-3">
                     <button id="quizFavBtn" onclick="toggleCurrentFavorite()" class="text-xl leading-none hover:scale-110 transition-transform" title="Додати в обране">☆</button>
-                    <span id="quizProgress" class="font-semibold"></span>
+                    <!-- НОВІ КНОПКИ (РЕДАКТОР І РЕПОРТ) -->
+                    <button id="quizEditBtn" onclick="editFromSession()" class="hidden text-xl leading-none hover:scale-110 transition-transform" title="Редагувати">✏️</button>
+                    <button id="quizReportBtn" onclick="openReportModal()" class="text-xl leading-none hover:scale-110 transition-transform" title="Повідомити про помилку">🚩</button>
+                    
+                    <span id="quizProgress" class="font-semibold ml-2"></span>
                     <span id="quizCurrentStats" class="text-xs bg-gray-900 text-gray-300 px-2 py-1 rounded border border-gray-600 shadow-inner"></span>
                     <span id="examTimerDisplay" class="hidden text-xs bg-red-900 text-white px-2 py-1 rounded border border-red-700 font-mono font-bold animate-pulse"></span>
                 </div>
                 <div class="flex space-x-4">
-                    <button onclick="toggleCheatSheet()" class="text-blue-400 hover:underline font-semibold">📘 Довідник</button>
-                    <button onclick="showScreen('homeScreen'); clearInterval(examInterval);" class="text-yellow-500 hover:underline">Перервати</button>
+                    <button onclick="toggleCheatSheet()" class="text-blue-400 hover:underline font-semibold hidden md:block">📘 Довідник</button>
+                    <button onclick="showScreen('homeScreen'); clearInterval(examInterval);" class="text-yellow-500 hover:underline font-semibold">Перервати</button>
                 </div>
             </div>
             
@@ -227,10 +270,14 @@
             <div class="flex justify-between items-center text-sm text-gray-400 mb-2">
                 <div class="flex items-center space-x-3">
                     <button id="fcFavBtn" onclick="toggleCurrentFavorite()" class="text-xl leading-none hover:scale-110 transition-transform" title="Додати в обране">☆</button>
-                    <span id="fcProgressText" class="font-semibold"></span>
-                    <span class="text-xs bg-purple-900/50 text-purple-200 px-2 py-1 rounded border border-purple-700 shadow-inner">Розумні інтервали</span>
+                    <!-- НОВІ КНОПКИ (РЕДАКТОР І РЕПОРТ) -->
+                    <button id="fcEditBtn" onclick="editFromSession()" class="hidden text-xl leading-none hover:scale-110 transition-transform" title="Редагувати">✏️</button>
+                    <button id="fcReportBtn" onclick="openReportModal()" class="text-xl leading-none hover:scale-110 transition-transform" title="Повідомити про помилку">🚩</button>
+                    
+                    <span id="fcProgressText" class="font-semibold ml-2"></span>
+                    <span class="text-xs bg-purple-900/50 text-purple-200 px-2 py-1 rounded border border-purple-700 shadow-inner hidden md:block">Розумні інтервали</span>
                 </div>
-                <button onclick="showScreen('homeScreen')" class="text-purple-400 hover:underline">Перервати</button>
+                <button onclick="showScreen('homeScreen')" class="text-purple-400 hover:underline font-semibold">Перервати</button>
             </div>
             <div class="w-full bg-gray-700 h-2 rounded-full mb-4 overflow-hidden"><div id="fcProgressBar" class="bg-purple-500 h-2 rounded-full progress-bar" style="width: 0%;"></div></div>
             <div id="fcCard" onclick="flipFlashcard()" class="bg-gray-800 p-8 rounded-lg border border-gray-600 cursor-pointer shadow-xl text-center min-h-[300px] flex flex-col justify-center flashcard-inner">
@@ -366,6 +413,7 @@
         let currentQuizQuestions = [];
         let currentQIndex = 0, score = 0, userMistakes = [];
         let editingQuestionId = null, pendingQuestionSave = null, currentMode = 'quiz', examInterval = null, examTimeLeft = 0, examPassTarget = 70;
+        let returnToQuizAfterEdit = false;
 
         function shuffle(array) { let arr = [...array]; for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
         
@@ -418,10 +466,16 @@
             }
         }
 
-        function checkAdminMode() { if (adminSettings.token && adminSettings.gistId) { document.getElementById('adminPanel').classList.remove('hidden'); } else { document.getElementById('adminPanel').classList.add('hidden'); } }
+        function checkAdminMode() { 
+            if (adminSettings && adminSettings.token && adminSettings.gistId) { 
+                document.getElementById('adminPanel').classList.remove('hidden'); 
+            } else { 
+                document.getElementById('adminPanel').classList.add('hidden'); 
+            } 
+        }
         function logoutAdmin() { adminSettings = { token: '', gistId: '' }; localStorage.removeItem('quiz_admin_settings'); checkAdminMode(); }
 
-        async function autoSyncOnLoad() { if (!PUBLIC_GIST_ID || PUBLIC_GIST_ID === '') return; if (adminSettings.token) return; await performCloudSync(PUBLIC_GIST_ID); }
+        async function autoSyncOnLoad() { if (!PUBLIC_GIST_ID || PUBLIC_GIST_ID === '') return; if (adminSettings && adminSettings.token) return; await performCloudSync(PUBLIC_GIST_ID); }
         async function forceSyncWithCloud() { if (!adminSettings.gistId) { alert("Спершу налаштуй Gist ID!"); return; } if (confirm("⬇️ Завантажити базу з хмари?\n\n⚠️ УВАГА: Ваші неопубліковані локальні питання або зміни тексту можуть бути затерті хмарною версією!")) { const btn = document.getElementById('forceSyncBtn'); btn.innerText = "⏳..."; let ok = await performCloudSync(adminSettings.gistId); btn.innerText = "⬇️ Завантажити з бази"; if (ok) alert("✅ Базу успішно оновлено з хмари!"); } }
 
         async function performCloudSync(targetGistId) {
@@ -455,6 +509,49 @@
                 if (!res.ok) throw new Error("Помилка відправки (перевірте токен)");
                 alert("✅ Базу успішно опубліковано у хмару!");
             } catch(e) { alert("❌ Помилка: " + e.message); } finally { btn.innerText = "☁️ Публікація в базу"; }
+        }
+
+        // --- GOOGLE SHEETS ВІДПРАВКА ПОМИЛОК ---
+        function openReportModal() {
+            document.getElementById('reportText').value = '';
+            document.getElementById('reportModal').classList.remove('hidden');
+        }
+
+       async function sendReport() {
+            // ГОТОВІ ДАНІ ТВОЄЇ ФОРМИ:
+            const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSedH4PuETDq9wADo1hSLaZU7keXT-IK4WS1pzZvzW9wE3dGbg/formResponse'; 
+            const entryIdQId = 'entry.283478792'; 
+            const entryIdPeriod = 'entry.581882450'; 
+            const entryIdOriginal = 'entry.1246253848';
+            const entryIdComment = 'entry.622718986'; 
+
+            const userText = document.getElementById('reportText').value.trim();
+            if (!userText) { alert('Напишіть хоч щось!'); return; }
+
+            const q = currentQuizQuestions[currentQIndex];
+            const btn = document.getElementById('sendReportBtn');
+            btn.innerText = "⏳...";
+
+            const formData = new URLSearchParams();
+            formData.append(entryIdQId, q.id);
+            formData.append(entryIdPeriod, q.period || 'Без періоду');
+            formData.append(entryIdOriginal, `[${q.category || ''} -> ${q.subCategory || ''}] ${q.text}`);
+            formData.append(entryIdComment, userText);
+
+            try {
+                await fetch(formUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString()
+                });
+                alert('✅ Дякуємо! Репорт успішно відправлено автору.');
+                document.getElementById('reportModal').classList.add('hidden');
+            } catch (e) {
+                alert('❌ Помилка відправки. Перевірте з\'єднання.');
+            } finally {
+                btn.innerText = "Відправити";
+            }
         }
 
         // --- ЛОГІКА ОБРАНОГО ---
@@ -557,38 +654,104 @@
             if (dueCount > 0) { badge.innerText = `${dueCount} на сьогодні`; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
         }
 
+        // --- НОВИЙ ЕКРАН АНАЛІТИКИ (DASHBOARD) ---
         function renderStatsScreen() {
             document.getElementById('statsPeriodLabel').innerText = activePeriod;
-            let catStats = {};
             const periodQuestions = questions.filter(q => q.period === activePeriod);
+            
+            // 1. Загальна статистика (Круговий графік)
+            let totalC = 0, totalW = 0;
+            let catStats = {};
             
             periodQuestions.forEach(q => {
                 let cat = q.category || 'Без категорії';
                 if(!catStats[cat]) catStats[cat] = { c: 0, w: 0 };
-                if (quizStats[q.id]) { catStats[cat].c += quizStats[q.id].c; catStats[cat].w += quizStats[q.id].w; }
+                if (quizStats[q.id]) { 
+                    catStats[cat].c += quizStats[q.id].c; 
+                    catStats[cat].w += quizStats[q.id].w; 
+                    totalC += quizStats[q.id].c;
+                    totalW += quizStats[q.id].w;
+                }
             });
+            
+            let totalAnswers = totalC + totalW;
+            let overallPerc = totalAnswers > 0 ? Math.round((totalC / totalAnswers) * 100) : 0;
+            
+            document.getElementById('statTotalPerc').innerText = overallPerc + '%';
+            // Заповнення круга (зелений - правильні, червоний - помилки)
+            document.getElementById('statDonut').style.background = `conic-gradient(#10b981 0% ${overallPerc}%, #ef4444 ${overallPerc}% 100%)`;
+            
+            document.getElementById('statTotalAnswers').innerText = totalAnswers;
+            document.getElementById('statTotalCorrect').innerText = totalC;
+            document.getElementById('statTotalWrong').innerText = totalW;
 
+            // 2. Графік останніх екзаменів (Bar Chart)
+            let barHtml = '';
+            let recentExams = [...examHistory].slice(-7); // Останні 7 екзаменів
+            
+            if (recentExams.length === 0) {
+                barHtml = '<div class="text-gray-500 flex items-center justify-center w-full h-full text-sm">Немає даних</div>';
+            } else {
+                recentExams.forEach(h => {
+                    let hPerc = h.perc;
+                    let isPassed = hPerc >= h.targetPass;
+                    let color = isPassed ? 'bg-green-500' : 'bg-red-500';
+                    let dateShort = h.date.split(',')[0];
+                    
+                    barHtml += `
+                    <div class="flex flex-col items-center justify-end h-full flex-1 group relative">
+                        <div class="absolute bottom-full mb-2 hidden group-hover:block bg-gray-900 text-xs text-white p-2 rounded z-10 whitespace-nowrap border border-gray-600 shadow-xl">
+                            <span class="font-bold ${isPassed ? 'text-green-400' : 'text-red-400'}">${hPerc}%</span> (${h.score}/${h.total})<br>
+                            <span class="text-[10px] text-gray-400">${dateShort}</span>
+                        </div>
+                        <div class="w-full max-w-[2.5rem] bg-gray-700 rounded-t-sm flex flex-col justify-end h-24 relative overflow-hidden">
+                            <div class="w-full ${color} transition-all duration-500" style="height: ${hPerc}%"></div>
+                        </div>
+                        <span class="text-[10px] text-gray-400 mt-2 font-bold">${hPerc}%</span>
+                    </div>`;
+                });
+            }
+            document.getElementById('examBarChart').innerHTML = barHtml;
+
+            // 3. Детальний розбір модулів
             let statsHtml = '', weakestCat = null, lowestPerc = 100;
+            
             Object.keys(catStats).sort().forEach(cat => {
                 let total = catStats[cat].c + catStats[cat].w;
                 let perc = total === 0 ? 0 : Math.round((catStats[cat].c / total) * 100);
+                
                 if (total > 0 && perc < lowestPerc) { lowestPerc = perc; weakestCat = cat; }
+                
                 let color = perc >= 80 ? 'bg-green-500' : (perc >= 60 ? 'bg-yellow-500' : 'bg-red-500');
                 let textColor = perc >= 80 ? 'text-green-400' : (perc >= 60 ? 'text-yellow-400' : 'text-red-400');
-                statsHtml += `<div class="mb-4"><div class="flex justify-between items-end mb-1"><span class="font-bold text-gray-200">${escapeHtml(cat)}</span><span class="font-bold ${textColor}">${total > 0 ? perc + '%' : 'Немає даних'}</span></div><div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden"><div class="${color} h-2 rounded-full" style="width: ${perc}%"></div></div><p class="text-xs text-gray-500 mt-1">Відповідей: ${total}</p></div>`;
+                
+                statsHtml += `
+                <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
+                    <div class="flex justify-between items-end mb-2">
+                        <span class="font-bold text-gray-200 text-sm md:text-base">${escapeHtml(cat)}</span>
+                        <span class="font-bold ${textColor} text-sm">${total > 0 ? perc + '%' : '—'}</span>
+                    </div>
+                    <div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden mb-2">
+                        <div class="${color} h-2 rounded-full transition-all duration-500" style="width: ${perc}%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs text-gray-400 font-mono">
+                        <span>Спроб: ${total}</span>
+                        <span>✅ ${catStats[cat].c} | ❌ ${catStats[cat].w}</span>
+                    </div>
+                </div>`;
             });
-            if (weakestCat && lowestPerc < 75) statsHtml += `<div class="mt-4 p-3 bg-red-900/30 border border-red-800 rounded text-red-200 text-sm">⚠️ <b>Рекомендація:</b> Приділи більше уваги категорії <b>${escapeHtml(weakestCat)}</b>.</div>`;
-            document.getElementById('moduleStatsList').innerHTML = statsHtml || '<p class="text-gray-500">Немає даних у цьому періоді</p>';
-
-            let histHtml = '';
-            if (examHistory.length === 0) { histHtml = '<p class="text-gray-500">Ти ще не проходив симулятор екзамену.</p>'; } 
-            else {
-                [...examHistory].reverse().slice(0,10).forEach(h => {
-                    let passed = h.perc >= h.targetPass; let color = passed ? 'text-green-400' : 'text-red-400'; let bg = passed ? 'bg-green-900/20 border-green-800' : 'bg-red-900/20 border-red-800';
-                    histHtml += `<div class="flex justify-between items-center p-3 rounded border mb-2 ${bg}"><div><p class="text-xs text-gray-400">${escapeHtml(h.date)}</p><p class="font-bold text-gray-200">Симулятор (${h.total} питань)</p></div><div class="text-right"><p class="font-bold ${color} text-lg">${h.perc}%</p><p class="text-xs text-gray-400">${h.score} вірних (Прохідний: ${h.targetPass}%)</p></div></div>`;
-                });
+            
+            if (weakestCat && lowestPerc < 75) {
+                statsHtml = `<div class="mb-4 p-4 bg-red-900/20 border border-red-800 rounded-lg flex items-start gap-3">
+                    <span class="text-2xl leading-none">⚠️</span>
+                    <div>
+                        <h4 class="text-red-400 font-bold text-sm">Слабке місце</h4>
+                        <p class="text-red-200 text-xs mt-1">Варто приділити більше уваги модулю <b>${escapeHtml(weakestCat)}</b> (точність ${lowestPerc}%).</p>
+                    </div>
+                </div>` + statsHtml;
             }
-            document.getElementById('examHistoryList').innerHTML = histHtml;
+            
+            document.getElementById('moduleStatsList').innerHTML = statsHtml || '<p class="text-gray-500 text-sm text-center py-4">Немає даних у цьому періоді</p>';
         }
 
         function startMode(mode) {
@@ -674,12 +837,26 @@
             return false;
         }
 
+        // --- РЕДАКТУВАННЯ НА ЛЬОТУ ---
+        function editFromSession() {
+            if (currentQIndex >= currentQuizQuestions.length) return;
+            const q = currentQuizQuestions[currentQIndex];
+            returnToQuizAfterEdit = true;
+            editQuestion(q.id);
+            showScreen('editorScreen');
+        }
+
         function loadNextQuestion() {
             if (currentQIndex >= currentQuizQuestions.length) { finishSession(); return; }
             const q = currentQuizQuestions[currentQIndex], type = q.type || 'choice';
             document.getElementById('quizProgressBar').style.width = ((currentQIndex + 1) / currentQuizQuestions.length * 100) + '%';
             document.getElementById('quizProgress').innerText = `Питання ${currentQIndex + 1}/${currentQuizQuestions.length} (${q.category || 'Без категорії'})`;
             document.getElementById('quizQuestionText').innerText = q.text;
+            
+            // Адмінські кнопки
+            const isAdmin = !!(adminSettings && adminSettings.token);
+            document.getElementById('quizEditBtn').classList.toggle('hidden', !isAdmin);
+
             updateFavoriteUI(q.id);
             const statUI = document.getElementById('quizCurrentStats');
             if (currentMode === 'exam') { statUI.classList.add('hidden'); } else { statUI.classList.remove('hidden'); const stats = quizStats[q.id] || { c: 0, w: 0 }; statUI.innerText = `✅ ${stats.c} | ❌ ${stats.w}`; }
@@ -720,7 +897,12 @@
             const q = currentQuizQuestions[currentQIndex];
             document.getElementById('fcProgressBar').style.width = ((currentQIndex + 1) / currentQuizQuestions.length * 100) + '%';
             document.getElementById('fcProgressText').innerText = `Картка ${currentQIndex + 1}/${currentQuizQuestions.length} (${q.category || 'Без категорії'})`;
-            document.getElementById('fcQuestion').innerText = q.text; updateFavoriteUI(q.id);
+            document.getElementById('fcQuestion').innerText = q.text; 
+            
+            const isAdmin = !!(adminSettings && adminSettings.token);
+            document.getElementById('fcEditBtn').classList.toggle('hidden', !isAdmin);
+
+            updateFavoriteUI(q.id);
             const imgEl = document.getElementById('fcImage'); (q.imageUrl && /^https?:\/\//i.test(q.imageUrl)) ? (imgEl.src = q.imageUrl, imgEl.classList.remove('hidden')) : (imgEl.removeAttribute('src'), imgEl.classList.add('hidden'));
             document.getElementById('fcAnswerBox').classList.add('hidden'); document.getElementById('fcTapHint').classList.remove('hidden');
             document.getElementById('fcCard').className = 'bg-gray-800 p-8 rounded-lg border border-gray-600 cursor-pointer shadow-xl text-center min-h-[300px] flex flex-col justify-center flashcard-inner';
@@ -790,6 +972,12 @@
             document.getElementById('qCategory').value = ''; document.getElementById('qSubCategory').value = ''; document.getElementById('qText').value = ''; document.getElementById('qImage').value = ''; document.getElementById('qExplanation').value = '';
             document.querySelectorAll('.qOptionChoice').forEach(i => i.value = ''); document.getElementById('qOptionInput').value = '';
             const btn = document.getElementById('saveQuestionBtn'); btn.innerText = 'Зберегти питання'; btn.classList.replace('bg-green-600', 'btn-primary'); btn.classList.remove('text-white'); document.getElementById('cancelEditBtn').classList.add('hidden');
+            
+            if (returnToQuizAfterEdit) {
+                returnToQuizAfterEdit = false;
+                if (currentMode === 'flashcards') { showScreen('flashcardScreen'); loadNextFlashcard(); } 
+                else { showScreen('quizScreen'); loadNextQuestion(); }
+            }
         }
 
         function saveQuestion() {
@@ -814,7 +1002,11 @@
                 if (oldQ.text !== newQ.text || oldQ.period !== newQ.period || oldType !== newQ.type || oldOptionsKey !== newOptionsKey || oldCorrect !== newCorrect) { pendingQuestionSave = { question: newQ, index: idx, questionId: editingQuestionId }; document.getElementById('questionStatsModal').classList.remove('hidden'); return; }
                 questions[idx] = newQ;
             } else { questions.unshift(newQ); }
-            saveData(); cancelEdit(); updateEditorList();
+            
+            saveData(); updateEditorList();
+            
+            if (returnToQuizAfterEdit) { currentQuizQuestions[currentQIndex] = newQ; }
+            cancelEdit();
         }
 
         function closeQuestionStatsModal() { document.getElementById('questionStatsModal').classList.add('hidden'); pendingQuestionSave = null; }
@@ -823,7 +1015,10 @@
             if (!questions[index] || questions[index].id !== questionId) { closeQuestionStatsModal(); alert('Питання змінилося або більше не існує. Збереження скасовано.'); return; }
             questions[index] = question;
             if (resetStats) { delete quizStats[questionId]; delete srsStats[questionId]; mistakeIds = mistakeIds.filter(id => id !== questionId); }
-            closeQuestionStatsModal(); saveData(); cancelEdit(); updateEditorList();
+            closeQuestionStatsModal(); saveData(); updateEditorList();
+            
+            if (returnToQuizAfterEdit) { currentQuizQuestions[currentQIndex] = question; }
+            cancelEdit();
         }
 
         function deleteQuestion(id) { if(confirm("Точно видалити?")) { questions = questions.filter(q => q.id !== id); favoriteIds = favoriteIds.filter(f => f !== id); if (!deletedCloudIds.includes(id)) { deletedCloudIds.push(id); } saveData(); updateEditorList(); } }
@@ -889,39 +1084,20 @@
                 try {
                     const imp = JSON.parse(evt.target.result);
                     
-                    // Сценарій 1: Масив (Пачка нових питань від мене)
                     if (Array.isArray(imp)) {
                         if (!confirm(`📦 Знайдено ${imp.length} нових питань.\n\nДодати їх до поточної бази?\n(Ваша статистика та старі питання не постраждають)`)) return;
-                        
-                        let newQuestions = imp.map(q => { 
-                            if (!q.period) q.period = activePeriod; 
-                            if (!q.id) q.id = Date.now().toString() + Math.floor(Math.random()*10000);
-                            if (q.isCustom === undefined) q.isCustom = true; // Важливо, щоб не видалило при хмарній синхронізації
-                            return q; 
-                        });
-                        
-                        questions = [...newQuestions, ...questions]; // Додаємо на самий верх списку
+                        let newQuestions = imp.map(q => { if (!q.period) q.period = activePeriod; if (!q.id) q.id = Date.now().toString() + Math.floor(Math.random()*10000); if (q.isCustom === undefined) q.isCustom = true; return q; });
+                        questions = [...newQuestions, ...questions]; 
                         alert(`✅ Успішно додано ${newQuestions.length} нових питань! Тепер можна публікувати у хмару.`);
                     } 
-                    // Сценарій 2: Об'єкт (Повний бекап)
                     else if (imp.questions) {
                         if (!confirm('⚠️ УВАГА! Це ПОВНИЙ БЕКАП.\nВін повністю перепише всю базу, статистику і стрик на ті, що у файлі. Продовжити?')) return;
-                        
                         questions = imp.questions.map(q => { if (!q.period) q.period = '2nd period'; return q; });
-                        
-                        if (imp.cheatSheets) {
-                            Object.keys(imp.cheatSheets).forEach(p => { localStorage.setItem('quiz_cheatsheet_' + p, sanitizeRichHtml(imp.cheatSheets[p])); });
-                        } else if (imp.cheatSheet !== undefined) { 
-                            localStorage.setItem('quiz_cheatsheet_2nd period', sanitizeRichHtml(imp.cheatSheet)); 
-                        }
-
+                        if (imp.cheatSheets) { Object.keys(imp.cheatSheets).forEach(p => { localStorage.setItem('quiz_cheatsheet_' + p, sanitizeRichHtml(imp.cheatSheets[p])); }); } else if (imp.cheatSheet !== undefined) { localStorage.setItem('quiz_cheatsheet_2nd period', sanitizeRichHtml(imp.cheatSheet)); }
                         quizStats = imp.quizStats || {}; mistakeIds = imp.mistakeIds || []; favoriteIds = imp.favoriteIds || []; srsStats = imp.srsStats || {}; examHistory = imp.examHistory || [];
                         if (imp.appStats) { appStats = { streak: Number.isFinite(imp.appStats.streak) ? imp.appStats.streak : 0, lastStudyDate: imp.appStats.lastStudyDate || null, questionsDate: imp.appStats.questionsDate || null, questionsToday: imp.appStats.lastStudyDate && Number.isFinite(imp.appStats.questionsToday) ? imp.appStats.questionsToday : 0, streakUpdatedToday: !!imp.appStats.lastStudyDate && !!imp.appStats.streakUpdatedToday, totalQuizzes: Number.isFinite(imp.appStats.totalQuizzes) ? imp.appStats.totalQuizzes : 0 }; } else appStats = { streak: 0, lastStudyDate: null, questionsDate: null, questionsToday: 0, streakUpdatedToday: false, totalQuizzes: 0 };
                         alert('✅ Повну копію успішно відновлено!');
-                    } else {
-                        alert('❌ Невідомий формат файлу.');
-                        return;
-                    }
+                    } else { alert('❌ Невідомий формат файлу.'); return; }
                     
                     saveData(); updateEditorList(); checkDailyProgress(); updatePeriodTabsUI(); renderCategories(); loadCheatSheet();
                 } catch(err) { alert(`❌ Не вдалося прочитати файл.\n\nПоточна база не змінена.`); } finally { e.target.value = ''; }
