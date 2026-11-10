@@ -176,7 +176,7 @@
                 <div class="flex justify-between items-center mb-4 pb-3"><h3 class="font-bold text-lg">База питань (<span id="qCount">0</span>)</h3></div>
                 <div class="flex gap-3 mb-4">
                     <button onclick="exportFullData()" class="btn-secondary flex-1 py-3 rounded font-bold text-sm shadow">📥 Повний Backup</button>
-                    <button onclick="document.getElementById('importFile').click()" class="bg-green-700 hover:bg-green-600 text-white flex-1 py-3 rounded font-bold text-sm shadow">📤 Відновити</button>
+                    <button onclick="document.getElementById('importFile').click()" class="bg-green-700 hover:bg-green-600 text-white flex-1 py-3 rounded font-bold text-sm shadow">📤 Відновити / Додати</button>
                     <input type="file" id="importFile" class="hidden" accept=".json" onchange="importFullData(event)">
                 </div>
                 
@@ -317,7 +317,6 @@
 
         const defaultQuestions = [{ id: "1", period: "2nd period", type: "choice", category: "AC Fundamentals", subCategory: "105A", text: "Яке значення показує мультиметр при вимірюванні AC?", options: ["RMS", "Peak", "Average", "Миттєве"], answerIndex: 0, explanation: "Завжди RMS." }];
         
-        // Шаблоны шпаргалок для каждого периода
         const defaultCheatSheets = {
             '1st period': `<div><h3>⚡ 1st Period Основи</h3><ul><li>Запиши сюди формули для першого року...</li></ul></div>`,
             '2nd period': `<div><h3>⚡ AC (2nd Period)</h3><ul><li><b>V(RMS)</b> = V(Peak) × 0.707</li></ul></div>`,
@@ -356,7 +355,6 @@
             clean(doc.body); return doc.body.innerHTML;
         }
 
-        // Завантаження шпаргалки для активного періоду
         function loadCheatSheet() {
             const saved = localStorage.getItem('quiz_cheatsheet_' + activePeriod);
             const content = saved || defaultCheatSheets[activePeriod] || defaultCheatSheets['2nd period'];
@@ -890,29 +888,43 @@
             r.onload = function(evt) {
                 try {
                     const imp = JSON.parse(evt.target.result);
-                    if (!confirm('⚠️ УВАГА! Це повністю перепише всю базу, статистику і стрик на ті, що у файлі. Продовжити?')) return;
+                    
+                    // Сценарій 1: Масив (Пачка нових питань від мене)
                     if (Array.isArray(imp)) {
-                        questions = imp.map(q => { if (!q.period) q.period = '2nd period'; return q; }); mistakeIds = []; favoriteIds = []; quizStats = {}; srsStats = {}; examHistory = [];
-                        appStats = { streak: 0, lastStudyDate: null, questionsDate: null, questionsToday: 0, streakUpdatedToday: false, totalQuizzes: 0 };
-                        alert('Завантажено тільки питання (старий формат). Статистика скинута.');
-                    } else {
+                        if (!confirm(`📦 Знайдено ${imp.length} нових питань.\n\nДодати їх до поточної бази?\n(Ваша статистика та старі питання не постраждають)`)) return;
+                        
+                        let newQuestions = imp.map(q => { 
+                            if (!q.period) q.period = activePeriod; 
+                            if (!q.id) q.id = Date.now().toString() + Math.floor(Math.random()*10000);
+                            if (q.isCustom === undefined) q.isCustom = true; // Важливо, щоб не видалило при хмарній синхронізації
+                            return q; 
+                        });
+                        
+                        questions = [...newQuestions, ...questions]; // Додаємо на самий верх списку
+                        alert(`✅ Успішно додано ${newQuestions.length} нових питань! Тепер можна публікувати у хмару.`);
+                    } 
+                    // Сценарій 2: Об'єкт (Повний бекап)
+                    else if (imp.questions) {
+                        if (!confirm('⚠️ УВАГА! Це ПОВНИЙ БЕКАП.\nВін повністю перепише всю базу, статистику і стрик на ті, що у файлі. Продовжити?')) return;
+                        
                         questions = imp.questions.map(q => { if (!q.period) q.period = '2nd period'; return q; });
                         
                         if (imp.cheatSheets) {
-                            Object.keys(imp.cheatSheets).forEach(p => {
-                                localStorage.setItem('quiz_cheatsheet_' + p, sanitizeRichHtml(imp.cheatSheets[p]));
-                            });
+                            Object.keys(imp.cheatSheets).forEach(p => { localStorage.setItem('quiz_cheatsheet_' + p, sanitizeRichHtml(imp.cheatSheets[p])); });
                         } else if (imp.cheatSheet !== undefined) { 
-                            // підтримуємо старі бекапи де була одна шпаргалка
                             localStorage.setItem('quiz_cheatsheet_2nd period', sanitizeRichHtml(imp.cheatSheet)); 
                         }
 
                         quizStats = imp.quizStats || {}; mistakeIds = imp.mistakeIds || []; favoriteIds = imp.favoriteIds || []; srsStats = imp.srsStats || {}; examHistory = imp.examHistory || [];
                         if (imp.appStats) { appStats = { streak: Number.isFinite(imp.appStats.streak) ? imp.appStats.streak : 0, lastStudyDate: imp.appStats.lastStudyDate || null, questionsDate: imp.appStats.questionsDate || null, questionsToday: imp.appStats.lastStudyDate && Number.isFinite(imp.appStats.questionsToday) ? imp.appStats.questionsToday : 0, streakUpdatedToday: !!imp.appStats.lastStudyDate && !!imp.appStats.streakUpdatedToday, totalQuizzes: Number.isFinite(imp.appStats.totalQuizzes) ? imp.appStats.totalQuizzes : 0 }; } else appStats = { streak: 0, lastStudyDate: null, questionsDate: null, questionsToday: 0, streakUpdatedToday: false, totalQuizzes: 0 };
-                        alert('Повну копію успішно відновлено!');
+                        alert('✅ Повну копію успішно відновлено!');
+                    } else {
+                        alert('❌ Невідомий формат файлу.');
+                        return;
                     }
+                    
                     saveData(); updateEditorList(); checkDailyProgress(); updatePeriodTabsUI(); renderCategories(); loadCheatSheet();
-                } catch(err) { alert(`Не вдалося прочитати backup.\n\nПоточна база не змінена.`); } finally { e.target.value = ''; }
+                } catch(err) { alert(`❌ Не вдалося прочитати файл.\n\nПоточна база не змінена.`); } finally { e.target.value = ''; }
             };
             r.onerror = function() { alert('Не вдалося прочитати вибраний файл.'); e.target.value = ''; }; r.readAsText(f);
         }
