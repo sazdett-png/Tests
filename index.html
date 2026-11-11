@@ -191,7 +191,7 @@
                         <div class="flex-1"><input type="text" id="qSubCategory" list="subCategoryList" placeholder="Підкатегорія / Модуль" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:ring-2 focus:ring-yellow-500"><datalist id="subCategoryList"></datalist></div>
                     </div>
                     <select id="qType" onchange="toggleQuestionTypeUI()" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:ring-2 focus:ring-yellow-500">
-                        <option value="choice">Тест (Вибір 1 з 4 варіантів)</option><option value="input">Ввід тексту</option>
+                        <option value="choice">Тест (вибір правильної відповіді)</option><option value="input">Ввід тексту</option>
                     </select>
                     <textarea id="qText" placeholder="Текст питання..." class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white h-24 focus:ring-2 focus:ring-yellow-500"></textarea>
                     <input type="url" id="qImage" class="w-full bg-gray-900 border-gray-600 rounded p-2 text-white text-sm" placeholder="🖼️ Посилання на картинку (URL)">
@@ -1044,15 +1044,40 @@
 
         function toggleQuestionTypeUI() { const t = document.getElementById('qType').value; if (t === 'input') { document.getElementById('uiTypeChoice').classList.add('hidden'); document.getElementById('uiTypeInput').classList.remove('hidden'); } else { document.getElementById('uiTypeChoice').classList.remove('hidden'); document.getElementById('uiTypeInput').classList.add('hidden'); } }
 
+        // Imported legacy questions may contain more than four choices. Keep all of them editable.
+        function ensureChoiceOptionInputs(count) {
+            const container = document.getElementById('uiTypeChoice');
+            let inputs = Array.from(container.querySelectorAll('.qOptionChoice'));
+            while (inputs.length < count) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'qOptionChoice w-full bg-gray-700 rounded p-2 text-white border border-gray-600';
+                input.placeholder = `Варіант ${inputs.length + 1}`;
+                container.appendChild(input);
+                inputs.push(input);
+            }
+            return inputs;
+        }
+
+        function resetExtraChoiceOptionInputs() {
+            const container = document.getElementById('uiTypeChoice');
+            const inputs = Array.from(container.querySelectorAll('.qOptionChoice'));
+            inputs.slice(4).forEach(input => input.remove());
+        }
+
         function editQuestion(id) {
             const q = questions.find(x => x.id === id); if(!q) return; editingQuestionId = id; document.getElementById('editorFormTitle').innerText = `✏️ Редагування питання (${id})`;
             document.getElementById('qPeriod').value = q.period || '2nd period';
             document.getElementById('qCategory').value = q.category || ''; document.getElementById('qSubCategory').value = q.subCategory || ''; document.getElementById('qType').value = q.type || 'choice'; toggleQuestionTypeUI();
             document.getElementById('qText').value = q.text || ''; document.getElementById('qImage').value = q.imageUrl || ''; document.getElementById('qExplanation').value = q.explanation || '';
-            if (q.type === 'choice') {
-                const inputs = document.querySelectorAll('.qOptionChoice'); inputs.forEach(i => i.value = ''); let correct = q.options[q.answerIndex], wrong = q.options.filter((_, idx) => idx !== q.answerIndex);
-                inputs[0].value = correct || ''; if(wrong[0]) inputs[1].value = wrong[0]; if(wrong[1]) inputs[2].value = wrong[1]; if(wrong[2]) inputs[3].value = wrong[2];
-            } else { document.getElementById('qOptionInput').value = q.options.join(', '); }
+            if ((q.type || 'choice') === 'choice') {
+                const originalOptions = Array.isArray(q.options) ? q.options : [];
+                const optionsForEditor = originalOptions.length
+                    ? [originalOptions[q.answerIndex], ...originalOptions.filter((_, idx) => idx !== q.answerIndex)]
+                    : [];
+                const inputs = ensureChoiceOptionInputs(Math.max(4, optionsForEditor.length));
+                inputs.forEach((input, idx) => input.value = optionsForEditor[idx] || '');
+            } else { document.getElementById('qOptionInput').value = (q.options || []).join(', '); }
             document.getElementById('saveQuestionBtn').innerText = '💾 Оновити'; document.getElementById('saveQuestionBtn').classList.replace('btn-primary', 'bg-green-600'); document.getElementById('saveQuestionBtn').classList.add('text-white'); document.getElementById('cancelEditBtn').classList.remove('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1060,7 +1085,7 @@
             editingQuestionId = null; document.getElementById('editorFormTitle').innerText = 'Додати нове питання';
             document.getElementById('qPeriod').value = activePeriod;
             document.getElementById('qCategory').value = ''; document.getElementById('qSubCategory').value = ''; document.getElementById('qText').value = ''; document.getElementById('qImage').value = ''; document.getElementById('qExplanation').value = '';
-            document.querySelectorAll('.qOptionChoice').forEach(i => i.value = ''); document.getElementById('qOptionInput').value = '';
+            document.querySelectorAll('.qOptionChoice').forEach(i => i.value = ''); resetExtraChoiceOptionInputs(); document.getElementById('qOptionInput').value = '';
             const btn = document.getElementById('saveQuestionBtn'); btn.innerText = 'Зберегти питання'; btn.classList.replace('bg-green-600', 'btn-primary'); btn.classList.remove('text-white'); document.getElementById('cancelEditBtn').classList.add('hidden');
             
             if (returnToQuizAfterEdit) {
@@ -1195,9 +1220,9 @@
                 if (!Array.isArray(raw.options) || raw.options.length === 0 || raw.options.some(option => typeof option !== 'string' || option.trim() === '')) {
                     throw new Error(`${prefix} options має бути масивом непорожніх текстових варіантів.`);
                 }
-                if (raw.type === 'choice' && (raw.options.length < 2 || raw.options.length > 4)) {
-                    throw new Error(`${prefix} для type «choice» потрібно від 2 до 4 варіантів відповіді.`);
-                }
+                // The previous app renderer accepted any non-empty number of choices.
+                // Do not reject older banks just because a question has 5+ options,
+                // or only one legacy option; preserve the data and let the owner edit it.
 
                 const answerIndex = raw.answerIndex;
                 if (!Number.isInteger(answerIndex) || answerIndex < 0 || answerIndex >= raw.options.length) {
@@ -1320,7 +1345,9 @@
                         if (!confirm(`📦 Перевірку пройдено: ${newQuestions.length} питань без помилок.\n\nДодати їх до поточної бази?\nПоточні питання та статистика залишаться без змін.`)) return;
                         questions = [...newQuestions, ...questions];
                         saveData();
-                        alert(`✅ Успішно додано ${newQuestions.length} питань!`);
+                        const oneOptionCount = newQuestions.filter(q => q.type === 'choice' && q.options.length < 2).length;
+                        const extraNote = oneOptionCount ? `\n\n⚠️ ${oneOptionCount} питань мають лише один варіант відповіді. Вони збережені, але їх варто відредагувати й додати варіанти.` : '';
+                        alert(`✅ Успішно додано ${newQuestions.length} питань!${extraNote}`);
                     }
                     else if (isPlainObject(imp) && Array.isArray(imp.questions)) {
                         // Validate the complete backup before asking for confirmation or changing anything.
@@ -1338,7 +1365,9 @@
                             Object.entries(backup.cheatSheets).forEach(([period, content]) => localStorage.setItem('quiz_cheatsheet_' + period, content));
                         }
                         saveData();
-                        alert('✅ Повну копію успішно перевірено та відновлено!');
+                        const oneOptionCount = backup.questions.filter(q => q.type === 'choice' && q.options.length < 2).length;
+                        const extraNote = oneOptionCount ? `\n\n⚠️ ${oneOptionCount} питань мають лише один варіант відповіді. Вони збережені, але їх варто відредагувати й додати варіанти.` : '';
+                        alert(`✅ Повну копію успішно перевірено та відновлено!${extraNote}`);
                     }
                     else {
                         alert('❌ Невідомий формат файлу. Очікується масив питань або повний бекап.');
