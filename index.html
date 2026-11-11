@@ -524,7 +524,16 @@ button:active { transform: translateY(1px) scale(.99); }
 
 /* Quiz and flashcard focus modes */
 .app-shell.is-immersive { grid-template-columns: minmax(0,1fr); max-width: 1100px; }
-.app-shell.is-immersive .app-sidebar, .app-shell.is-immersive .app-topbar { display: none; }
+.app-shell.is-immersive .app-sidebar { display: none; }
+.app-shell.is-immersive .app-topbar {
+  position: sticky; top: 0; z-index: 45;
+  display: flex !important; align-items: center; justify-content: flex-end;
+  min-height: 48px; padding: 5px 4px 10px; margin: 0 0 8px;
+  border: 0 !important; border-bottom: 1px solid var(--line) !important;
+  border-radius: 0 !important; background: transparent !important; box-shadow: none !important;
+}
+.app-shell.is-immersive .page-heading-group { display: none !important; }
+.app-shell.is-immersive .topbar-meta { display: flex !important; margin-left: auto; }
 .app-shell.is-immersive .app-main { width: 100%; }
 #quizScreen.study-session-screen, #flashcardScreen.flashcard-session-screen, #resultScreen.result-session-screen { max-width: 920px; margin: 12px auto 0; }
 .study-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 15px; border: 1px solid var(--line); border-radius: 14px; background: rgba(16,29,48,.82); }
@@ -753,6 +762,191 @@ button:active { transform: translateY(1px) scale(.99); }
     .topbar-meta .status-pill { min-width: 38px; min-height: 36px; padding: 7px 9px !important; }
 }
 
+
+
+
+/* v7.1 — persistent quick access to reference and sound; cloud refresh lives in Tools. */
+.reference-quick-btn { color: #8bc5ff !important; }
+.quick-ref-icon { display: inline-flex !important; align-items: center; justify-content: center; }
+.quick-ref-icon svg { display: block; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.reference-quick-btn:hover { border-color: rgba(114,183,255,.4) !important; background: rgba(35,59,88,.88) !important; }
+.sync-settings-card {
+  padding: 18px; border: 1px solid rgba(114,183,255,.20); border-radius: 17px;
+  background: linear-gradient(145deg, rgba(24,43,68,.97), rgba(13,26,44,.98));
+  box-shadow: 0 12px 28px rgba(0,0,0,.13);
+}
+.sync-settings-heading { display: flex; align-items: flex-start; gap: 13px; }
+.sync-settings-icon { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 auto; border-radius: 13px; color: #8bc5ff; background: rgba(114,183,255,.13); font-size: 21px; }
+.sync-settings-copy { min-width: 0; }
+.sync-settings-copy strong { display: block; color: #edf4ff; font-size: .9rem; font-weight: 820; }
+.sync-settings-copy p { margin: 5px 0 0; color: #9aacc4; font-size: .74rem; line-height: 1.55; }
+.sync-settings-footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 15px; padding-top: 13px; border-top: 1px solid var(--line); }
+.sync-settings-footer > p { max-width: 620px; margin: 0; color: #8498b2; font-size: .68rem; line-height: 1.5; }
+.sync-settings-footer > p strong { color: #cbd7e7; }
+.sync-settings-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 130px; min-height: 42px; flex: 0 0 auto; padding: 9px 13px; border: 1px solid rgba(114,183,255,.26); border-radius: 11px; color: #9fd0ff; background: rgba(57,107,157,.17); font-size: .76rem; font-weight: 800; }
+.sync-settings-toggle:hover { background: rgba(57,107,157,.27); border-color: rgba(114,183,255,.42); }
+.admin-sync-explainer { width: 100%; margin: 0 0 5px; color: #98abc4; font-size: .7rem; line-height: 1.5; }
+@media (max-width: 820px) {
+  .app-shell.is-immersive .app-topbar { position: sticky; top: 0; z-index: 45; margin: 0 -2px 8px; padding: max(8px, env(safe-area-inset-top)) 2px 9px; background: rgba(8,15,29,.92) !important; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+  .app-shell.is-immersive .topbar-meta { width: 100%; justify-content: flex-end; }
+  .sync-settings-card { padding: 14px; border-radius: 14px; }
+  .sync-settings-copy strong { font-size: .8rem; }
+  .sync-settings-copy p { font-size: .68rem; }
+  .sync-settings-footer { align-items: stretch; flex-direction: column; gap: 10px; }
+  .sync-settings-footer > p { font-size: .65rem; }
+  .sync-settings-toggle { width: 100%; }
+  .admin-sync-explainer { font-size: .65rem; }
+}
+
+/* ================================================================
+   ELECTRICIAN HUB v7 — MOBILE-FIRST APP NAVIGATION
+   Original quiz, question, progress and sync logic is preserved.
+   ================================================================ */
+.home-dashboard, .learn-dashboard, .more-dashboard { width: 100%; max-width: 100%; }
+.learn-dashboard { display: flex; flex-direction: column; gap: 16px; }
+.more-dashboard { display: flex; flex-direction: column; gap: 18px; }
+.more-intro { padding: 8px 2px 2px; }
+.more-kicker { color: #dcb66f; font-size: .62rem; font-weight: 850; letter-spacing: .16em; }
+.more-intro h2 { margin: 6px 0 4px; color: #f2f6ff; font-size: 1.55rem; font-weight: 850; letter-spacing: -.04em; }
+.more-intro p { margin: 0; color: #8fa2bb; font-size: .84rem; }
+.home-shortcuts { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.home-shortcut-card { display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 86px; padding: 14px; text-align: left; border: 1px solid var(--line); border-radius: 16px; color: #eef4ff; background: linear-gradient(145deg, rgba(24,42,67,.96), rgba(15,28,47,.98)); box-shadow: 0 10px 25px rgba(0,0,0,.13); }
+.home-shortcut-card:hover { border-color: rgba(244,189,85,.35); transform: translateY(-2px); }
+.home-shortcut-icon { display: grid; place-items: center; width: 39px; height: 39px; flex: 0 0 auto; border-radius: 12px; background: rgba(244,189,85,.12); color: #f6cf7f; font-size: 20px; }
+.home-shortcut-card > span:nth-child(2) { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 4px; }
+.home-shortcut-card strong { color: #f3f6fc; font-size: .78rem; line-height: 1.25; }
+.home-shortcut-card small { color: #91a4bd; font-size: .64rem; line-height: 1.35; }
+.home-shortcut-arrow { color: #d5b46f; font-size: 1.05rem; }
+.home-exam-shortcut .home-shortcut-icon { color: #ffb2b7; background: rgba(255,126,136,.12); }
+.home-exam-shortcut .home-shortcut-arrow { color: #f09ca5; }
+.module-search-wrap { position: relative; margin: 0 0 13px; }
+.module-search-wrap svg { position: absolute; left: 13px; top: 50%; width: 18px; height: 18px; transform: translateY(-50%); fill: none; stroke: #8296b1; stroke-width: 1.8; stroke-linecap: round; }
+.module-search-wrap input { width: 100%; min-height: 44px; padding: 10px 13px 10px 40px; border: 1px solid var(--line-strong); border-radius: 12px; outline: none; color: #edf4ff; background: rgba(6,15,28,.72); font-size: .82rem; }
+.module-search-wrap input::placeholder { color: #7588a2; }
+.module-search-wrap input:focus { border-color: rgba(244,189,85,.58); box-shadow: 0 0 0 3px rgba(244,189,85,.08); }
+.no-module-results { padding: 18px 10px; color: #90a2ba; text-align: center; font-size: .82rem; }
+.more-tools-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 11px; }
+.more-tool-card { display: flex; align-items: center; gap: 11px; min-width: 0; min-height: 86px; padding: 13px; border: 1px solid var(--line); border-radius: 15px; text-align: left; color: #edf4ff; background: linear-gradient(145deg, rgba(23,40,64,.96), rgba(13,25,42,.98)); }
+.more-tool-card:hover { border-color: rgba(244,189,85,.35); background: #192d49; }
+.more-tool-card > span:nth-child(2) { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 4px; }
+.more-tool-card strong { color: #eaf1fc; font-size: .76rem; line-height: 1.25; }
+.more-tool-card small { color: #8fa2bb; font-size: .63rem; line-height: 1.35; }
+.more-tool-icon { display: grid; place-items: center; width: 37px; height: 37px; flex: 0 0 auto; border-radius: 11px; font-size: 19px; background: rgba(244,189,85,.11); color: #f3cd7b; }
+.reference-icon { background: rgba(114,183,255,.12); color: #8bc5ff; }
+.editor-icon { background: rgba(179,162,255,.13); color: #c2b6ff; }
+.backup-icon { background: rgba(83,214,160,.12); color: #70dfb1; }
+.import-icon { background: rgba(255,174,111,.12); color: #ffbe87; }
+.more-tool-arrow { color: #8499b5; font-size: 1rem; }
+.more-tip { display: flex; align-items: flex-start; gap: 11px; padding: 14px; border: 1px solid rgba(244,189,85,.14); border-radius: 14px; background: rgba(244,189,85,.055); }
+.more-tip > span { font-size: 20px; }
+.more-tip strong { color: #e9d5a9; font-size: .78rem; }
+.more-tip p { margin: 3px 0 0; color: #91a2b9; font-size: .7rem; line-height: 1.45; }
+.mobile-bottom-nav { display: none; }
+.page-eyebrow { cursor: pointer; }
+
+@media (max-width: 820px) {
+  html { min-height: 100%; background: #080f1d; }
+  body { min-height: 100vh; padding: 0 !important; overflow-x: hidden; }
+  .app-shell-container { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 12px; }
+  .app-shell { display: block !important; min-height: 100vh; width: 100%; }
+  .app-sidebar { display: none !important; }
+  .app-main { width: 100%; min-width: 0; }
+  .app-topbar { position: sticky; top: 0; z-index: 35; display: flex; flex-wrap: nowrap; align-items: center; gap: 10px; margin: 0 -2px 10px; padding: max(10px, env(safe-area-inset-top)) 2px 11px; border: 0 !important; border-bottom: 1px solid rgba(148,163,184,.12) !important; border-radius: 0 !important; background: rgba(8,15,29,.92) !important; box-shadow: none !important; backdrop-filter: blur(18px); }
+  .page-heading-group { flex: 1 1 auto; min-width: 0; }
+  .page-eyebrow { display: block; margin: 0 0 3px; color: #d6b36d; font-size: .55rem; letter-spacing: .15em; font-weight: 850; }
+  #pageHeading { margin: 0; color: #f2f6ff; font-size: 1.12rem; line-height: 1.2; }
+  #pageSubheading { display: none; }
+  .topbar-meta { display: flex !important; align-items: center; justify-content: flex-end; gap: 6px; flex: 0 0 auto; margin: 0; }
+  .topbar-meta .status-pill { display: inline-flex !important; align-items: center; justify-content: center; width: 39px; min-width: 39px; height: 39px; min-height: 39px; padding: 0 !important; border: 1px solid rgba(148,163,184,.17) !important; border-radius: 12px !important; background: rgba(20,34,55,.9) !important; font-size: 0 !important; box-shadow: none !important; }
+  .topbar-meta .status-pill > span:first-child { display: inline-block !important; font-size: 18px !important; line-height: 1; }
+  .topbar-meta .status-pill > span:not(:first-child) { display: none !important; }
+  .topbar-meta .build-stamp { display: none !important; }
+  .app-content { min-width: 0; padding: 0 0 calc(94px + env(safe-area-inset-bottom)); }
+  #homeScreen, #learnScreen, #moreScreen, #statsScreen, #editorScreen { margin: 0; padding-top: 4px; }
+  #homeScreen.home-dashboard, #learnScreen.learn-dashboard { gap: 13px !important; }
+  #homeScreen > .welcome-card { min-height: 126px !important; padding: 20px 18px !important; border-radius: 18px !important; }
+  .welcome-copy h2 { max-width: 100%; margin: 7px 0 5px; font-size: 1.42rem; line-height: 1.14; }
+  .welcome-copy p { max-width: 100%; font-size: .75rem; line-height: 1.45; }
+  .welcome-art { display: none !important; }
+  #homeStats.home-stats { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; }
+  .metric-card { min-height: 82px; padding: 13px !important; border-radius: 14px !important; }
+  .metric-card p:first-child { font-size: .54rem !important; letter-spacing: .07em; }
+  .metric-card p:nth-child(2), .metric-tests p:last-child { font-size: 1.12rem !important; }
+  .metric-card p:last-child { font-size: .62rem !important; }
+  .metric-card::after { width: 33px; height: 33px; border-radius: 10px; font-size: 15px; }
+  .home-shortcuts { gap: 9px; }
+  .home-shortcut-card { min-height: 88px; flex-wrap: wrap; gap: 8px; padding: 12px; border-radius: 14px; }
+  .home-shortcut-icon { width: 34px; height: 34px; border-radius: 10px; font-size: 17px; }
+  .home-shortcut-card > span:nth-child(2) { flex-basis: calc(100% - 48px); }
+  .home-shortcut-card strong { font-size: .73rem; }
+  .home-shortcut-card small { font-size: .6rem; }
+  .home-shortcut-arrow { display: none; }
+  .dashboard-panel { padding: 14px !important; border-radius: 15px !important; }
+  .section-heading { margin-bottom: 11px; }
+  .section-heading h2 { font-size: .92rem; }
+  .section-heading p { font-size: .67rem; }
+  #periodTabs.period-tabs { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 5px !important; }
+  .period-tab { min-height: 39px; padding: 8px 3px !important; border-radius: 9px !important; font-size: .65rem !important; }
+  .quick-actions-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  .quick-action-card { min-height: 106px; flex-direction: column; align-items: flex-start; gap: 8px; padding: 11px !important; border-radius: 13px !important; }
+  .quick-action-icon { width: 34px; height: 34px; border-radius: 10px; font-size: 17px; }
+  .quick-action-copy strong { font-size: .74rem; }
+  .quick-action-copy small { font-size: .59rem; }
+  .quick-action-arrow { display: none; }
+  .modules-section .section-heading { align-items: flex-start; }
+  #categoriesGrid #specialGrid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px !important; }
+  #categoriesGrid > div.mb-6:not(:first-child) { margin: 0 0 9px !important; padding: 12px !important; border-radius: 13px !important; }
+  #categoriesGrid .card { min-height: 62px !important; padding: 9px 7px !important; border-radius: 10px !important; }
+  #categoriesGrid .card span:first-child { font-size: .7rem !important; }
+  #categoriesGrid .card span:last-child { font-size: .59rem !important; }
+  .learning-launch-panel { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; padding: 9px; border-radius: 14px; }
+  .launch-action { min-height: 75px; gap: 8px; padding: 9px !important; border-radius: 10px !important; }
+  .launch-icon { width: 31px; height: 31px; border-radius: 9px; font-size: 16px; }
+  .launch-copy strong { font-size: .7rem; }
+  .launch-copy small { font-size: .57rem; }
+  .launch-arrow { display: none; }
+  .due-cards-badge { font-size: .52rem !important; }
+  .stats-overview-grid { grid-template-columns: 1fr; }
+  .stats-card { padding: 15px !important; }
+  .accuracy-card { flex-direction: row; align-items: center; gap: 14px !important; }
+  #statDonut { width: 110px !important; height: 110px !important; flex-basis: 110px; }
+  #statDonut > div { width: 86px !important; height: 86px !important; }
+  #statTotalPerc { font-size: 1.4rem !important; }
+  .more-tools-grid { gap: 9px; }
+  .more-tool-card { min-height: 84px; padding: 11px; gap: 9px; border-radius: 13px; }
+  .more-tool-icon { width: 33px; height: 33px; border-radius: 9px; font-size: 17px; }
+  .more-tool-card strong { font-size: .7rem; }
+  .more-tool-card small { font-size: .58rem; }
+  .screen-title-row { align-items: flex-start; }
+  .screen-title-row h2 { font-size: 1.08rem !important; }
+  .back-home-btn { display: none; }
+  .editor-layout { grid-template-columns: minmax(0,1fr); }
+  #editorFormPanel { position: static; }
+  #editorScreen #questionsList { max-height: none !important; }
+  #quizScreen.study-session-screen, #flashcardScreen.flashcard-session-screen, #resultScreen.result-session-screen { margin: 4px auto 0; padding-bottom: 20px; }
+  .study-toolbar { padding: 9px; gap: 8px; border-radius: 12px; }
+  .mobile-bottom-nav { position: fixed; z-index: 40; left: 10px; right: 10px; bottom: max(9px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 3px; padding: 7px 6px; border: 1px solid rgba(157,178,207,.19); border-radius: 19px; background: rgba(12,23,40,.94); box-shadow: 0 15px 42px rgba(0,0,0,.42), inset 0 1px rgba(255,255,255,.045); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); }
+  .mobile-tab { position: relative; display: flex; min-width: 0; min-height: 54px; align-items: center; justify-content: center; flex-direction: column; gap: 4px; padding: 6px 2px; border: 1px solid transparent; border-radius: 12px; color: #8294ad; background: transparent; font-size: .61rem; font-weight: 720; }
+  .mobile-tab svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .mobile-tab.active { color: #ffda91; background: linear-gradient(145deg, rgba(244,189,85,.14), rgba(244,189,85,.055)); border-color: rgba(244,189,85,.12); }
+  .mobile-tab.active::after { content: ""; position: absolute; bottom: 3px; width: 13px; height: 2px; border-radius: 9px; background: #f4bd55; }
+  .app-shell.is-immersive .mobile-bottom-nav { display: none !important; }
+}
+@media (max-width: 380px) {
+  .app-shell-container { padding-left: 9px; padding-right: 9px; }
+  .topbar-meta .status-pill { width: 36px; min-width: 36px; height: 36px; min-height: 36px; }
+  .home-shortcut-card { padding: 10px; }
+  .more-tools-grid { grid-template-columns: 1fr; }
+  #periodTabs.period-tabs { gap: 4px !important; }
+  .period-tab { font-size: .6rem !important; }
+  .mobile-bottom-nav { left: 7px; right: 7px; }
+}
+@media (min-width: 821px) {
+  .mobile-bottom-nav { display: none !important; }
+  .home-shortcut-card { min-height: 96px; }
+  .more-tools-grid { max-width: 900px; }
+}
+
 </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
@@ -784,15 +978,12 @@ button:active { transform: translateY(1px) scale(.99); }
 </div>
 </div>
 </div>
-<div class="app-shell-container"><div class="app-shell"><aside aria-label="Основна навігація" class="app-sidebar"><div class="sidebar-brand"><div aria-hidden="true" class="brand-mark">⚡</div><div class="brand-copy"><h1 class="brand-title" id="mainAppTitle" onclick="handleAdminTrigger()">Electrician Hub</h1><span class="brand-subtitle">ELECTRICIAN STUDY HUB</span></div></div><p class="sidebar-section-label">НАВІГАЦІЯ</p><div class="app-nav" id="navButtons"><button class="app-nav-btn" data-screen-target="homeScreen" onclick="showScreen('homeScreen')" type="button"><span aria-hidden="true" class="nav-icon">⌂</span><span class="nav-label">Огляд</span></button><button class="app-nav-btn" data-screen-target="statsScreen" onclick="showScreen('statsScreen')" type="button"><span aria-hidden="true" class="nav-icon">▥</span><span class="nav-label">Аналітика</span></button><button class="app-nav-btn" onclick="toggleCheatSheet()" type="button"><span aria-hidden="true" class="nav-icon">▤</span><span class="nav-label">Довідник</span></button><button class="app-nav-btn" data-screen-target="editorScreen" onclick="showScreen('editorScreen')" type="button"><span aria-hidden="true" class="nav-icon">✎</span><span class="nav-label">Редактор</span></button></div><div class="sidebar-spacer"></div><div class="sidebar-note"><span class="sidebar-note-icon">⚡</span><div><strong>ЕЛЕКТРИЧНА ТЕОРІЯ</strong><span>DC · AC · RLC · Controls</span></div></div></aside><main class="app-main" id="appMain"><header class="app-topbar"><div class="page-heading-group"><p class="page-eyebrow">ELECTRICIAN · THEORY & PRACTICE</p><h1 id="pageHeading">Навчальна панель</h1><p id="pageSubheading">Питання, модулі, довідник та результати.</p></div><div class="topbar-meta">
-    <button class="status-pill" id="soundToggleBtn" type="button" onclick="toggleSound()" title="Звук увімкнений — натисніть, щоб вимкнути" aria-label="Вимкнути звук" aria-pressed="true"><span id="soundIcon" aria-hidden="true">🔊</span> <span>Звук</span></button>
-    
-    <!-- КНОПКА СИНХРОНІЗАЦІЇ -->
-    <button class="status-pill" id="syncToggleBtn" type="button" onclick="toggleAutoSync()" title="Авто-оновлення бази питань" aria-label="Вимкнути автоматичну синхронізацію" aria-pressed="true">
-        <span id="syncIcon" aria-hidden="true">☁️</span> <span id="syncText">Синхр: УВІМК</span>
+<div class="app-shell-container"><div class="app-shell"><aside aria-label="Основна навігація" class="app-sidebar"><div class="sidebar-brand"><div aria-hidden="true" class="brand-mark">⚡</div><div class="brand-copy"><h1 class="brand-title" id="mainAppTitle" onclick="handleAdminTrigger()">Electrician Hub</h1><span class="brand-subtitle">ELECTRICIAN STUDY HUB</span></div></div><p class="sidebar-section-label">НАВІГАЦІЯ</p><div class="app-nav" id="navButtons"><button class="app-nav-btn" data-screen-target="homeScreen" onclick="showScreen('homeScreen')" type="button"><span aria-hidden="true" class="nav-icon">⌂</span><span class="nav-label">Огляд</span></button><button class="app-nav-btn" data-screen-target="learnScreen" onclick="showScreen('learnScreen')" type="button"><span aria-hidden="true" class="nav-icon">▦</span><span class="nav-label">Практика</span></button><button class="app-nav-btn" data-screen-target="statsScreen" onclick="showScreen('statsScreen')" type="button"><span aria-hidden="true" class="nav-icon">▥</span><span class="nav-label">Аналітика</span></button><button class="app-nav-btn" onclick="toggleCheatSheet()" type="button"><span aria-hidden="true" class="nav-icon">▤</span><span class="nav-label">Довідник</span></button><button class="app-nav-btn" data-screen-target="editorScreen" onclick="showScreen('editorScreen')" type="button"><span aria-hidden="true" class="nav-icon">✎</span><span class="nav-label">Редактор</span></button></div><div class="sidebar-spacer"></div><div class="sidebar-note"><span class="sidebar-note-icon">⚡</span><div><strong>ЕЛЕКТРИЧНА ТЕОРІЯ</strong><span>DC · AC · RLC · Controls</span></div></div></aside><main class="app-main" id="appMain"><header class="app-topbar"><div class="page-heading-group"><p class="page-eyebrow" onclick="handleAdminTrigger()" title="Electrician Hub">⚡ ELECTRICIAN HUB</p><h1 id="pageHeading">Навчальна панель</h1><p id="pageSubheading">Питання, модулі, довідник та результати.</p></div><div class="topbar-meta">
+    <button class="status-pill reference-quick-btn" id="referenceQuickBtn" type="button" onclick="toggleCheatSheet()" title="Відкрити довідник з електричної теорії" aria-label="Відкрити довідник">
+        <span class="quick-ref-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 5.5A2.5 2.5 0 0 1 7 3h12.5v17H7a2.5 2.5 0 0 0-2.5 2z"/><path d="M4.5 5.5v16.5A2.5 2.5 0 0 1 7 19.5h12.5M8 7h7M8 10h7"/></svg></span><span>Довідник</span>
     </button>
-    
-    <span class="build-stamp">VERSION 4</span>
+    <button class="status-pill" id="soundToggleBtn" type="button" onclick="toggleSound()" title="Звук увімкнений — натисніть, щоб вимкнути" aria-label="Вимкнути звук" aria-pressed="true"><span id="soundIcon" aria-hidden="true">🔊</span> <span>Звук</span></button>
+    <span class="build-stamp">VERSION 7.1</span>
 </div></header><div class="app-content" id="appContent"><div class="home-dashboard" id="homeScreen"><section class="welcome-card"><div class="welcome-copy"><span class="welcome-kicker">ELECTRICIAN · STUDY WORKSPACE</span><h2>Питання, модулі та довідник</h2><p>Матеріали з електричної теорії, електричних кіл і систем керування.</p></div><div aria-hidden="true" class="welcome-art"><div class="welcome-art-icon">⚡</div><span>DC · AC · RLC · CONTROLS</span></div></section><div class="home-stats" id="homeStats">
 <div class="metric-card metric-streak">
 <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Поточна серія</p>
@@ -803,7 +994,17 @@ button:active { transform: translateY(1px) scale(.99); }
 <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Пройдено тестів</p>
 <p class="text-xl md:text-2xl font-bold text-blue-400">📝 <span id="totalTestsCompleted">0</span></p>
 </div>
-</div><section class="period-panel dashboard-panel"><div class="section-heading compact-heading"><h2>Навчальний період</h2><p>Обери період, матеріал якого хочеш опрацювати.</p></div><div class="period-tabs" id="periodTabs">
+</div>
+<section class="home-shortcuts" aria-label="Швидкий запуск">
+<button class="home-shortcut-card home-study-shortcut" type="button" onclick="showScreen('learnScreen')">
+  <span class="home-shortcut-icon">▦</span><span><strong>Продовжити навчання</strong><small>Періоди, модулі та практика</small></span><span class="home-shortcut-arrow">→</span>
+</button>
+<button class="home-shortcut-card home-exam-shortcut" type="button" onclick="openExamSettings()">
+  <span class="home-shortcut-icon">◷</span><span><strong>Симулятор іспиту</strong><small>Перевір себе з таймером</small></span><span class="home-shortcut-arrow">→</span>
+</button>
+</section>
+</div><div class="learn-dashboard hidden" id="learnScreen">
+<section class="period-panel dashboard-panel"><div class="section-heading compact-heading"><h2>Навчальний період</h2><p>Обери період, матеріал якого хочеш опрацювати.</p></div><div class="period-tabs" id="periodTabs">
 <button class="period-tab flex-1 py-2 px-4 rounded-full font-bold text-sm whitespace-nowrap" id="tab-1st" onclick="changePeriod('1st period')">1st Period</button>
 <button class="period-tab flex-1 py-2 px-4 rounded-full font-bold text-sm whitespace-nowrap" id="tab-2nd" onclick="changePeriod('2nd period')">2nd Period</button>
 <button class="period-tab flex-1 py-2 px-4 rounded-full font-bold text-sm whitespace-nowrap" id="tab-3rd" onclick="changePeriod('3rd period')">3rd Period</button>
@@ -811,10 +1012,37 @@ button:active { transform: translateY(1px) scale(.99); }
 </div></section><div class="quick-actions-grid">
 <button class="quick-action-card exam-action" onclick="openExamSettings()"><span class="quick-action-icon">🎓</span><span class="quick-action-copy"><strong>Симулятор іспиту</strong><small>Тест із таймером та підсумковим результатом</small></span><span class="quick-action-arrow">↗</span></button>
 <button class="quick-action-card smart-action" onclick="startSmartWorkout()"><span class="quick-action-icon">🧠</span><span class="quick-action-copy"><strong>Розумне тренування</strong><small>Добірка з урахуванням помилок і складних тем</small></span><span class="quick-action-arrow">↗</span></button>
-</div><section class="modules-section dashboard-panel"><div class="section-heading"><div><h2>Навчальні модулі</h2><p>Вибери одну або кілька тем для практики.</p></div><span class="section-tag">ОБЕРИ ТЕМИ</span></div><div class="categories-grid" id="categoriesGrid"></div></section><div class="learning-launch-panel">
+</div><section class="modules-section dashboard-panel"><div class="section-heading"><div><h2>Навчальні модулі</h2><p>Вибери одну або кілька тем для практики.</p></div><span class="section-tag">ОБЕРИ ТЕМИ</span></div>
+<div class="module-search-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="moduleSearch" type="search" placeholder="Знайти модуль або тему..." autocomplete="off" oninput="filterLearningModules()" aria-label="Знайти модуль або тему"></div>
+<div class="categories-grid" id="categoriesGrid"></div><p id="noModuleResults" class="hidden no-module-results">Нічого не знайдено. Спробуй іншу назву.</p></section><div class="learning-launch-panel">
 <button class="launch-action launch-primary" onclick="startMode('quiz')"><span class="launch-icon">✎</span><span class="launch-copy"><strong>Почати практику</strong><small>Перевір обрані модулі</small></span><span class="launch-arrow">→</span></button>
 <button class="launch-action launch-secondary" onclick="startMode('flashcards')"><span class="launch-icon">▣</span><span class="launch-copy"><strong>Флеш-картки</strong><small>Картки з інтервальним повторенням</small></span><span class="due-cards-badge" id="dueCardsBadge"></span><span class="launch-arrow">→</span></button>
-</div></div><div class="stats-dashboard hidden" id="statsScreen">
+</div></div>
+<div class="more-dashboard hidden" id="moreScreen">
+  <div class="more-intro"><span class="more-kicker">ELECTRICIAN HUB</span><h2>Інструменти</h2><p>Керування базою питань, редактор і резервні копії.</p></div>
+  <section class="sync-settings-card" aria-labelledby="syncSettingsTitle">
+    <div class="sync-settings-heading">
+      <span class="sync-settings-icon" aria-hidden="true">☁️</span>
+      <div class="sync-settings-copy">
+        <strong id="syncSettingsTitle">Автоматичне оновлення бази питань</strong>
+        <p>Коли функція увімкнена, застосунок під час запуску завантажує опубліковані питання зі спільної бази GitHub. Нові й оновлені питання з’являються на цьому пристрої автоматично.</p>
+      </div>
+    </div>
+    <div class="sync-settings-footer">
+      <p><strong>Важливо:</strong> це оновлює лише спільну базу питань. Особиста статистика, обране та історія тестів між пристроями не синхронізуються.</p>
+      <button class="sync-settings-toggle" id="syncToggleBtn" type="button" onclick="toggleAutoSync()" aria-pressed="true" aria-label="Вимкнути автоматичне оновлення бази">
+        <span id="syncIcon" aria-hidden="true">☁️</span><span id="syncText">Увімкнено</span>
+      </button>
+    </div>
+  </section>
+  <div class="more-tools-grid">
+    <button class="more-tool-card" type="button" onclick="showScreen('editorScreen')"><span class="more-tool-icon editor-icon">✎</span><span><strong>Редактор питань</strong><small>Додавання, зміна та керування навчальними питаннями</small></span><span class="more-tool-arrow">↗</span></button>
+    <button class="more-tool-card" type="button" onclick="exportFullData()"><span class="more-tool-icon backup-icon">↓</span><span><strong>Експорт резервної копії</strong><small>Зберегти питання, довідники та особистий прогрес у файл JSON</small></span><span class="more-tool-arrow">↓</span></button>
+    <button class="more-tool-card" type="button" onclick="document.getElementById('importFile').click()"><span class="more-tool-icon import-icon">↑</span><span><strong>Імпорт резервної копії</strong><small>Відновити дані з раніше збереженого JSON-файлу</small></span><span class="more-tool-arrow">↑</span></button>
+  </div>
+  <section class="more-tip"><span>📘</span><div><strong>Довідник завжди під рукою</strong><p>Натисни кнопку з книжкою у верхній панелі. Вона доступна навіть під час тесту та перегляду флеш-карток.</p></div></section>
+</div>
+<div class="stats-dashboard hidden" id="statsScreen">
 <div class="screen-title-row">
 <h2 class="text-2xl font-bold text-white">Аналітика навчання <span class="period-inline-label" id="statsPeriodLabel"></span></h2>
 <button class="back-home-btn" onclick="showScreen('homeScreen')">← На головну</button>
@@ -855,9 +1083,10 @@ button:active { transform: translateY(1px) scale(.99); }
 </div>
 <!-- АДМИН ПАНЕЛЬ -->
 <div class="admin-panel hidden flex flex-wrap gap-2" id="adminPanel">
-<span class="text-blue-400 font-bold self-center text-sm w-full mb-1">👑 Адмін-панель (GitHub Sync)</span>
-<button class="bg-blue-600 hover:bg-blue-500 text-white flex-1 py-2 rounded font-bold text-xs shadow transition" id="publishToCloudBtn" onclick="publishToCloud()">☁️ Публікація в базу</button>
-<button class="bg-indigo-600 hover:bg-indigo-500 text-white flex-1 py-2 rounded font-bold text-xs shadow transition" id="forceSyncBtn" onclick="forceSyncWithCloud()">⬇️ Завантажити з бази</button>
+<span class="text-blue-400 font-bold self-center text-sm w-full mb-1">👑 Адмін-панель · Спільна база GitHub</span>
+<p class="admin-sync-explainer">«Публікація в базу» надсилає поточний набір питань у спільну базу для інших користувачів. «Завантажити з бази» оновлює локальний набір опублікованими питаннями. Це інструменти керування загальною базою, а не синхронізація особистого прогресу.</p>
+<button class="bg-blue-600 hover:bg-blue-500 text-white flex-1 py-2 rounded font-bold text-xs shadow transition" id="publishToCloudBtn" onclick="publishToCloud()">☁️ Опублікувати питання</button>
+<button class="bg-indigo-600 hover:bg-indigo-500 text-white flex-1 py-2 rounded font-bold text-xs shadow transition" id="forceSyncBtn" onclick="forceSyncWithCloud()">⬇️ Завантажити базу</button>
 <button class="bg-gray-700 hover:bg-red-900 text-gray-300 py-2 px-3 rounded font-bold text-xs shadow transition" onclick="logoutAdmin()">Вийти</button>
 </div><div class="editor-layout"><div class="editor-panel editor-form-panel" id="editorFormPanel">
 <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-yellow-500" id="editorFormTitle">Додати нове питання</h3></div>
@@ -922,7 +1151,7 @@ button:active { transform: translateY(1px) scale(.99); }
 <span class="hidden text-xs bg-red-900 text-white px-2 py-1 rounded border border-red-700 font-mono font-bold animate-pulse" id="examTimerDisplay"></span>
 </div>
 <div class="flex space-x-4">
-<button class="text-blue-400 hover:underline font-semibold hidden md:block" onclick="toggleCheatSheet()">📘 Довідник</button>
+
 <button class="text-yellow-500 hover:underline font-semibold" onclick="showScreen('homeScreen'); clearInterval(examInterval);">Перервати</button>
 </div>
 </div>
@@ -977,7 +1206,22 @@ button:active { transform: translateY(1px) scale(.99); }
 </div>
 <button class="btn-primary px-8 py-3 rounded text-lg w-full md:w-auto" onclick="showScreen('homeScreen')">На головну</button>
 </div>
-</div></div></main></div></div>
+</div></div></main>
+<nav class="mobile-bottom-nav" aria-label="Основна навігація телефону">
+  <button class="mobile-tab active" type="button" data-screen-target="homeScreen" onclick="showScreen('homeScreen')" aria-label="Головна">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Головна</span>
+  </button>
+  <button class="mobile-tab" type="button" data-screen-target="learnScreen" onclick="showScreen('learnScreen')" aria-label="Практика">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg><span>Практика</span>
+  </button>
+  <button class="mobile-tab" type="button" data-screen-target="statsScreen" onclick="showScreen('statsScreen')" aria-label="Статистика">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17"/><rect x="7" y="11" width="3" height="5" rx=".7"/><rect x="13" y="7" width="3" height="9" rx=".7"/><rect x="19" y="3" width="2" height="13" rx=".7"/></svg><span>Статистика</span>
+  </button>
+  <button class="mobile-tab" type="button" data-screen-target="moreScreen" onclick="showScreen('moreScreen')" aria-label="Інструменти">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span>Ще</span>
+  </button>
+</nav>
+</div></div>
 <!-- ВІКНО НАЛАШТУВАНЬ ЕКЗАМЕНУ -->
 <div class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4" id="examSettingsModal">
 <div class="bg-gray-800 rounded-lg border border-gray-700 max-w-sm w-full shadow-2xl overflow-hidden">
@@ -1023,7 +1267,7 @@ button:active { transform: translateY(1px) scale(.99); }
 </div>
 </div>
 <script>
-        // BUILD: 2026.11.10-electrician-hub-v3 — neutral labels, technical reference and editor refresh.
+        // BUILD: 2026.11.10-electrician-hub-v7 — mobile bottom navigation and compact learning dashboard.
         const PUBLIC_GIST_ID = '5ee027de84d344fbe11d2a496246d8ea'; 
 
         const defaultQuestions = [{ id: "1", period: "2nd period", type: "choice", category: "AC Fundamentals", subCategory: "105A", text: "Яке значення показує мультиметр при вимірюванні AC?", options: ["RMS", "Peak", "Average", "Миттєве"], answerIndex: 0, explanation: "Завжди RMS." }];
@@ -1480,11 +1724,11 @@ function initSyncUI() {
     if (!icon || !text || !btn) return;
 
     icon.textContent = autoSyncEnabled ? '☁️' : '🚫';
-    text.textContent = autoSyncEnabled ? 'Синхр: УВІМК' : 'Синхр: ВИМК';
+    text.textContent = autoSyncEnabled ? 'Увімкнено' : 'Вимкнено';
     btn.style.color = autoSyncEnabled ? '#72b7ff' : '#9caec5';
     btn.setAttribute('aria-pressed', String(autoSyncEnabled));
-    btn.setAttribute('aria-label', autoSyncEnabled ? 'Вимкнути автоматичну синхронізацію' : 'Увімкнути автоматичну синхронізацію');
-    btn.title = autoSyncEnabled ? 'Автоматична синхронізація увімкнена — натисніть, щоб вимкнути' : 'Автоматична синхронізація вимкнена — натисніть, щоб увімкнути';
+    btn.setAttribute('aria-label', autoSyncEnabled ? 'Вимкнути автоматичне оновлення спільної бази питань' : 'Увімкнути автоматичне оновлення спільної бази питань');
+    btn.title = autoSyncEnabled ? 'Автоматичне оновлення спільної бази увімкнене — натисніть, щоб вимкнути' : 'Автоматичне оновлення спільної бази вимкнене — натисніть, щоб увімкнути';
 }
 
 function toggleAutoSync() {
@@ -1492,7 +1736,7 @@ function toggleAutoSync() {
     localStorage.setItem('quiz_auto_sync', autoSyncEnabled ? 'on' : 'off');
     initSyncUI();
     if (autoSyncEnabled) {
-        document.getElementById('syncText').innerText = 'Завантаження...';
+        document.getElementById('syncText').innerText = 'Оновлення...';
         autoSyncOnLoad().then(() => initSyncUI());
     }
 }
@@ -1521,7 +1765,7 @@ async function autoSyncOnLoad() {
                 questions.forEach(localQ => { if (!cloudMap[localQ.id] && localQ.isCustom && !deletedCloudIds.includes(localQ.id)) { finalQuestions.push(localQ); } });
                 
                 questions = finalQuestions; saveData(); updateEditorList();
-                if (!document.getElementById('homeScreen').classList.contains('hidden')) renderCategories();
+                if (!document.getElementById('homeScreen').classList.contains('hidden') || !document.getElementById('learnScreen').classList.contains('hidden')) renderCategories();
                 return true;
             } catch(e) { console.warn("Синхронізація не вдалася:", e); return false; }
         }
@@ -1669,6 +1913,22 @@ async function autoSyncOnLoad() {
                 Object.keys(groups[main]).sort().forEach(sub => grid.appendChild(createCatCard(sub, groups[main][sub], `cat|${main}|${sub}`)));
             });
             updateDueCardsCount(periodQuestions);
+            filterLearningModules();
+        }
+
+        function filterLearningModules() {
+            const input = document.getElementById('moduleSearch');
+            const container = document.getElementById('categoriesGrid');
+            const empty = document.getElementById('noModuleResults');
+            if (!input || !container) return;
+            const query = input.value.trim().toLocaleLowerCase();
+            let visible = 0;
+            Array.from(container.children).forEach(group => {
+                const match = !query || group.textContent.toLocaleLowerCase().includes(query);
+                group.classList.toggle('hidden', !match);
+                if (match) visible++;
+            });
+            if (empty) empty.classList.toggle('hidden', visible > 0);
         }
 
         function createCatCard(title, count, id, customClass = '') {
@@ -2497,7 +2757,7 @@ async function autoSyncOnLoad() {
         }
 
         function showScreen(screenId) {
-            const screenIds = ['homeScreen', 'statsScreen', 'editorScreen', 'quizScreen', 'flashcardScreen', 'resultScreen'];
+            const screenIds = ['homeScreen', 'learnScreen', 'moreScreen', 'statsScreen', 'editorScreen', 'quizScreen', 'flashcardScreen', 'resultScreen'];
             screenIds.forEach(id => document.getElementById(id).classList.add('hidden'));
             const target = document.getElementById(screenId);
             if (!target) return;
@@ -2508,10 +2768,16 @@ async function autoSyncOnLoad() {
             document.querySelectorAll('#navButtons [data-screen-target]').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-screen-target') === screenId);
             });
+            const mobileActiveScreen = screenId === 'editorScreen' ? 'moreScreen' : screenId;
+            document.querySelectorAll('.mobile-bottom-nav [data-screen-target]').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-screen-target') === mobileActiveScreen);
+            });
 
             const pageMeta = {
-                homeScreen: ['Навчальна панель', 'Питання, модулі, довідник та результати.'],
-                statsScreen: ['Аналітика', 'Результати відповідей і статистика за модулями.'],
+                homeScreen: ['Головна', 'Твій прогрес та швидкий доступ до навчання.'],
+                learnScreen: ['Практика', 'Періоди, навчальні модулі та тренування.'],
+                moreScreen: ['Інструменти', 'Довідник, редактор та резервні копії.'],
+                statsScreen: ['Статистика', 'Результати відповідей і прогрес за модулями.'],
                 editorScreen: ['Редактор бази питань', 'Додавання, редагування, імпорт та резервні копії.'],
                 quizScreen: ['Тестування', 'Поточне питання та варіанти відповіді.'],
                 flashcardScreen: ['Флеш-картки', 'Запитання, відповідь і статистика повторення.'],
@@ -2524,6 +2790,7 @@ async function autoSyncOnLoad() {
             if (subheading) subheading.textContent = meta[1];
 
             if (screenId === 'homeScreen') { selectedCategories.clear(); renderCategories(); checkDailyProgress(); }
+            else if (screenId === 'learnScreen') { updatePeriodTabsUI(); renderCategories(); }
             else if (screenId === 'editorScreen') { updateEditorList(); checkAdminMode(); }
             else if (screenId === 'statsScreen') { renderStatsScreen(); }
         }
