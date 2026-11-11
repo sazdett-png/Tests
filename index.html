@@ -383,7 +383,23 @@
         let adminSettings = JSON.parse(localStorage.getItem('quiz_admin_settings')) || { token: '', gistId: '' };
         
         const storedAppStats = JSON.parse(localStorage.getItem('app_stats')) || {};
-        let appStats = { streak: storedAppStats.lastStudyDate && Number.isFinite(storedAppStats.streak) ? storedAppStats.streak : 0, lastStudyDate: storedAppStats.lastStudyDate || null, questionsDate: storedAppStats.questionsDate || null, questionsToday: storedAppStats.lastStudyDate && Number.isFinite(storedAppStats.questionsToday) ? storedAppStats.questionsToday : 0, streakUpdatedToday: !!storedAppStats.lastStudyDate && !!storedAppStats.streakUpdatedToday, totalQuizzes: Number.isFinite(storedAppStats.totalQuizzes) ? storedAppStats.totalQuizzes : 0 };
+        function normalizeAppStats(source) {
+            const data = source && typeof source === 'object' && !Array.isArray(source) ? source : {};
+            const today = new Date().toDateString();
+            const questionsDate = typeof data.questionsDate === 'string' ? data.questionsDate : null;
+            const lastStudyDate = typeof data.lastStudyDate === 'string' ? data.lastStudyDate : null;
+            return {
+                streak: Number.isFinite(data.streak) && data.streak >= 0 ? Math.floor(data.streak) : 0,
+                lastStudyDate: lastStudyDate,
+                questionsDate: questionsDate,
+                // Partial progress belongs to questionsDate, not lastStudyDate:
+                // lastStudyDate is only set after the fifth answer.
+                questionsToday: questionsDate === today && Number.isFinite(data.questionsToday) ? Math.max(0, Math.min(5, Math.floor(data.questionsToday))) : 0,
+                streakUpdatedToday: questionsDate === today && !!data.streakUpdatedToday,
+                totalQuizzes: Number.isFinite(data.totalQuizzes) && data.totalQuizzes >= 0 ? Math.floor(data.totalQuizzes) : 0
+            };
+        }
+        let appStats = normalizeAppStats(storedAppStats);
         
         function escapeHtml(value) { return String(value ?? '').replace(/[&<>\"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch])); }
         function sanitizeRichHtml(html) {
@@ -650,58 +666,57 @@
             if (dueCount > 0) { badge.innerText = `${dueCount} на сьогодні`; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
         }
 
-        // --- НОВИЙ ЕКРАН АНАЛІТИКИ (DASHBOARD) ---
+        // --- ЕКРАН АНАЛІТИКИ: статистика за категоріями та конкретними модулями ---
         function renderStatsScreen() {
             document.getElementById('statsPeriodLabel').innerText = activePeriod;
             const periodQuestions = questions.filter(q => q.period === activePeriod);
-            
-            // 1. Загальна статистика (Круговий графік)
+
             let totalC = 0, totalW = 0;
-            let catStats = {};
-            
+            const catStats = {};
             periodQuestions.forEach(q => {
-                let cat = q.category || 'Без категорії';
-                if(!catStats[cat]) catStats[cat] = { c: 0, w: 0 };
-                if (quizStats[q.id]) { 
-                    catStats[cat].c += quizStats[q.id].c; 
-                    catStats[cat].w += quizStats[q.id].w; 
-                    totalC += quizStats[q.id].c;
-                    totalW += quizStats[q.id].w;
-                }
+                const cat = q.category || 'Без категорії';
+                const sub = q.subCategory || 'Загальні';
+                if (!catStats[cat]) catStats[cat] = { c: 0, w: 0, modules: {} };
+                if (!catStats[cat].modules[sub]) catStats[cat].modules[sub] = { c: 0, w: 0, questionCount: 0 };
+                catStats[cat].modules[sub].questionCount++;
+                const stat = quizStats[q.id] || { c: 0, w: 0 };
+                const c = Number.isFinite(stat.c) ? stat.c : 0;
+                const w = Number.isFinite(stat.w) ? stat.w : 0;
+                catStats[cat].c += c;
+                catStats[cat].w += w;
+                catStats[cat].modules[sub].c += c;
+                catStats[cat].modules[sub].w += w;
+                totalC += c;
+                totalW += w;
             });
-            
-            let totalAnswers = totalC + totalW;
-            let overallPerc = totalAnswers > 0 ? Math.round((totalC / totalAnswers) * 100) : 0;
-            
+
+            const totalAnswers = totalC + totalW;
+            const overallPerc = totalAnswers > 0 ? Math.round((totalC / totalAnswers) * 100) : 0;
             document.getElementById('statTotalPerc').innerText = overallPerc + '%';
-            // Заповнення круга (зелений - правильні, червоний - помилки)
             document.getElementById('statDonut').style.background = `conic-gradient(#10b981 0% ${overallPerc}%, #ef4444 ${overallPerc}% 100%)`;
-            
             document.getElementById('statTotalAnswers').innerText = totalAnswers;
             document.getElementById('statTotalCorrect').innerText = totalC;
             document.getElementById('statTotalWrong').innerText = totalW;
 
-            // 2. Графік останніх екзаменів (Bar Chart)
+            // Останні 7 екзаменів
             let barHtml = '';
-            let recentExams = [...examHistory].slice(-7); // Останні 7 екзаменів
-            
+            const recentExams = [...examHistory].slice(-7);
             if (recentExams.length === 0) {
                 barHtml = '<div class="text-gray-500 flex items-center justify-center w-full h-full text-sm">Немає даних</div>';
             } else {
                 recentExams.forEach(h => {
-                    let hPerc = h.perc;
-                    let isPassed = hPerc >= h.targetPass;
-                    let color = isPassed ? 'bg-green-500' : 'bg-red-500';
-                    let dateShort = h.date.split(',')[0];
-                    
+                    const hPerc = Number(h.perc) || 0;
+                    const isPassed = hPerc >= (Number(h.targetPass) || 70);
+                    const color = isPassed ? 'bg-green-500' : 'bg-red-500';
+                    const dateShort = String(h.date || '').split(',')[0];
                     barHtml += `
                     <div class="flex flex-col items-center justify-end h-full flex-1 group relative">
                         <div class="absolute bottom-full mb-2 hidden group-hover:block bg-gray-900 text-xs text-white p-2 rounded z-10 whitespace-nowrap border border-gray-600 shadow-xl">
-                            <span class="font-bold ${isPassed ? 'text-green-400' : 'text-red-400'}">${hPerc}%</span> (${h.score}/${h.total})<br>
-                            <span class="text-[10px] text-gray-400">${dateShort}</span>
+                            <span class="font-bold ${isPassed ? 'text-green-400' : 'text-red-400'}">${hPerc}%</span> (${Number(h.score) || 0}/${Number(h.total) || 0})<br>
+                            <span class="text-[10px] text-gray-400">${escapeHtml(dateShort)}</span>
                         </div>
                         <div class="w-full max-w-[2.5rem] bg-gray-700 rounded-t-sm flex flex-col justify-end h-24 relative overflow-hidden">
-                            <div class="w-full ${color} transition-all duration-500" style="height: ${hPerc}%"></div>
+                            <div class="w-full ${color} transition-all duration-500" style="height: ${Math.max(0, Math.min(100, hPerc))}%"></div>
                         </div>
                         <span class="text-[10px] text-gray-400 mt-2 font-bold">${hPerc}%</span>
                     </div>`;
@@ -709,45 +724,82 @@
             }
             document.getElementById('examBarChart').innerHTML = barHtml;
 
-            // 3. Детальний розбір модулів
-            let statsHtml = '', weakestCat = null, lowestPerc = 100;
-            
+            // Розбір категорій із розгортанням до підкатегорій/модулів
+            let statsHtml = '';
+            let weakestModule = null;
+            let lowestPerc = 101;
             Object.keys(catStats).sort().forEach(cat => {
-                let total = catStats[cat].c + catStats[cat].w;
-                let perc = total === 0 ? 0 : Math.round((catStats[cat].c / total) * 100);
-                
-                if (total > 0 && perc < lowestPerc) { lowestPerc = perc; weakestCat = cat; }
-                
-                let color = perc >= 80 ? 'bg-green-500' : (perc >= 60 ? 'bg-yellow-500' : 'bg-red-500');
-                let textColor = perc >= 80 ? 'text-green-400' : (perc >= 60 ? 'text-yellow-400' : 'text-red-400');
-                
+                const category = catStats[cat];
+                const catTotal = category.c + category.w;
+                const catPerc = catTotal > 0 ? Math.round((category.c / catTotal) * 100) : 0;
+                const catTextColor = catPerc >= 80 ? 'text-green-400' : (catPerc >= 60 ? 'text-yellow-400' : 'text-red-400');
+                const moduleNames = Object.keys(category.modules).sort();
+                let modulesHtml = '';
+
+                moduleNames.forEach(sub => {
+                    const module = category.modules[sub];
+                    const moduleTotal = module.c + module.w;
+                    const modulePerc = moduleTotal > 0 ? Math.round((module.c / moduleTotal) * 100) : 0;
+                    const color = modulePerc >= 80 ? 'bg-green-500' : (modulePerc >= 60 ? 'bg-yellow-500' : 'bg-red-500');
+                    const textColor = modulePerc >= 80 ? 'text-green-400' : (modulePerc >= 60 ? 'text-yellow-400' : 'text-red-400');
+                    if (moduleTotal > 0 && modulePerc < lowestPerc) {
+                        lowestPerc = modulePerc;
+                        weakestModule = { category: cat, subCategory: sub, perc: modulePerc };
+                    }
+                    modulesHtml += `
+                    <div class="bg-gray-800 p-3 rounded-lg border border-gray-600">
+                        <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
+                            <div class="min-w-0">
+                                <span class="font-semibold text-gray-100 text-sm">${escapeHtml(sub)}</span>
+                                <span class="text-xs text-gray-500 ml-2">${module.questionCount} питань у базі</span>
+                            </div>
+                            <span class="font-bold ${textColor} text-sm">${moduleTotal > 0 ? modulePerc + '%' : '—'}</span>
+                        </div>
+                        <div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden mb-2">
+                            <div class="${color} h-2 rounded-full transition-all duration-500" style="width: ${modulePerc}%"></div>
+                        </div>
+                        <div class="flex flex-wrap justify-between items-center gap-2 text-xs text-gray-400">
+                            <span>Спроб: ${moduleTotal} · ✅ ${module.c} | ❌ ${module.w}</span>
+                            <button type="button" class="train-stat-module bg-indigo-700 hover:bg-indigo-600 text-white px-3 py-1.5 rounded font-bold" data-category="${escapeHtml(cat)}" data-subcategory="${escapeHtml(sub)}">Тренувати модуль</button>
+                        </div>
+                    </div>`;
+                });
+
                 statsHtml += `
-                <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-end mb-2">
-                        <span class="font-bold text-gray-200 text-sm md:text-base">${escapeHtml(cat)}</span>
-                        <span class="font-bold ${textColor} text-sm">${total > 0 ? perc + '%' : '—'}</span>
-                    </div>
-                    <div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden mb-2">
-                        <div class="${color} h-2 rounded-full transition-all duration-500" style="width: ${perc}%"></div>
-                    </div>
-                    <div class="flex justify-between text-xs text-gray-400 font-mono">
-                        <span>Спроб: ${total}</span>
-                        <span>✅ ${catStats[cat].c} | ❌ ${catStats[cat].w}</span>
-                    </div>
-                </div>`;
+                <details class="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
+                    <summary class="list-none cursor-pointer p-4 flex flex-wrap items-center justify-between gap-3 hover:bg-gray-800">
+                        <span class="font-bold text-gray-200">📂 ${escapeHtml(cat)} <span class="text-xs text-gray-500 font-normal ml-1">(${moduleNames.length} мод.)</span></span>
+                        <span class="font-bold ${catTextColor} text-sm">${catTotal > 0 ? catPerc + '%' : '—'} · ${catTotal} спроб</span>
+                    </summary>
+                    <div class="p-3 pt-0 space-y-2 border-t border-gray-700">${modulesHtml}</div>
+                </details>`;
             });
-            
-            if (weakestCat && lowestPerc < 75) {
+
+            if (weakestModule && lowestPerc < 75) {
                 statsHtml = `<div class="mb-4 p-4 bg-red-900/20 border border-red-800 rounded-lg flex items-start gap-3">
                     <span class="text-2xl leading-none">⚠️</span>
                     <div>
                         <h4 class="text-red-400 font-bold text-sm">Слабке місце</h4>
-                        <p class="text-red-200 text-xs mt-1">Варто приділити більше уваги модулю <b>${escapeHtml(weakestCat)}</b> (точність ${lowestPerc}%).</p>
+                        <p class="text-red-200 text-xs mt-1">Варто повторити <b>${escapeHtml(weakestModule.category)} → ${escapeHtml(weakestModule.subCategory)}</b> (точність ${weakestModule.perc}%).</p>
                     </div>
                 </div>` + statsHtml;
             }
-            
-            document.getElementById('moduleStatsList').innerHTML = statsHtml || '<p class="text-gray-500 text-sm text-center py-4">Немає даних у цьому періоді</p>';
+            document.getElementById('moduleStatsList').innerHTML = statsHtml || '<p class="text-gray-500 text-sm text-center py-4">Немає питань у цьому періоді</p>';
+
+            document.querySelectorAll('.train-stat-module').forEach(button => {
+                button.addEventListener('click', event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    trainSpecificModule(button.dataset.category, button.dataset.subcategory);
+                });
+            });
+        }
+
+        function trainSpecificModule(category, subCategory) {
+            if (typeof category !== 'string' || typeof subCategory !== 'string') return;
+            selectedCategories.clear();
+            selectedCategories.add(`cat|${category}|${subCategory}`);
+            startMode('quiz');
         }
 
         function startMode(mode) {
@@ -775,16 +827,45 @@
         function startSmartWorkout() {
             currentMode = 'smart'; clearInterval(examInterval);
             const periodQuestions = questions.filter(q => q.period === activePeriod);
-            if (periodQuestions.length < 10) { alert("Мало питань у базі цього періоду для цього режиму!"); return; }
-            
-            let weakPool = periodQuestions.filter(q => quizStats[q.id] && quizStats[q.id].w > 0 && quizStats[q.id].w >= quizStats[q.id].c);
-            weakPool.sort((a, b) => { let pA = quizStats[a.id].w / (quizStats[a.id].w + quizStats[a.id].c); let pB = quizStats[b.id].w / (quizStats[b.id].w + quizStats[b.id].c); return pB - pA; });
-            weakPool = shuffle(weakPool.slice(0, 20));
-            let unseenPool = shuffle(periodQuestions.filter(q => !quizStats[q.id])); let randomPool = shuffle(periodQuestions.filter(q => !weakPool.includes(q) && !unseenPool.includes(q)));
-            let targetTotal = 20, wCount = Math.min(10, weakPool.length), uCount = Math.min(6 + (10 - wCount), unseenPool.length), rCount = targetTotal - wCount - uCount;
-            let mix = [...weakPool.slice(0, wCount), ...unseenPool.slice(0, uCount), ...randomPool.slice(0, rCount)];
-            
-            currentQuizQuestions = shuffle(mix); currentQIndex = 0; score = 0; userMistakes = [];
+            if (periodQuestions.length === 0) { alert("У цьому періоді поки немає питань для тренування."); return; }
+
+            const weakPool = periodQuestions.filter(q => quizStats[q.id] && quizStats[q.id].w > 0 && quizStats[q.id].w >= quizStats[q.id].c);
+            weakPool.sort((a, b) => {
+                const aStats = quizStats[a.id], bStats = quizStats[b.id];
+                const pA = aStats.w / (aStats.w + aStats.c);
+                const pB = bStats.w / (bStats.w + bStats.c);
+                return pB - pA;
+            });
+            const unseenPool = shuffle(periodQuestions.filter(q => !quizStats[q.id]));
+            const targetTotal = Math.min(20, periodQuestions.length);
+            const selected = [];
+            const selectedIds = new Set();
+            const addFromPool = (pool, limit) => {
+                if (limit <= 0 || selected.length >= targetTotal) return 0;
+                let added = 0;
+                for (const q of pool) {
+                    if (selected.length >= targetTotal) break;
+                    if (selectedIds.has(String(q.id))) continue;
+                    selected.push(q);
+                    selectedIds.add(String(q.id));
+                    added++;
+                    if (added >= limit || selected.length >= targetTotal) break;
+                }
+                return added;
+            };
+
+            const weakCount = addFromPool(weakPool, Math.min(10, targetTotal));
+            const unseenTarget = Math.min(6 + (10 - weakCount), targetTotal - selected.length);
+            addFromPool(unseenPool, unseenTarget);
+
+            // Fill any remaining slots from every not-yet-selected question.
+            // This also recovers unused weak/unseen questions and avoids duplicates.
+            const remainingPool = shuffle(periodQuestions.filter(q => !selectedIds.has(String(q.id))));
+            addFromPool(remainingPool, targetTotal - selected.length);
+
+            currentQuizQuestions = shuffle(selected);
+            if (currentQuizQuestions.length === 0) { alert("Не вдалося підготувати питання для тренування."); return; }
+            currentQIndex = 0; score = 0; userMistakes = [];
             document.getElementById('examTimerDisplay').classList.add('hidden'); document.getElementById('quizFeedback').classList.add('hidden');
             showScreen('quizScreen'); loadNextQuestion();
         }
@@ -808,12 +889,21 @@
             
             const periodQuestions = questions.filter(q => q.period === activePeriod);
             let pool = periodQuestions;
-            if (src === 'selected' && selectedCategories.size > 0 && !selectedCategories.has('all')) {
-                let filterCats = Array.from(selectedCategories).filter(c => c.startsWith('cat|'));
-                pool = periodQuestions.filter(q => filterCats.includes(`cat|${q.category || 'Без категорії'}|${q.subCategory || 'Загальні'}`));
-                if (pool.length === 0) { alert("В обраних модулях немає питань!"); return; }
+            if (src === 'selected') {
+                if (!selectedCategories.has('all')) {
+                    const filterCats = Array.from(selectedCategories).filter(c => c.startsWith('cat|'));
+                    if (filterCats.length === 0) {
+                        alert("Спочатку виберіть хоча б один модуль на головному екрані або змініть джерело на «З усієї бази». Екзамен не запущено.");
+                        return;
+                    }
+                    pool = periodQuestions.filter(q => filterCats.includes(`cat|${q.category || 'Без категорії'}|${q.subCategory || 'Загальні'}`));
+                    if (pool.length === 0) { alert("В обраних модулях немає питань!"); return; }
+                }
             }
-            pool = shuffle(pool); let finalCount = (cnt === 'all') ? pool.length : Math.min(parseInt(cnt), pool.length); currentQuizQuestions = pool.slice(0, finalCount);
+            pool = shuffle(pool);
+            const finalCount = (cnt === 'all') ? pool.length : Math.min(parseInt(cnt, 10) || 0, pool.length);
+            if (finalCount <= 0) { alert("Немає питань для запуску екзамену."); return; }
+            currentQuizQuestions = pool.slice(0, finalCount);
             currentQIndex = 0; score = 0; userMistakes = []; closeExamSettings();
             if (hasTimer) {
                 examTimeLeft = currentQuizQuestions.length * 120; document.getElementById('examTimerDisplay').classList.remove('hidden'); updateExamTimerUI();
@@ -932,7 +1022,8 @@
                 if (currentMode === 'smart') {
                     let catResults = {}; currentQuizQuestions.forEach(q => { let cat = q.category || 'Інше'; if (!catResults[cat]) catResults[cat] = { total: 0, wrong: 0 }; catResults[cat].total++; });
                     userMistakes.forEach(m => { catResults[m.q.category || 'Інше'].wrong++; });
-                    let html = ''; Object.keys(catResults).forEach(c => { let w = catResults[c].wrong; let t = catResults[c].total; let ok = t - w; html += `• <b>${escapeHtml(c)}:</b> вірно ${ok} з ${t} ${w > 0 ? `<span class="text-red-400">(помилок: ${w})</span>` : '✅'}<br>`; });
+                    let html = `<p class="text-gray-300 mb-3">Усього питань у тренуванні: <b>${currentQuizQuestions.length}</b>.</p>`;
+                    Object.keys(catResults).forEach(c => { let w = catResults[c].wrong; let t = catResults[c].total; let ok = t - w; html += `• <b>${escapeHtml(c)}:</b> вірно ${ok} з ${t} ${w > 0 ? `<span class="text-red-400">(помилок: ${w})</span>` : '✅'}<br>`; });
                     document.getElementById('smartWorkoutText').innerHTML = html; smartReview.classList.remove('hidden');
                 }
             }
@@ -1077,31 +1168,196 @@
             const dl = document.createElement('a'); dl.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToSave))); dl.setAttribute("download", "sait_quiz_FULL_backup.json"); dl.click(); 
         }
 
+        const VALID_PERIODS = ['1st period', '2nd period', '3rd period', '4th period'];
+
+        function isPlainObject(value) {
+            return value !== null && typeof value === 'object' && !Array.isArray(value);
+        }
+
+        function validateQuestionArray(rawQuestions, existingIds = new Set()) {
+            if (!Array.isArray(rawQuestions)) throw new Error('Поле questions має бути масивом.');
+            const usedIds = new Set([...existingIds].map(id => String(id)));
+            return rawQuestions.map((raw, index) => {
+                const prefix = `Питання №${index + 1}:`;
+                if (!isPlainObject(raw)) throw new Error(`${prefix} очікувався JSON-об’єкт.`);
+
+                if (raw.id === undefined || raw.id === null || String(raw.id).trim() === '') throw new Error(`${prefix} відсутній обов’язковий ID.`);
+                const id = String(raw.id).trim();
+                if (usedIds.has(id)) throw new Error(`${prefix} ID «${id}» повторюється або вже є в поточній базі.`);
+                usedIds.add(id);
+
+                if (raw.type !== 'choice' && raw.type !== 'input') throw new Error(`${prefix} type має бути «choice» або «input».`);
+                if (typeof raw.text !== 'string' || raw.text.trim() === '') throw new Error(`${prefix} текст питання порожній або має неправильний тип.`);
+
+                const period = raw.period;
+                if (typeof period !== 'string' || !VALID_PERIODS.includes(period)) throw new Error(`${prefix} період обов’язковий і має бути одним із 1st period, 2nd period, 3rd period або 4th period.`);
+
+                if (!Array.isArray(raw.options) || raw.options.length === 0 || raw.options.some(option => typeof option !== 'string' || option.trim() === '')) {
+                    throw new Error(`${prefix} options має бути масивом непорожніх текстових варіантів.`);
+                }
+                if (raw.type === 'choice' && (raw.options.length < 2 || raw.options.length > 4)) {
+                    throw new Error(`${prefix} для type «choice» потрібно від 2 до 4 варіантів відповіді.`);
+                }
+
+                const answerIndex = raw.answerIndex;
+                if (!Number.isInteger(answerIndex) || answerIndex < 0 || answerIndex >= raw.options.length) {
+                    throw new Error(`${prefix} answerIndex має бути цілим числом у межах масиву options.`);
+                }
+
+                for (const field of ['category', 'subCategory', 'imageUrl', 'explanation']) {
+                    if (raw[field] !== undefined && raw[field] !== null && typeof raw[field] !== 'string') {
+                        throw new Error(`${prefix} поле ${field} має бути текстом.`);
+                    }
+                }
+                if (raw.isCustom !== undefined && typeof raw.isCustom !== 'boolean') {
+                    throw new Error(`${prefix} поле isCustom має бути true або false.`);
+                }
+
+                return {
+                    ...raw,
+                    id,
+                    period,
+                    type: raw.type,
+                    text: raw.text.trim(),
+                    options: raw.options.map(option => option.trim()),
+                    answerIndex,
+                    category: raw.category || '',
+                    subCategory: raw.subCategory || '',
+                    imageUrl: raw.imageUrl || '',
+                    explanation: raw.explanation || ''
+                };
+            });
+        }
+
+        function validateBackupData(imp) {
+            if (!isPlainObject(imp)) throw new Error('Повний бекап має бути JSON-об’єктом.');
+            const importedQuestions = validateQuestionArray(imp.questions);
+
+            const importedQuizStats = imp.quizStats === undefined ? {} : imp.quizStats;
+            if (!isPlainObject(importedQuizStats)) throw new Error('quizStats має бути об’єктом.');
+            Object.entries(importedQuizStats).forEach(([id, stat]) => {
+                if (!isPlainObject(stat) || !Number.isFinite(stat.c) || stat.c < 0 || !Number.isFinite(stat.w) || stat.w < 0) {
+                    throw new Error(`Некоректна статистика для питання ID «${id}».`);
+                }
+            });
+
+            const validateIdList = (value, label) => {
+                if (value === undefined) return [];
+                if (!Array.isArray(value) || value.some(id => (typeof id !== 'string' && typeof id !== 'number') || String(id).trim() === '')) {
+                    throw new Error(`${label} має бути масивом ID.`);
+                }
+                return [...new Set(value.map(id => String(id)))];
+            };
+            const importedMistakes = validateIdList(imp.mistakeIds, 'mistakeIds');
+            const importedFavorites = validateIdList(imp.favoriteIds, 'favoriteIds');
+
+            const importedSrs = imp.srsStats === undefined ? {} : imp.srsStats;
+            if (!isPlainObject(importedSrs)) throw new Error('srsStats має бути об’єктом.');
+            Object.entries(importedSrs).forEach(([id, item]) => {
+                if (!isPlainObject(item) || !Number.isFinite(item.interval) || item.interval < 0 || !Number.isFinite(item.nextReview) || item.nextReview < 0) {
+                    throw new Error(`Некоректні дані повторення для питання ID «${id}».`);
+                }
+            });
+
+            const importedExamHistory = imp.examHistory === undefined ? [] : imp.examHistory;
+            if (!Array.isArray(importedExamHistory) || importedExamHistory.some(item => !isPlainObject(item) || typeof item.date !== 'string' || !Number.isFinite(item.score) || !Number.isFinite(item.total) || item.total <= 0 || !Number.isFinite(item.perc) || item.perc < 0 || item.perc > 100 || !Number.isFinite(item.targetPass))) {
+                throw new Error('examHistory має містити коректні записи результатів екзаменів.');
+            }
+
+            let importedCheatSheets = null;
+            if (imp.cheatSheets !== undefined) {
+                if (!isPlainObject(imp.cheatSheets) || Object.values(imp.cheatSheets).some(value => typeof value !== 'string')) {
+                    throw new Error('cheatSheets має бути об’єктом із текстовими значеннями.');
+                }
+                importedCheatSheets = {};
+                VALID_PERIODS.forEach(period => {
+                    if (typeof imp.cheatSheets[period] === 'string') importedCheatSheets[period] = sanitizeRichHtml(imp.cheatSheets[period]);
+                });
+            } else if (imp.cheatSheet !== undefined) {
+                if (typeof imp.cheatSheet !== 'string') throw new Error('cheatSheet має бути текстом.');
+                importedCheatSheets = { '2nd period': sanitizeRichHtml(imp.cheatSheet) };
+            }
+
+            const importedAppStats = imp.appStats === undefined ? normalizeAppStats({}) : imp.appStats;
+            if (!isPlainObject(importedAppStats)) throw new Error('appStats має бути об’єктом.');
+            for (const key of ['streak', 'questionsToday', 'totalQuizzes']) {
+                if (importedAppStats[key] !== undefined && (!Number.isFinite(importedAppStats[key]) || importedAppStats[key] < 0)) {
+                    throw new Error(`appStats.${key} має бути невід’ємним числом.`);
+                }
+            }
+            for (const key of ['lastStudyDate', 'questionsDate']) {
+                if (importedAppStats[key] !== undefined && importedAppStats[key] !== null && typeof importedAppStats[key] !== 'string') {
+                    throw new Error(`appStats.${key} має бути датою у текстовому форматі або null.`);
+                }
+            }
+            if (importedAppStats.streakUpdatedToday !== undefined && typeof importedAppStats.streakUpdatedToday !== 'boolean') {
+                throw new Error('appStats.streakUpdatedToday має бути true або false.');
+            }
+
+            return {
+                questions: importedQuestions,
+                quizStats: importedQuizStats,
+                mistakeIds: importedMistakes,
+                favoriteIds: importedFavorites,
+                srsStats: importedSrs,
+                examHistory: importedExamHistory,
+                appStats: normalizeAppStats(importedAppStats),
+                cheatSheets: importedCheatSheets
+            };
+        }
+
         function importFullData(e) {
-            const f = e.target.files[0]; if (!f) return; const r = new FileReader();
+            const f = e.target.files[0];
+            if (!f) return;
+            const r = new FileReader();
             r.onload = function(evt) {
                 try {
                     const imp = JSON.parse(evt.target.result);
-                    
+
                     if (Array.isArray(imp)) {
-                        if (!confirm(`📦 Знайдено ${imp.length} нових питань.\n\nДодати їх до поточної бази?\n(Ваша статистика та старі питання не постраждають)`)) return;
-                        let newQuestions = imp.map(q => { if (!q.period) q.period = activePeriod; if (!q.id) q.id = Date.now().toString() + Math.floor(Math.random()*10000); if (q.isCustom === undefined) q.isCustom = true; return q; });
-                        questions = [...newQuestions, ...questions]; 
-                        alert(`✅ Успішно додано ${newQuestions.length} нових питань! Тепер можна публікувати у хмару.`);
-                    } 
-                    else if (imp.questions) {
-                        if (!confirm('⚠️ УВАГА! Це ПОВНИЙ БЕКАП.\nВін повністю перепише всю базу, статистику і стрик на ті, що у файлі. Продовжити?')) return;
-                        questions = imp.questions.map(q => { if (!q.period) q.period = '2nd period'; return q; });
-                        if (imp.cheatSheets) { Object.keys(imp.cheatSheets).forEach(p => { localStorage.setItem('quiz_cheatsheet_' + p, sanitizeRichHtml(imp.cheatSheets[p])); }); } else if (imp.cheatSheet !== undefined) { localStorage.setItem('quiz_cheatsheet_2nd period', sanitizeRichHtml(imp.cheatSheet)); }
-                        quizStats = imp.quizStats || {}; mistakeIds = imp.mistakeIds || []; favoriteIds = imp.favoriteIds || []; srsStats = imp.srsStats || {}; examHistory = imp.examHistory || [];
-                        if (imp.appStats) { appStats = { streak: Number.isFinite(imp.appStats.streak) ? imp.appStats.streak : 0, lastStudyDate: imp.appStats.lastStudyDate || null, questionsDate: imp.appStats.questionsDate || null, questionsToday: imp.appStats.lastStudyDate && Number.isFinite(imp.appStats.questionsToday) ? imp.appStats.questionsToday : 0, streakUpdatedToday: !!imp.appStats.lastStudyDate && !!imp.appStats.streakUpdatedToday, totalQuizzes: Number.isFinite(imp.appStats.totalQuizzes) ? imp.appStats.totalQuizzes : 0 }; } else appStats = { streak: 0, lastStudyDate: null, questionsDate: null, questionsToday: 0, streakUpdatedToday: false, totalQuizzes: 0 };
-                        alert('✅ Повну копію успішно відновлено!');
-                    } else { alert('❌ Невідомий формат файлу.'); return; }
-                    
-                    saveData(); updateEditorList(); checkDailyProgress(); updatePeriodTabsUI(); renderCategories(); loadCheatSheet();
-                } catch(err) { alert(`❌ Не вдалося прочитати файл.\n\nПоточна база не змінена.`); } finally { e.target.value = ''; }
+                        const existingIds = new Set(questions.map(q => String(q.id)));
+                        const newQuestions = validateQuestionArray(imp, existingIds);
+                        if (!confirm(`📦 Перевірку пройдено: ${newQuestions.length} питань без помилок.\n\nДодати їх до поточної бази?\nПоточні питання та статистика залишаться без змін.`)) return;
+                        questions = [...newQuestions, ...questions];
+                        saveData();
+                        alert(`✅ Успішно додано ${newQuestions.length} питань!`);
+                    }
+                    else if (isPlainObject(imp) && Array.isArray(imp.questions)) {
+                        // Validate the complete backup before asking for confirmation or changing anything.
+                        const backup = validateBackupData(imp);
+                        if (!confirm(`⚠️ Перевірку повного бекапу пройдено: ${backup.questions.length} питань.\n\nБекап повністю замінить поточну базу, статистику та стрик. Продовжити?`)) return;
+
+                        questions = backup.questions;
+                        quizStats = backup.quizStats;
+                        mistakeIds = backup.mistakeIds;
+                        favoriteIds = backup.favoriteIds;
+                        srsStats = backup.srsStats;
+                        examHistory = backup.examHistory;
+                        appStats = backup.appStats;
+                        if (backup.cheatSheets) {
+                            Object.entries(backup.cheatSheets).forEach(([period, content]) => localStorage.setItem('quiz_cheatsheet_' + period, content));
+                        }
+                        saveData();
+                        alert('✅ Повну копію успішно перевірено та відновлено!');
+                    }
+                    else {
+                        alert('❌ Невідомий формат файлу. Очікується масив питань або повний бекап.');
+                        return;
+                    }
+
+                    updateEditorList();
+                    checkDailyProgress();
+                    updatePeriodTabsUI();
+                    renderCategories();
+                    loadCheatSheet();
+                } catch(err) {
+                    alert(`❌ Імпорт скасовано: ${err && err.message ? err.message : 'помилка структури файлу'}.\n\nПоточна база не змінена.`);
+                } finally {
+                    e.target.value = '';
+                }
             };
-            r.onerror = function() { alert('Не вдалося прочитати вибраний файл.'); e.target.value = ''; }; r.readAsText(f);
+            r.onerror = function() { alert('Не вдалося прочитати вибраний файл.'); e.target.value = ''; };
+            r.readAsText(f);
         }
 
         function showScreen(screenId) {
