@@ -41,6 +41,286 @@
         .flashcard-flip { transform: scale(0.98); opacity: 0.8; }
         
         .donut-chart { transition: background 0.5s ease-out; }
+/* Modern visual refresh — visual-only overrides; app logic and data model remain unchanged. */
+:root {
+    color-scheme: dark;
+    --app-bg: #0a1020;
+    --surface: rgba(20, 30, 49, .92);
+    --surface-raised: rgba(27, 40, 62, .94);
+    --surface-soft: rgba(12, 20, 35, .82);
+    --stroke: rgba(148, 163, 184, .16);
+    --stroke-strong: rgba(148, 163, 184, .25);
+    --ink: #edf3fc;
+    --muted: #94a3b8;
+    --amber: #f5bd4f;
+    --amber-bright: #ffd36b;
+    --blue: #67b5f7;
+    --violet: #a99bff;
+    --green: #4ade80;
+    --red: #fb7185;
+}
+
+html { background: var(--app-bg); scroll-behavior: smooth; }
+body {
+    position: relative;
+    isolation: isolate;
+    background:
+        radial-gradient(ellipse at 12% 0%, rgba(48, 91, 151, .20), transparent 36rem),
+        radial-gradient(ellipse at 92% 16%, rgba(118, 83, 172, .13), transparent 32rem),
+        linear-gradient(180deg, #0b1324 0%, #0a1020 56%, #080e1a 100%) !important;
+    color: var(--ink) !important;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    letter-spacing: .005em;
+    -webkit-font-smoothing: antialiased;
+}
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: .18;
+    background-image: linear-gradient(rgba(148,163,184,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.045) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: linear-gradient(to bottom, black, transparent 72%);
+}
+body > .max-w-3xl.mx-auto.mt-2 {
+    width: min(100%, 70rem) !important;
+    max-width: 70rem !important;
+    margin-top: 1rem !important;
+}
+
+/* App header and navigation */
+header.flex.justify-between.items-center {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem 1.15rem !important;
+    margin-bottom: 1.6rem !important;
+    border: 1px solid var(--stroke) !important;
+    border-radius: 1.35rem;
+    background: rgba(14, 23, 40, .78);
+    box-shadow: 0 14px 38px rgba(0,0,0,.22), inset 0 1px rgba(255,255,255,.035);
+    backdrop-filter: blur(18px);
+}
+#mainAppTitle {
+    display: flex;
+    flex-direction: column;
+    gap: .12rem;
+    color: var(--amber) !important;
+    font-size: 1.75rem !important;
+    line-height: 1.1;
+    letter-spacing: -.045em;
+    text-shadow: 0 0 28px rgba(245,189,79,.16);
+}
+#mainAppTitle::after {
+    content: "ELECTRICIAN · STUDY SPACE";
+    color: #71829b;
+    font-size: .58rem;
+    line-height: 1.3;
+    font-weight: 800;
+    letter-spacing: .16em;
+}
+#navButtons { display: flex; flex-wrap: wrap; gap: .5rem !important; }
+#navButtons button {
+    padding: .62rem .86rem !important;
+    border: 1px solid var(--stroke) !important;
+    border-radius: .8rem !important;
+    background: rgba(36, 51, 75, .72) !important;
+    color: #dbe7f7 !important;
+    box-shadow: none !important;
+    font-weight: 700;
+}
+#navButtons button:hover { background: rgba(53, 73, 105, .9) !important; border-color: var(--stroke-strong) !important; transform: translateY(-1px); }
+body > .max-w-3xl.mx-auto.mt-2 > p.text-right { margin-top: -1.15rem !important; margin-bottom: 1rem !important; opacity: .72; }
+
+/* Typography and general controls */
+h2, h3, h4 { letter-spacing: -.025em; }
+button {
+    border-radius: .85rem;
+    font-weight: 650;
+    transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, border-color .18s ease, filter .18s ease;
+}
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus-visible {
+    outline: 2px solid rgba(245,189,79,.9) !important;
+    outline-offset: 3px;
+}
+button:active { transform: translateY(1px) scale(.99); }
+.btn-primary {
+    background: linear-gradient(135deg, #f8cb68, #e7a936) !important;
+    color: #172033 !important;
+    border: 1px solid rgba(255,224,151,.55) !important;
+    box-shadow: 0 9px 24px rgba(226,166,53,.17), inset 0 1px rgba(255,255,255,.4) !important;
+}
+.btn-primary:hover { filter: brightness(1.07); box-shadow: 0 12px 28px rgba(226,166,53,.23) !important; transform: translateY(-1px); }
+.btn-secondary {
+    background: rgba(39, 54, 78, .9) !important;
+    color: #e2eaf5 !important;
+    border: 1px solid var(--stroke-strong) !important;
+}
+.btn-secondary:hover { background: rgba(54, 72, 101, .95) !important; }
+
+/* Consistent panels */
+.bg-gray-800 { background-color: var(--surface) !important; }
+.bg-gray-900 { background-color: var(--surface-soft) !important; }
+.border-gray-700 { border-color: var(--stroke) !important; }
+.border-gray-600 { border-color: var(--stroke-strong) !important; }
+.text-gray-400 { color: #a6b4c8 !important; }
+.text-gray-500 { color: #8292aa !important; }
+.text-gray-600 { color: #71829b !important; }
+
+/* Home dashboard */
+#homeScreen { gap: 1.25rem !important; }
+#homeScreen > div:first-child {
+    padding: 1.25rem 1.4rem !important;
+    border: 1px solid rgba(119, 151, 194, .22) !important;
+    border-radius: 1.25rem !important;
+    background: linear-gradient(115deg, rgba(27, 46, 73, .96), rgba(20, 31, 51, .94) 58%, rgba(37, 39, 68, .88)) !important;
+    box-shadow: 0 16px 36px rgba(0,0,0,.2), inset 0 1px rgba(255,255,255,.04) !important;
+}
+#streakCount { color: #ffb45a; }
+#totalTestsCompleted { color: #83c6ff; }
+#periodTabs {
+    gap: .45rem !important;
+    padding: .35rem;
+    border: 1px solid var(--stroke);
+    border-radius: 1rem;
+    background: rgba(10, 18, 32, .68);
+}
+.period-tab { min-height: 2.65rem; border-radius: .75rem !important; }
+#periodTabs .period-tab.bg-yellow-500 {
+    background: linear-gradient(135deg, #f8cb68, #e4a83d) !important;
+    color: #152033 !important;
+    box-shadow: 0 5px 14px rgba(226,166,53,.16);
+}
+#periodTabs .period-tab.bg-gray-800 { background: transparent !important; border-color: transparent !important; color: #9aabc1 !important; }
+#periodTabs .period-tab.bg-gray-800:hover { background: rgba(66,83,111,.35) !important; color: #edf3fc !important; }
+#homeScreen h2 { margin-top: .25rem !important; font-size: 1.1rem !important; color: #e2eaf5; }
+#homeScreen > .flex.flex-col.gap-3 button { min-height: 3.4rem; border-radius: 1rem !important; }
+#homeScreen > .flex.flex-col.gap-3 button:first-child {
+    background: linear-gradient(115deg, #9f3549, #7e2f47) !important;
+    border: 1px solid rgba(251,113,133,.3) !important;
+    box-shadow: 0 10px 24px rgba(127,36,62,.2) !important;
+}
+#homeScreen > .flex.flex-col.gap-3 button:last-child {
+    background: linear-gradient(115deg, #4b4a9d, #373d83) !important;
+    border: 1px solid rgba(169,155,255,.28) !important;
+    box-shadow: 0 10px 24px rgba(60,59,137,.18) !important;
+}
+#categoriesGrid > div.mb-6:not(:first-child) {
+    padding: 1rem !important;
+    border: 1px solid var(--stroke) !important;
+    border-radius: 1.1rem !important;
+    background: rgba(17, 27, 44, .76) !important;
+}
+#categoriesGrid h3 { border-color: var(--stroke) !important; color: #f1c86f !important; font-size: .98rem !important; }
+#categoriesGrid .card {
+    min-height: 5.4rem !important;
+    padding: .85rem .7rem !important;
+    border: 1px solid var(--stroke-strong) !important;
+    border-radius: 1rem !important;
+    background: linear-gradient(145deg, rgba(31,46,69,.9), rgba(21,32,51,.94)) !important;
+    box-shadow: 0 5px 16px rgba(0,0,0,.12);
+}
+#categoriesGrid .card:hover { transform: translateY(-2px); border-color: rgba(245,189,79,.5) !important; box-shadow: 0 10px 22px rgba(0,0,0,.2); }
+#categoriesGrid .card.active {
+    border: 1px solid rgba(245,189,79,.85) !important;
+    background: linear-gradient(145deg, rgba(111,82,32,.43), rgba(47,42,34,.72)) !important;
+    box-shadow: 0 0 0 2px rgba(245,189,79,.1), 0 9px 24px rgba(0,0,0,.2);
+}
+#homeScreen > .flex.flex-col.md\:flex-row { gap: .7rem !important; }
+#homeScreen > .flex.flex-col.md\:flex-row button { min-height: 3.5rem; border-radius: 1rem !important; }
+
+/* Analytics */
+#statsScreen > div.bg-gray-800, #statsScreen .grid > div.bg-gray-800 {
+    border: 1px solid var(--stroke) !important;
+    border-radius: 1.2rem !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.16) !important;
+}
+#statsScreen > div:first-child h2 { font-size: 1.35rem !important; }
+#moduleStatsList details { border-color: var(--stroke) !important; border-radius: .95rem !important; background: rgba(12,20,35,.7) !important; }
+#moduleStatsList details summary { transition: background .18s ease; }
+#moduleStatsList details summary:hover { background: rgba(49,66,94,.42) !important; }
+#moduleStatsList details > div > div { border-color: var(--stroke) !important; border-radius: .85rem !important; background: rgba(25,38,59,.75) !important; }
+#moduleStatsList button { border-radius: .7rem !important; }
+
+/* Editor and question list */
+#editorScreen > div.bg-gray-800 {
+    border: 1px solid var(--stroke) !important;
+    border-radius: 1.15rem !important;
+    box-shadow: 0 12px 30px rgba(0,0,0,.16) !important;
+}
+#editorScreen input, #editorScreen textarea, #editorScreen select,
+#examSettingsModal input, #examSettingsModal select,
+#reportModal textarea {
+    border: 1px solid var(--stroke-strong) !important;
+    border-radius: .8rem !important;
+    background: rgba(8,15,28,.78) !important;
+    color: #edf3fc !important;
+}
+#editorScreen input::placeholder, #editorScreen textarea::placeholder, #reportModal textarea::placeholder { color: #71829b !important; }
+#questionsList > div { border-radius: .85rem !important; border-color: var(--stroke) !important; }
+
+/* Quiz, flashcards and results */
+#quizScreen > div.bg-gray-800, #resultScreen > div.bg-gray-800 {
+    border: 1px solid var(--stroke) !important;
+    border-radius: 1.35rem !important;
+    background: linear-gradient(145deg, rgba(23,35,55,.98), rgba(15,25,42,.98)) !important;
+    box-shadow: 0 18px 40px rgba(0,0,0,.22) !important;
+}
+#quizQuestionText { color: #f2f6fc; line-height: 1.42; letter-spacing: -.025em; }
+#quizOptions button { border-radius: .95rem !important; border-width: 1px !important; padding: 1rem !important; }
+#quizFeedback { border-radius: 1rem !important; }
+#fcCard {
+    border: 1px solid rgba(148,163,184,.22) !important;
+    border-radius: 1.5rem !important;
+    background: radial-gradient(ellipse at 50% 0%, rgba(109,91,182,.2), transparent 55%), linear-gradient(145deg, rgba(25,37,59,.98), rgba(14,23,40,.98)) !important;
+    box-shadow: 0 20px 45px rgba(0,0,0,.24) !important;
+}
+#fcQuestion { line-height: 1.4; }
+#fcAnswerBox { border-color: var(--stroke) !important; }
+#fcAnswerBox button { border-radius: .9rem !important; }
+#mistakesReview { border: 1px solid var(--stroke) !important; border-radius: 1rem !important; }
+
+/* Progress, charts and modal surfaces */
+#quizProgressBar, #fcProgressBar { box-shadow: 0 0 16px rgba(245,189,79,.26); }
+#quizScreen .bg-gray-700.h-2, #flashcardScreen .bg-gray-700.h-2 { background: rgba(148,163,184,.16) !important; }
+#examSettingsModal > div, #cheatSheetModal > div, #reportModal > div, #questionStatsModal > div {
+    border: 1px solid var(--stroke-strong) !important;
+    border-radius: 1.25rem !important;
+    background: #111d31 !important;
+    box-shadow: 0 25px 70px rgba(0,0,0,.48) !important;
+}
+#examSettingsModal, #cheatSheetModal, #reportModal, #questionStatsModal, #imageZoomModal { backdrop-filter: blur(10px); }
+#cheatSheetModal > div > div:first-child, #cheatSheetModal > div > div:last-child, #examSettingsModal > div > div:first-child { background: rgba(8,15,28,.86) !important; border-color: var(--stroke) !important; }
+#cheatSheetContent { line-height: 1.7; }
+
+/* Scrollbars */
+* { scrollbar-color: rgba(120,139,166,.42) transparent; scrollbar-width: thin; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: rgba(120,139,166,.38); border-radius: 20px; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+@media (max-width: 640px) {
+    body { padding: .8rem !important; }
+    body > .max-w-3xl.mx-auto.mt-2 { margin-top: .25rem !important; }
+    header.flex.justify-between.items-center { padding: .85rem !important; gap: .75rem; }
+    #mainAppTitle { font-size: 1.5rem !important; }
+    #navButtons { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    #navButtons button { padding: .58rem .35rem !important; font-size: .75rem !important; }
+    #homeScreen > div:first-child { padding: 1rem !important; gap: .5rem; }
+    #periodTabs { overflow-x: auto; }
+    .period-tab { padding-left: .85rem !important; padding-right: .85rem !important; }
+    #categoriesGrid .card { min-height: 4.9rem !important; }
+    #quizScreen > div.bg-gray-800 { padding: 1.2rem !important; }
+    #fcCard { min-height: 260px !important; padding: 1.35rem !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
@@ -85,6 +365,7 @@
                 <button onclick="showScreen('editorScreen')" class="text-sm btn-secondary px-3 py-2 rounded">Редактор</button>
             </div>
         </header>
+        <p class="text-right text-[10px] text-gray-600 -mt-4 mb-3">Build 2026.11.10 · Modern UI refresh v1</p>
 
         <!-- ГОЛОВНИЙ ЕКРАН -->
         <div id="homeScreen" class="space-y-5">
@@ -357,6 +638,7 @@
     </div>
 
     <script>
+        // BUILD: 2026.11.10-modern-v1 — visual refresh; logic and data model preserved.
         const PUBLIC_GIST_ID = '5ee027de84d344fbe11d2a496246d8ea'; 
 
         const defaultQuestions = [{ id: "1", period: "2nd period", type: "choice", category: "AC Fundamentals", subCategory: "105A", text: "Яке значення показує мультиметр при вимірюванні AC?", options: ["RMS", "Peak", "Average", "Миттєве"], answerIndex: 0, explanation: "Завжди RMS." }];
@@ -1199,34 +1481,111 @@
             return value !== null && typeof value === 'object' && !Array.isArray(value);
         }
 
-        function validateQuestionArray(rawQuestions, existingIds = new Set()) {
+        function importTextValue(value) {
+            if (typeof value === 'string') return value.trim();
+            if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+            return null;
+        }
+
+        function importAnswerList(value, splitComma = false) {
+            if (Array.isArray(value)) return value.map(importTextValue).filter(value => value !== null && value !== '');
+            const text = importTextValue(value);
+            if (text === null || text === '') return [];
+            return (splitComma ? text.split(',') : [text]).map(value => String(value).trim()).filter(Boolean);
+        }
+
+        function validateQuestionArray(rawQuestions, existingIds = new Set(), allowGeneratedIds = false) {
             if (!Array.isArray(rawQuestions)) throw new Error('Поле questions має бути масивом.');
             const usedIds = new Set([...existingIds].map(id => String(id)));
             return rawQuestions.map((raw, index) => {
                 const prefix = `Питання №${index + 1}:`;
                 if (!isPlainObject(raw)) throw new Error(`${prefix} очікувався JSON-об’єкт.`);
 
-                if (raw.id === undefined || raw.id === null || String(raw.id).trim() === '') throw new Error(`${prefix} відсутній обов’язковий ID.`);
-                const id = String(raw.id).trim();
+                // The app uses two distinct question formats: multiple choice (choice)
+                // and typed/free-response (input). Normalize common AI-export aliases.
+                const hasExplicitType = raw.type !== undefined && raw.type !== null && String(raw.type).trim() !== '';
+                const hasChoiceArray = Array.isArray(raw.options) || Array.isArray(raw.choices) || Array.isArray(raw.answers);
+                const hasWrittenAnswer = raw.acceptedAnswers !== undefined || raw.correctAnswers !== undefined || raw.correctAnswer !== undefined || raw.answer !== undefined || raw.expectedAnswer !== undefined || raw.answerText !== undefined;
+                const rawType = String(hasExplicitType ? raw.type : (!hasChoiceArray && hasWrittenAnswer ? 'input' : 'choice')).trim().toLowerCase();
+                const typeAliases = {
+                    choice: 'choice', 'multiple-choice': 'choice', multiple_choice: 'choice', mcq: 'choice',
+                    input: 'input', text: 'input', written: 'input', 'short-answer': 'input', short_answer: 'input',
+                    'free-response': 'input', free_response: 'input', fill: 'input', 'fill-in': 'input'
+                };
+                let type = typeAliases[rawType];
+                if (!type) throw new Error(`${prefix} невідомий тип «${raw.type}». Допустимі типи: «choice» (вибір варіанта) або «input» (вписати відповідь).`);
+
+                let id = raw.id === undefined || raw.id === null ? '' : String(raw.id).trim();
+                if (!id && allowGeneratedIds) id = `import-${Date.now()}-${index + 1}`;
+                if (!id) throw new Error(`${prefix} відсутній обов’язковий ID.`);
                 if (usedIds.has(id)) throw new Error(`${prefix} ID «${id}» повторюється або вже є в поточній базі.`);
                 usedIds.add(id);
 
-                if (raw.type !== 'choice' && raw.type !== 'input') throw new Error(`${prefix} type має бути «choice» або «input».`);
-                if (typeof raw.text !== 'string' || raw.text.trim() === '') throw new Error(`${prefix} текст питання порожній або має неправильний тип.`);
+                const questionText = importTextValue(raw.text ?? raw.question ?? raw.questionText);
+                if (!questionText) throw new Error(`${prefix} текст питання порожній або відсутній (поле text).`);
 
-                const period = raw.period;
-                if (typeof period !== 'string' || !VALID_PERIODS.includes(period)) throw new Error(`${prefix} період обов’язковий і має бути одним із 1st period, 2nd period, 3rd period або 4th period.`);
-
-                if (!Array.isArray(raw.options) || raw.options.length === 0 || raw.options.some(option => typeof option !== 'string' || option.trim() === '')) {
-                    throw new Error(`${prefix} options має бути масивом непорожніх текстових варіантів.`);
+                // The original app assigned missing period values to 2nd period on load.
+                const period = raw.period === undefined || raw.period === null || raw.period === '' ? '2nd period' : raw.period;
+                if (typeof period !== 'string' || !VALID_PERIODS.includes(period)) {
+                    throw new Error(`${prefix} невідомий період «${period}». Використовуй 1st period, 2nd period, 3rd period або 4th period.`);
                 }
-                // The previous app renderer accepted any non-empty number of choices.
-                // Do not reject older banks just because a question has 5+ options,
-                // or only one legacy option; preserve the data and let the owner edit it.
 
-                const answerIndex = raw.answerIndex;
-                if (!Number.isInteger(answerIndex) || answerIndex < 0 || answerIndex >= raw.options.length) {
-                    throw new Error(`${prefix} answerIndex має бути цілим числом у межах масиву options.`);
+                let options = [];
+                let answerIndex = 0;
+                if (type === 'choice') {
+                    const sourceOptions = Array.isArray(raw.options) ? raw.options
+                        : (Array.isArray(raw.choices) ? raw.choices
+                        : (Array.isArray(raw.answers) ? raw.answers : null));
+                    if (!sourceOptions || sourceOptions.length < 2) {
+                        // A single supplied correct answer cannot function as multiple choice.
+                        // Preserve it as a typed-answer question instead of rejecting the entire import.
+                        const singleAnswer = sourceOptions && sourceOptions.length === 1
+                            ? importAnswerList(sourceOptions)
+                            : importAnswerList(raw.acceptedAnswers ?? raw.correctAnswers ?? raw.correctAnswer ?? raw.answer ?? raw.expectedAnswer ?? raw.answerText);
+                        if (singleAnswer.length > 0) {
+                            type = 'input';
+                            options = singleAnswer;
+                            answerIndex = 0;
+                        } else {
+                            throw new Error(`${prefix} для type «choice» потрібно щонайменше 2 варіанти. Якщо це питання з письмовою відповіддю, вкажи type: "input" та answer або correctAnswer.`);
+                        }
+                    } else {
+                        options = sourceOptions.map(importTextValue);
+                        if (options.some(option => option === null || option === '')) throw new Error(`${prefix} усі варіанти choice мають бути непорожнім текстом.`);
+
+                        const rawIndex = raw.answerIndex ?? raw.correctIndex ?? raw.correctAnswerIndex;
+                        if (rawIndex !== undefined && rawIndex !== null && rawIndex !== '') {
+                            if (!Number.isInteger(rawIndex) || rawIndex < 0 || rawIndex >= options.length) {
+                                throw new Error(`${prefix} answerIndex має бути цілим числом від 0 до ${options.length - 1}.`);
+                            }
+                            answerIndex = rawIndex;
+                        } else {
+                            // If an AI export provides the correct answer by text, map it to the option.
+                            const correctText = importTextValue(raw.correctAnswer ?? raw.correctOption ?? raw.answer);
+                            if (correctText !== null) {
+                                const found = options.findIndex(option => option.toLocaleLowerCase() === correctText.toLocaleLowerCase());
+                                if (found < 0) throw new Error(`${prefix} правильна відповідь «${correctText}» не збігається з жодним варіантом options.`);
+                                answerIndex = found;
+                            } else {
+                                // The editor's legacy convention is that the first listed option is correct.
+                                answerIndex = 0;
+                            }
+                        }
+                    }
+                } else {
+                    // Free-response questions do not use answerIndex. The runtime checks
+                    // the typed response against every string in options[] (accepted answers).
+                    if (Array.isArray(raw.options)) options = importAnswerList(raw.options);
+                    else if (typeof raw.options === 'string' || typeof raw.options === 'number') options = importAnswerList(raw.options, true);
+                    else {
+                        const accepted = raw.acceptedAnswers ?? raw.correctAnswers ?? raw.answers ??
+                            raw.correctAnswer ?? raw.answer ?? raw.expectedAnswer ?? raw.answerText;
+                        options = importAnswerList(accepted);
+                    }
+                    if (options.length === 0) {
+                        throw new Error(`${prefix} для type «input» потрібна правильна відповідь: options: ["відповідь"] або answer / correctAnswer.`);
+                    }
+                    answerIndex = 0; // Not used for input questions; kept for legacy screen compatibility.
                 }
 
                 for (const field of ['category', 'subCategory', 'imageUrl', 'explanation']) {
@@ -1242,9 +1601,9 @@
                     ...raw,
                     id,
                     period,
-                    type: raw.type,
-                    text: raw.text.trim(),
-                    options: raw.options.map(option => option.trim()),
+                    type,
+                    text: questionText,
+                    options,
                     answerIndex,
                     category: raw.category || '',
                     subCategory: raw.subCategory || '',
@@ -1341,18 +1700,22 @@
 
                     if (Array.isArray(imp)) {
                         const existingIds = new Set(questions.map(q => String(q.id)));
-                        const newQuestions = validateQuestionArray(imp, existingIds);
-                        if (!confirm(`📦 Перевірку пройдено: ${newQuestions.length} питань без помилок.\n\nДодати їх до поточної бази?\nПоточні питання та статистика залишаться без змін.`)) return;
+                        const newQuestions = validateQuestionArray(imp, existingIds, true);
+                        const choiceCount = newQuestions.filter(q => q.type === 'choice').length;
+                        const inputCount = newQuestions.filter(q => q.type === 'input').length;
+                        if (!confirm(`📦 Перевірку пройдено: ${newQuestions.length} питань.\n• З вибором відповіді: ${choiceCount}\n• З введенням відповіді: ${inputCount}\n\nДодати їх до поточної бази?\nПоточні питання та статистика залишаться без змін.`)) return;
                         questions = [...newQuestions, ...questions];
                         saveData();
                         const oneOptionCount = newQuestions.filter(q => q.type === 'choice' && q.options.length < 2).length;
                         const extraNote = oneOptionCount ? `\n\n⚠️ ${oneOptionCount} питань мають лише один варіант відповіді. Вони збережені, але їх варто відредагувати й додати варіанти.` : '';
-                        alert(`✅ Успішно додано ${newQuestions.length} питань!${extraNote}`);
+                        alert(`✅ Успішно додано ${newQuestions.length} питань (choice: ${choiceCount}, input: ${inputCount})!${extraNote}`);
                     }
                     else if (isPlainObject(imp) && Array.isArray(imp.questions)) {
                         // Validate the complete backup before asking for confirmation or changing anything.
                         const backup = validateBackupData(imp);
-                        if (!confirm(`⚠️ Перевірку повного бекапу пройдено: ${backup.questions.length} питань.\n\nБекап повністю замінить поточну базу, статистику та стрик. Продовжити?`)) return;
+                        const choiceCount = backup.questions.filter(q => q.type === 'choice').length;
+                        const inputCount = backup.questions.filter(q => q.type === 'input').length;
+                        if (!confirm(`⚠️ Перевірку повного бекапу пройдено: ${backup.questions.length} питань.\n• З вибором відповіді: ${choiceCount}\n• З введенням відповіді: ${inputCount}\n\nБекап повністю замінить поточну базу, статистику та стрик. Продовжити?`)) return;
 
                         questions = backup.questions;
                         quizStats = backup.quizStats;
@@ -1367,7 +1730,7 @@
                         saveData();
                         const oneOptionCount = backup.questions.filter(q => q.type === 'choice' && q.options.length < 2).length;
                         const extraNote = oneOptionCount ? `\n\n⚠️ ${oneOptionCount} питань мають лише один варіант відповіді. Вони збережені, але їх варто відредагувати й додати варіанти.` : '';
-                        alert(`✅ Повну копію успішно перевірено та відновлено!${extraNote}`);
+                        alert(`✅ Повну копію успішно відновлено: ${backup.questions.length} питань (choice: ${choiceCount}, input: ${inputCount})!${extraNote}`);
                     }
                     else {
                         alert('❌ Невідомий формат файлу. Очікується масив питань або повний бекап.');
