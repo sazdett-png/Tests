@@ -738,6 +738,21 @@ button:active { transform: translateY(1px) scale(.99); }
     .cheat-tool { padding: .42rem .55rem; font-size: .72rem; }
 }
 
+
+/* Mobile controls: keep sound and cloud-sync toggles visible instead of hiding .status-pill. */
+@media (max-width: 820px) {
+    .app-topbar { flex-wrap: wrap; align-items: flex-start; gap: 8px 12px; }
+    .page-heading-group { flex: 1 1 180px; }
+    .topbar-meta { display: flex !important; flex: 0 0 auto; align-items: center; justify-content: flex-end; gap: 7px; margin-left: auto; }
+    .topbar-meta .status-pill { display: inline-flex !important; align-items: center; justify-content: center; min-width: 40px; min-height: 38px; padding: 8px 10px !important; border-radius: 11px; font-size: 0 !important; }
+    .topbar-meta .status-pill > span:first-child { display: inline-block !important; font-size: 17px !important; line-height: 1; }
+    .topbar-meta .status-pill > span:not(:first-child) { display: none !important; }
+    .topbar-meta .build-stamp { display: none; }
+}
+@media (max-width: 420px) {
+    .topbar-meta .status-pill { min-width: 38px; min-height: 36px; padding: 7px 9px !important; }
+}
+
 </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
@@ -773,8 +788,8 @@ button:active { transform: translateY(1px) scale(.99); }
     <button class="status-pill" id="soundToggleBtn" type="button" onclick="toggleSound()" title="Звук увімкнений — натисніть, щоб вимкнути" aria-label="Вимкнути звук" aria-pressed="true"><span id="soundIcon" aria-hidden="true">🔊</span> <span>Звук</span></button>
     
     <!-- КНОПКА СИНХРОНІЗАЦІЇ -->
-    <button class="status-pill" id="syncToggleBtn" onclick="toggleAutoSync()" title="Авто-оновлення бази питань">
-        <span id="syncIcon">☁️</span> <span id="syncText">Синхр: УВІМК</span>
+    <button class="status-pill" id="syncToggleBtn" type="button" onclick="toggleAutoSync()" title="Авто-оновлення бази питань" aria-label="Вимкнути автоматичну синхронізацію" aria-pressed="true">
+        <span id="syncIcon" aria-hidden="true">☁️</span> <span id="syncText">Синхр: УВІМК</span>
     </button>
     
     <span class="build-stamp">VERSION 4</span>
@@ -1373,8 +1388,9 @@ button:active { transform: translateY(1px) scale(.99); }
         function logoutAdmin() { adminSettings = { token: '', gistId: '' }; localStorage.removeItem('quiz_admin_settings'); checkAdminMode(); }
 
        // --- КЕРУВАННЯ ЗВУКОМ ---
-// На цей момент у застосунку немає звукових ефектів; перемикач зберігає стан для UI та майбутніх звуків.
+// Sounds are generated locally with Web Audio API; no audio files or network requests are needed.
 let soundEnabled = localStorage.getItem('quiz_sound_enabled') !== 'off';
+let answerAudioContext = null;
 
 function initSoundUI() {
     const btn = document.getElementById('soundToggleBtn');
@@ -1392,8 +1408,66 @@ function initSoundUI() {
 
 function toggleSound() {
     soundEnabled = !soundEnabled;
-    localStorage.setItem('quiz_sound_enabled', soundEnabled ? 'on' : 'off');
+    try { localStorage.setItem('quiz_sound_enabled', soundEnabled ? 'on' : 'off'); } catch (error) {
+        console.warn('Не вдалося зберегти налаштування звуку.', error);
+    }
     initSoundUI();
+}
+
+function getAnswerAudioContext() {
+    if (!soundEnabled) return null;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return null;
+    if (!answerAudioContext) answerAudioContext = new AudioContextClass();
+    return answerAudioContext;
+}
+
+function playAnswerSound(isCorrect) {
+    if (!soundEnabled) return;
+    try {
+        const context = getAnswerAudioContext();
+        if (!context) return; // Browser does not support Web Audio.
+
+        // resume() is called directly from the answer gesture for iOS/Safari compatibility.
+        const ready = context.state === 'suspended' ? context.resume() : Promise.resolve();
+        ready.then(() => {
+            if (!soundEnabled || context.state !== 'running') return;
+            const startAt = context.currentTime + 0.015;
+            const notes = isCorrect
+                // Short, warm ascending major arpeggio: a gentle "ding-ding-ding".
+                ? [
+                    { frequency: 523.25, offset: 0.00, duration: 0.17, volume: 0.065 },
+                    { frequency: 659.25, offset: 0.105, duration: 0.18, volume: 0.060 },
+                    { frequency: 783.99, offset: 0.210, duration: 0.22, volume: 0.055 }
+                  ]
+                // Soft, lower descending pair; noticeable but not an unpleasant buzzer.
+                : [
+                    { frequency: 329.63, offset: 0.00, duration: 0.16, volume: 0.042 },
+                    { frequency: 246.94, offset: 0.145, duration: 0.19, volume: 0.038 }
+                  ];
+
+            notes.forEach(note => {
+                const oscillator = context.createOscillator();
+                const gain = context.createGain();
+                const noteStart = startAt + note.offset;
+                const noteEnd = noteStart + note.duration;
+                oscillator.type = isCorrect ? 'sine' : 'triangle';
+                oscillator.frequency.setValueAtTime(note.frequency, noteStart);
+                gain.gain.setValueAtTime(0.0001, noteStart);
+                gain.gain.exponentialRampToValueAtTime(note.volume, noteStart + 0.025);
+                gain.gain.exponentialRampToValueAtTime(0.0001, noteEnd);
+                oscillator.connect(gain);
+                gain.connect(context.destination);
+                oscillator.start(noteStart);
+                oscillator.stop(noteEnd + 0.02);
+            });
+        }).catch(error => {
+            console.debug('Audio playback was blocked by the browser.', error);
+        });
+    } catch (error) {
+        // Audio must never interrupt quiz flow on browsers without Web Audio support.
+        console.debug('Could not play answer feedback sound.', error);
+    }
 }
 
        // --- КЕРУВАННЯ АВТО-ОНОВЛЕННЯМ ---
@@ -1404,12 +1478,13 @@ function initSyncUI() {
     const text = document.getElementById('syncText');
     const btn = document.getElementById('syncToggleBtn');
     if (!icon || !text || !btn) return;
-    
-    if (autoSyncEnabled) {
-        icon.innerText = '☁️'; text.innerText = 'Синхр: УВІМК'; btn.style.color = '#72b7ff';
-    } else {
-        icon.innerText = '🚫'; text.innerText = 'Синхр: ВИМК'; btn.style.color = '#9caec5';
-    }
+
+    icon.textContent = autoSyncEnabled ? '☁️' : '🚫';
+    text.textContent = autoSyncEnabled ? 'Синхр: УВІМК' : 'Синхр: ВИМК';
+    btn.style.color = autoSyncEnabled ? '#72b7ff' : '#9caec5';
+    btn.setAttribute('aria-pressed', String(autoSyncEnabled));
+    btn.setAttribute('aria-label', autoSyncEnabled ? 'Вимкнути автоматичну синхронізацію' : 'Увімкнути автоматичну синхронізацію');
+    btn.title = autoSyncEnabled ? 'Автоматична синхронізація увімкнена — натисніть, щоб вимкнути' : 'Автоматична синхронізація вимкнена — натисніть, щоб увімкнути';
 }
 
 function toggleAutoSync() {
@@ -1909,6 +1984,7 @@ async function autoSyncOnLoad() {
         }
 
         function processAnswer(isCorrect, qObj, selText, btnEl) {
+            playAnswerSound(isCorrect);
             if (!quizStats[qObj.id]) quizStats[qObj.id] = { c: 0, w: 0 };
             if (isCorrect) { score++; mistakeIds = mistakeIds.filter(id => id !== qObj.id); quizStats[qObj.id].c++; } else { userMistakes.push({ q: qObj, sel: selText }); if (!mistakeIds.includes(qObj.id)) mistakeIds.push(qObj.id); quizStats[qObj.id].w++; }
             addProgressPoint(); 
@@ -1952,6 +2028,7 @@ async function autoSyncOnLoad() {
 
         function recordFlashcard(isCorrect, e) {
             if (e && e.stopPropagation) e.stopPropagation();
+            playAnswerSound(isCorrect);
             const q = currentQuizQuestions[currentQIndex]; let srs = srsStats[q.id] || { interval: 0, nextReview: 0 };
             if (isCorrect) { score++; if (srs.interval === 0) srs.interval = 1; else if (srs.interval === 1) srs.interval = 3; else srs.interval = Math.ceil(srs.interval * 2); } else { srs.interval = 0; userMistakes.push({ q: q, sel: "Не згадав" }); }
             addProgressPoint(); srs.nextReview = Date.now() + (srs.interval * 86400000); srsStats[q.id] = srs; saveData(); currentQIndex++; loadNextFlashcard();
