@@ -770,7 +770,7 @@ button:active { transform: translateY(1px) scale(.99); }
 </div>
 </div>
 <div class="app-shell-container"><div class="app-shell"><aside aria-label="Основна навігація" class="app-sidebar"><div class="sidebar-brand"><div aria-hidden="true" class="brand-mark">⚡</div><div class="brand-copy"><h1 class="brand-title" id="mainAppTitle" onclick="handleAdminTrigger()">Electrician Hub</h1><span class="brand-subtitle">ELECTRICIAN STUDY HUB</span></div></div><p class="sidebar-section-label">НАВІГАЦІЯ</p><div class="app-nav" id="navButtons"><button class="app-nav-btn" data-screen-target="homeScreen" onclick="showScreen('homeScreen')" type="button"><span aria-hidden="true" class="nav-icon">⌂</span><span class="nav-label">Огляд</span></button><button class="app-nav-btn" data-screen-target="statsScreen" onclick="showScreen('statsScreen')" type="button"><span aria-hidden="true" class="nav-icon">▥</span><span class="nav-label">Аналітика</span></button><button class="app-nav-btn" onclick="toggleCheatSheet()" type="button"><span aria-hidden="true" class="nav-icon">▤</span><span class="nav-label">Довідник</span></button><button class="app-nav-btn" data-screen-target="editorScreen" onclick="showScreen('editorScreen')" type="button"><span aria-hidden="true" class="nav-icon">✎</span><span class="nav-label">Редактор</span></button></div><div class="sidebar-spacer"></div><div class="sidebar-note"><span class="sidebar-note-icon">⚡</span><div><strong>ЕЛЕКТРИЧНА ТЕОРІЯ</strong><span>DC · AC · RLC · Controls</span></div></div></aside><main class="app-main" id="appMain"><header class="app-topbar"><div class="page-heading-group"><p class="page-eyebrow">ELECTRICIAN · THEORY & PRACTICE</p><h1 id="pageHeading">Навчальна панель</h1><p id="pageSubheading">Питання, модулі, довідник та результати.</p></div><div class="topbar-meta">
-    <button class="status-pill" id="soundToggleBtn" onclick="toggleSound()" title="Увімкнути/Вимкнути звук"><span id="soundIcon">🔊</span> <span>Звук</span></button>
+    <button class="status-pill" id="soundToggleBtn" type="button" onclick="toggleSound()" title="Звук увімкнений — натисніть, щоб вимкнути" aria-label="Вимкнути звук" aria-pressed="true"><span id="soundIcon" aria-hidden="true">🔊</span> <span>Звук</span></button>
     
     <!-- КНОПКА СИНХРОНІЗАЦІЇ -->
     <button class="status-pill" id="syncToggleBtn" onclick="toggleAutoSync()" title="Авто-оновлення бази питань">
@@ -1222,21 +1222,47 @@ button:active { transform: translateY(1px) scale(.99); }
             '2nd period': `<div><h3>⚡ AC (2nd Period)</h3><ul><li><b>V(RMS)</b> = V(Peak) × 0.707</li></ul></div>`
         };
 
-        let questions = JSON.parse(localStorage.getItem('quiz_questions'));
+        // Corrupt or outdated localStorage JSON should not prevent the app from opening.
+        function readStoredJSON(key, fallback) {
+            try {
+                const raw = localStorage.getItem(key);
+                return raw === null ? fallback : JSON.parse(raw);
+            } catch (error) {
+                console.warn(`Не вдалося прочитати локальні дані "${key}". Використано резервне значення.`, error);
+                return fallback;
+            }
+        }
+        function readStoredArray(key) {
+            const value = readStoredJSON(key, []);
+            return Array.isArray(value) ? value : [];
+        }
+        function readStoredObject(key, fallback = {}) {
+            const value = readStoredJSON(key, fallback);
+            return value && typeof value === 'object' && !Array.isArray(value) ? value : fallback;
+        }
+
+        let questions = readStoredJSON('quiz_questions', defaultQuestions);
         if (!Array.isArray(questions)) questions = defaultQuestions;
-        questions = questions.map(q => { if (!q.period) q.period = '2nd period'; return q; });
+        questions = questions
+            .filter(q => q && typeof q === 'object' && !Array.isArray(q))
+            .map(q => { if (!q.period) q.period = '2nd period'; return q; });
 
         let activePeriod = localStorage.getItem('quiz_active_period') || '2nd period';
+        if (!['1st period', '2nd period', '3rd period', '4th period'].includes(activePeriod)) activePeriod = '2nd period';
 
-        let quizStats = JSON.parse(localStorage.getItem('quiz_stats')) || {}; 
-        let mistakeIds = JSON.parse(localStorage.getItem('quiz_mistakes')) || []; 
-        let favoriteIds = JSON.parse(localStorage.getItem('quiz_favorites')) || [];
-        let deletedCloudIds = JSON.parse(localStorage.getItem('quiz_deleted_cloud')) || [];
-        let srsStats = JSON.parse(localStorage.getItem('quiz_srs')) || {}; 
-        let examHistory = JSON.parse(localStorage.getItem('quiz_exam_history')) || [];
-        let adminSettings = JSON.parse(localStorage.getItem('quiz_admin_settings')) || { token: '', gistId: '' };
+        let quizStats = readStoredObject('quiz_stats');
+        let mistakeIds = readStoredArray('quiz_mistakes');
+        let favoriteIds = readStoredArray('quiz_favorites');
+        let deletedCloudIds = readStoredArray('quiz_deleted_cloud');
+        let srsStats = readStoredObject('quiz_srs');
+        let examHistory = readStoredArray('quiz_exam_history');
+        let adminSettings = readStoredObject('quiz_admin_settings', { token: '', gistId: '' });
+        adminSettings = {
+            token: typeof adminSettings.token === 'string' ? adminSettings.token : '',
+            gistId: typeof adminSettings.gistId === 'string' ? adminSettings.gistId : ''
+        };
         
-        const storedAppStats = JSON.parse(localStorage.getItem('app_stats')) || {};
+        const storedAppStats = readStoredObject('app_stats');
         function normalizeAppStats(source) {
             const data = source && typeof source === 'object' && !Array.isArray(source) ? source : {};
             const today = new Date().toDateString();
@@ -1346,6 +1372,30 @@ button:active { transform: translateY(1px) scale(.99); }
         }
         function logoutAdmin() { adminSettings = { token: '', gistId: '' }; localStorage.removeItem('quiz_admin_settings'); checkAdminMode(); }
 
+       // --- КЕРУВАННЯ ЗВУКОМ ---
+// На цей момент у застосунку немає звукових ефектів; перемикач зберігає стан для UI та майбутніх звуків.
+let soundEnabled = localStorage.getItem('quiz_sound_enabled') !== 'off';
+
+function initSoundUI() {
+    const btn = document.getElementById('soundToggleBtn');
+    const icon = document.getElementById('soundIcon');
+    if (!btn || !icon) return;
+
+    icon.textContent = soundEnabled ? '🔊' : '🔇';
+    btn.setAttribute('aria-pressed', String(soundEnabled));
+    btn.setAttribute('aria-label', soundEnabled ? 'Вимкнути звук' : 'Увімкнути звук');
+    btn.title = soundEnabled
+        ? 'Звук увімкнений — натисніть, щоб вимкнути'
+        : 'Звук вимкнений — натисніть, щоб увімкнути';
+    btn.style.color = soundEnabled ? '#53d6a0' : '#9caec5';
+}
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    localStorage.setItem('quiz_sound_enabled', soundEnabled ? 'on' : 'off');
+    initSoundUI();
+}
+
        // --- КЕРУВАННЯ АВТО-ОНОВЛЕННЯМ ---
 let autoSyncEnabled = localStorage.getItem('quiz_auto_sync') !== 'off';
 
@@ -1446,7 +1496,7 @@ async function autoSyncOnLoad() {
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: formData.toString()
                 });
-                alert('✅ Дякуємо! Репорт успішно відправлено автору.');
+                alert('✅ Запит надіслано. Google Forms не повертає підтвердження через цей спосіб, тому перевірити фактичне збереження тут неможливо.');
                 document.getElementById('reportModal').classList.add('hidden');
             } catch (e) {
                 alert('❌ Помилка відправки. Перевірте з\'єднання.');
@@ -2409,7 +2459,7 @@ async function autoSyncOnLoad() {
         fcCardElement.addEventListener('touchend', e => { if (document.getElementById('fcAnswerBox').classList.contains('hidden')) return; touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, { passive: true });
         function handleSwipe() { const deltaX = touchEndX - touchStartX; const swipeThreshold = 60; if (deltaX < -swipeThreshold) { recordFlashcard(false, { stopPropagation: () => {} }); } else if (deltaX > swipeThreshold) { recordFlashcard(true, { stopPropagation: () => {} }); } }
 
-        saveData(); checkDailyProgress(); checkAdminMode(); updatePeriodTabsUI(); showScreen('homeScreen'); loadCheatSheet(); initSyncUI(); autoSyncOnLoad();
+        saveData(); checkDailyProgress(); checkAdminMode(); updatePeriodTabsUI(); showScreen('homeScreen'); loadCheatSheet(); initSoundUI(); initSyncUI(); autoSyncOnLoad();
     </script>
 </body>
 </html>
