@@ -1,21 +1,19 @@
 <!DOCTYPE html>
+
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>⚡ Тести</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="SAIT Тести">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#111827">
-    
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23111827%22/><text y=%22.85em%22 x=%2210%22 font-size=%2280%22>⚡</text></svg>">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Electrician Hub — Theory & Practice</title>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="Electrician Hub" name="apple-mobile-web-app-title"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="#111827" name="theme-color"/>
+<link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;⚡&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+<link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;rect width=%22100%22 height=%22100%22 fill=%22%23111827%22/&gt;&lt;text y=%22.85em%22 x=%2210%22 font-size=%2280%22&gt;⚡&lt;/text&gt;&lt;/svg&gt;" rel="apple-touch-icon"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
         body { background-color: #111827; color: #f3f4f6; -webkit-tap-highlight-color: transparent; }
         .btn-primary { background-color: #eab308; color: #111827; font-weight: bold; transition: all 0.2s; }
         .btn-primary:hover { background-color: #facc15; }
@@ -171,6 +169,7 @@ button:active { transform: translateY(1px) scale(.99); }
 .text-gray-600 { color: #71829b !important; }
 
 /* Home dashboard */
+#homeScreen > .welcome-card { padding: 28px 32px !important; min-height: 185px !important; border: 1px solid rgba(125,156,199,.22) !important; border-radius: 23px !important; background: radial-gradient(circle at 83% 46%, rgba(244,189,85,.13), transparent 17rem), linear-gradient(112deg, #1d3555 0%, #172943 57%, #282a49 100%) !important; box-shadow: 0 18px 40px rgba(0,0,0,.2), inset 0 1px rgba(255,255,255,.05) !important; }
 #homeScreen { gap: 1.25rem !important; }
 #homeScreen > div:first-child {
     padding: 1.25rem 1.4rem !important;
@@ -321,333 +320,897 @@ button:active { transform: translateY(1px) scale(.99); }
     *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 
-    </style>
+    
+/* ================================================================
+   ELECTRICIAN HUB — PRODUCT REDESIGN
+   Layout, navigation and visual hierarchy. Existing app logic retained.
+   ================================================================ */
+:root {
+  color-scheme: dark;
+  --app-bg: #080f1d;
+  --app-bg-2: #0d1728;
+  --surface: #111e31;
+  --surface-2: #16263d;
+  --surface-3: #1b2e49;
+  --line: rgba(157, 178, 207, .14);
+  --line-strong: rgba(157, 178, 207, .23);
+  --ink: #eff5ff;
+  --muted: #94a6bf;
+  --quiet: #71849f;
+  --gold: #f4bd55;
+  --gold-2: #ffd77e;
+  --blue: #72b7ff;
+  --violet: #b3a2ff;
+  --green: #53d6a0;
+  --red: #ff7e88;
+  --shadow: 0 22px 60px rgba(0, 0, 0, .25);
+}
+html { background: var(--app-bg); scroll-behavior: smooth; }
+body {
+  min-height: 100vh;
+  padding: 24px !important;
+  color: var(--ink) !important;
+  background:
+    radial-gradient(ellipse at 8% 4%, rgba(52, 100, 160, .20), transparent 34rem),
+    radial-gradient(ellipse at 90% 5%, rgba(116, 83, 169, .13), transparent 31rem),
+    linear-gradient(155deg, #0b1424 0%, #080f1d 58%, #080d17 100%) !important;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: .005em;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .15;
+  background-image: linear-gradient(rgba(156,177,205,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(156,177,205,.05) 1px, transparent 1px);
+  background-size: 40px 40px; mask-image: linear-gradient(to bottom, #000, transparent 75%);
+}
+.app-shell-container { max-width: 1580px !important; width: 100%; margin: 0 auto !important; }
+.app-shell { display: grid; grid-template-columns: 252px minmax(0, 1fr); gap: 24px; align-items: start; min-height: calc(100vh - 48px); }
+.app-sidebar {
+  position: sticky; top: 24px; min-height: calc(100vh - 48px); height: calc(100vh - 48px); min-width: 0;
+  display: flex; flex-direction: column; padding: 22px 15px 16px;
+  border: 1px solid var(--line); border-radius: 24px;
+  background: linear-gradient(165deg, rgba(20, 34, 55, .97), rgba(12, 22, 38, .97));
+  box-shadow: var(--shadow), inset 0 1px rgba(255,255,255,.035); overflow: hidden;
+}
+.app-sidebar::before { content: ""; position: absolute; width: 210px; height: 210px; border-radius: 50%; top: -105px; left: -85px; background: rgba(244,189,85,.08); filter: blur(18px); pointer-events: none; }
+.sidebar-brand { position: relative; display: flex; align-items: center; gap: 12px; padding: 4px 7px 26px; border-bottom: 1px solid var(--line); }
+.brand-mark { width: 44px; height: 44px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 14px; color: #1a2638; font-size: 23px; background: linear-gradient(145deg, #ffdc8b, #eaa936); box-shadow: 0 8px 22px rgba(231,169,54,.22), inset 0 1px rgba(255,255,255,.65); }
+.brand-copy { display: flex; flex-direction: column; min-width: 0; gap: 3px; }
+#mainAppTitle.brand-title { margin: 0; color: #f5f7fc !important; font-size: 1.27rem !important; line-height: 1.1; letter-spacing: -.045em; font-weight: 850; cursor: pointer; }
+.brand-subtitle { color: #8498b4; font-size: .57rem; font-weight: 800; letter-spacing: .14em; white-space: nowrap; }
+.sidebar-section-label { margin: 27px 11px 10px; color: #647994; font-size: .62rem; font-weight: 850; letter-spacing: .16em; }
+#navButtons.app-nav { display: flex; flex-direction: column; gap: 6px !important; width: 100%; }
+.app-nav-btn { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 10px 12px !important; border: 1px solid transparent !important; border-radius: 13px !important; background: transparent !important; color: #9fb0c8 !important; box-shadow: none !important; text-align: left; font-size: .88rem !important; font-weight: 680 !important; transition: .18s ease; }
+.app-nav-btn:hover { background: rgba(255,255,255,.045) !important; color: #f2f6ff !important; transform: translateX(2px); }
+.app-nav-btn.active { color: #ffe0a0 !important; border-color: rgba(244,189,85,.16) !important; background: linear-gradient(95deg, rgba(244,189,85,.16), rgba(244,189,85,.045)) !important; box-shadow: inset 3px 0 #f4bd55 !important; }
+.nav-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 9px; background: rgba(255,255,255,.055); color: #b9c8dc; font-size: 18px; line-height: 1; }
+.app-nav-btn.active .nav-icon { background: rgba(244,189,85,.17); color: #ffdc91; }
+.nav-label { white-space: nowrap; }
+.sidebar-spacer { flex: 1; }
+.sidebar-note { display: flex; align-items: center; gap: 10px; padding: 13px 11px; border: 1px solid rgba(244,189,85,.13); border-radius: 14px; background: linear-gradient(130deg, rgba(244,189,85,.095), rgba(244,189,85,.025)); }
+.sidebar-note-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; background: rgba(244,189,85,.13); color: var(--gold-2); }
+.sidebar-note div { display: flex; flex-direction: column; gap: 2px; }
+.sidebar-note strong { color: #e9d5a9; font-size: .76rem; }
+.sidebar-note span:not(.sidebar-note-icon) { color: #8294ad; font-size: .66rem; }
+.app-main { min-width: 0; width: 100%; }
+.app-topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 8px 4px 22px; margin-bottom: 4px; border: 0 !important; background: transparent !important; box-shadow: none !important; }
+.page-heading-group { min-width: 0; }
+.page-eyebrow { margin: 0 0 5px; color: #7f94b0; font-size: .64rem; line-height: 1.3; font-weight: 850; letter-spacing: .16em; }
+#pageHeading { margin: 0; color: #f2f6ff; font-size: clamp(1.45rem, 2.5vw, 2rem); line-height: 1.1; font-weight: 820; letter-spacing: -.04em; }
+#pageSubheading { margin: 7px 0 0; color: #8ea1ba; font-size: .88rem; line-height: 1.45; }
+.topbar-meta { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+.status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 999px; background: rgba(18,31,50,.68); color: #9caec5; font-size: .7rem; white-space: nowrap; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ed39a; box-shadow: 0 0 11px rgba(78,211,154,.65); }
+.build-stamp { color: #60748f; font-size: .61rem; letter-spacing: .08em; white-space: nowrap; }
+.app-content { min-width: 0; }
+#homeScreen, #statsScreen, #editorScreen, #quizScreen, #flashcardScreen, #resultScreen { width: 100%; max-width: 100%; margin: 0; }
+.hidden { display: none !important; }
+h1,h2,h3,h4 { letter-spacing: -.025em; }
+button, input, textarea, select { font-family: inherit; }
+button { cursor: pointer; transition: transform .17s ease, box-shadow .17s ease, border-color .17s ease, background .17s ease, color .17s ease; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid rgba(244,189,85,.95) !important; outline-offset: 3px; }
+button:active { transform: translateY(1px) scale(.99); }
+.btn-primary { color: #1b2636 !important; background: linear-gradient(135deg, #ffda88, #e7a83c) !important; border: 1px solid rgba(255,226,163,.55) !important; box-shadow: 0 9px 26px rgba(222,164,55,.18), inset 0 1px rgba(255,255,255,.5) !important; font-weight: 800 !important; }
+.btn-secondary { color: #dce8f8 !important; background: #1a2b43 !important; border: 1px solid var(--line-strong) !important; }
+
+/* Home dashboard */
+#homeScreen > .welcome-card { padding: 28px 32px !important; min-height: 185px !important; border: 1px solid rgba(125,156,199,.22) !important; border-radius: 23px !important; background: radial-gradient(circle at 83% 46%, rgba(244,189,85,.13), transparent 17rem), linear-gradient(112deg, #1d3555 0%, #172943 57%, #282a49 100%) !important; box-shadow: 0 18px 40px rgba(0,0,0,.2), inset 0 1px rgba(255,255,255,.05) !important; }
+#homeScreen.home-dashboard { display: flex; flex-direction: column; gap: 18px !important; }
+.welcome-card { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 185px; padding: 28px 32px; overflow: hidden; border: 1px solid rgba(125,156,199,.22); border-radius: 23px; background: radial-gradient(circle at 83% 46%, rgba(244,189,85,.13), transparent 17rem), linear-gradient(112deg, #1d3555 0%, #172943 57%, #282a49 100%); box-shadow: 0 18px 40px rgba(0,0,0,.2), inset 0 1px rgba(255,255,255,.05); }
+.welcome-card::after { content: ""; position: absolute; right: 19%; top: -110px; width: 300px; height: 300px; border: 1px solid rgba(255,255,255,.055); border-radius: 50%; box-shadow: 0 0 0 35px rgba(255,255,255,.018), 0 0 0 70px rgba(255,255,255,.014); pointer-events: none; }
+.welcome-copy { position: relative; z-index: 1; max-width: 640px; }
+.welcome-kicker { color: #e8bd70; font-size: .62rem; font-weight: 850; letter-spacing: .17em; }
+.welcome-copy h2 { max-width: 610px; margin: 10px 0 8px; color: #f4f7ff; font-size: clamp(1.55rem, 3vw, 2.35rem); line-height: 1.12; font-weight: 820; letter-spacing: -.045em; }
+.welcome-copy p { max-width: 560px; margin: 0; color: #b1c1d7; font-size: .9rem; line-height: 1.55; }
+.welcome-art { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 0 0 auto; padding: 0 28px; }
+.welcome-art-icon { display: grid; place-items: center; width: 90px; height: 90px; border: 1px solid rgba(255,220,145,.28); border-radius: 27px; background: linear-gradient(145deg, rgba(255,220,145,.24), rgba(255,220,145,.06)); color: #ffda91; font-size: 47px; filter: drop-shadow(0 9px 18px rgba(0,0,0,.18)); transform: rotate(7deg); }
+.welcome-art > span { color: #899bb5; font-size: .56rem; font-weight: 850; letter-spacing: .15em; white-space: nowrap; }
+#homeStats.home-stats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; padding: 0 !important; margin: 0; border: 0 !important; background: transparent !important; box-shadow: none !important; }
+.metric-card { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-width: 0; padding: 17px 20px !important; border: 1px solid var(--line) !important; border-radius: 17px !important; background: linear-gradient(145deg, rgba(21,36,58,.96), rgba(15,27,45,.96)) !important; box-shadow: 0 10px 26px rgba(0,0,0,.13) !important; }
+.metric-card p { margin: 0; }
+.metric-card p:first-child { color: #91a4bd !important; font-size: .65rem !important; font-weight: 850 !important; letter-spacing: .12em; }
+.metric-card p:nth-child(2) { margin-top: 5px; color: #f2f5fc !important; font-size: 1.42rem !important; font-weight: 820 !important; line-height: 1.15; }
+.metric-card p:last-child { margin-top: 5px !important; color: #8294ad !important; font-size: .7rem !important; }
+.metric-tests p:last-child { color: #f2f5fc !important; font-size: 1.42rem !important; font-weight: 820 !important; line-height: 1.15; }
+.metric-card::after { display: grid; place-items: center; width: 46px; height: 46px; flex: 0 0 auto; border-radius: 14px; font-size: 21px; }
+.metric-streak::after { content: "🔥"; background: rgba(255,150,83,.11); }
+.metric-tests::after { content: "✓"; color: #8cc9ff; background: rgba(114,183,255,.12); font-weight: 900; }
+.dashboard-panel { padding: 21px; border: 1px solid var(--line); border-radius: 19px; background: rgba(16,29,48,.82); box-shadow: 0 12px 28px rgba(0,0,0,.12); }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+.section-heading h2 { margin: 0; color: #edf3fd; font-size: 1.02rem; font-weight: 800; }
+.section-heading p { margin: 4px 0 0; color: #8296b1; font-size: .75rem; }
+.compact-heading { margin-bottom: 13px; }
+.section-tag { padding: 6px 9px; border: 1px solid rgba(244,189,85,.17); border-radius: 8px; color: #dfbd7b; background: rgba(244,189,85,.06); font-size: .58rem; font-weight: 850; letter-spacing: .12em; white-space: nowrap; }
+#periodTabs.period-tabs { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px !important; padding: 0; overflow: visible; }
+.period-tab { min-width: 0; min-height: 43px; padding: 10px 12px !important; border: 1px solid var(--line) !important; border-radius: 11px !important; color: #9caec5 !important; background: #101c2f !important; font-size: .78rem !important; font-weight: 750 !important; box-shadow: none !important; }
+#periodTabs .period-tab.bg-yellow-500 { color: #1a2638 !important; background: linear-gradient(135deg, #ffdb8d, #e8ad47) !important; border-color: rgba(255,222,152,.65) !important; box-shadow: 0 6px 17px rgba(220,164,63,.15) !important; }
+#periodTabs .period-tab.bg-gray-800:hover { color: #edf4ff !important; background: #1b2e49 !important; }
+.quick-actions-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+.quick-action-card { display: flex; align-items: center; gap: 15px; min-width: 0; min-height: 105px; padding: 18px 20px !important; border: 1px solid var(--line) !important; border-radius: 17px !important; text-align: left !important; color: #edf4ff !important; box-shadow: 0 12px 26px rgba(0,0,0,.14) !important; }
+.quick-action-card:hover { transform: translateY(-3px); box-shadow: 0 17px 32px rgba(0,0,0,.2) !important; }
+.exam-action { background: linear-gradient(115deg, rgba(83,39,54,.92), rgba(34,30,49,.97)) !important; border-color: rgba(244,122,134,.19) !important; }
+.smart-action { background: linear-gradient(115deg, rgba(46,43,87,.94), rgba(25,34,58,.97)) !important; border-color: rgba(167,151,255,.2) !important; }
+.quick-action-icon { display: grid; place-items: center; width: 50px; height: 50px; flex: 0 0 auto; border-radius: 15px; background: rgba(255,255,255,.07); font-size: 24px; }
+.quick-action-copy { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 5px; }
+.quick-action-copy strong { font-size: .94rem; font-weight: 820; }
+.quick-action-copy small { color: #a3b0c4; font-size: .7rem; line-height: 1.35; font-weight: 500; }
+.quick-action-arrow { margin-left: auto; color: #b8c5d8; font-size: 1.15rem; }
+#categoriesGrid.categories-grid { display: flex; flex-direction: column; gap: 14px; }
+#categoriesGrid > div:first-child { margin: 0 !important; }
+#categoriesGrid #specialGrid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 9px !important; }
+#categoriesGrid > div.mb-6:not(:first-child) { margin: 0 !important; padding: 16px !important; border: 1px solid var(--line) !important; border-radius: 15px !important; background: rgba(9,18,32,.55) !important; }
+#categoriesGrid h3 { margin: 0 0 12px !important; padding: 0 0 10px !important; border-color: var(--line) !important; color: #d9e5f6 !important; font-size: .86rem !important; font-weight: 800 !important; }
+#categoriesGrid .grid { gap: 9px !important; }
+#categoriesGrid .card { min-height: 73px !important; padding: 12px 10px !important; border: 1px solid var(--line) !important; border-radius: 12px !important; background: linear-gradient(145deg, rgba(25,42,66,.95), rgba(17,30,49,.95)) !important; box-shadow: none !important; cursor: pointer; }
+#categoriesGrid .card:hover { transform: translateY(-2px); border-color: rgba(244,189,85,.35) !important; box-shadow: 0 9px 20px rgba(0,0,0,.16) !important; }
+#categoriesGrid .card.active { border-color: rgba(244,189,85,.74) !important; background: linear-gradient(145deg, rgba(109,78,33,.33), rgba(37,41,51,.94)) !important; box-shadow: inset 0 0 0 1px rgba(244,189,85,.12), 0 8px 20px rgba(0,0,0,.12) !important; }
+#categoriesGrid .card span:first-child { color: #e7effb !important; font-size: .76rem !important; line-height: 1.35; }
+#categoriesGrid .card span:last-child { color: #8296b1 !important; font-size: .65rem !important; }
+#categoriesGrid .card.active span:first-child { color: #ffdf9e !important; }
+.learning-launch-panel { display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; padding: 14px; border: 1px solid rgba(244,189,85,.14); border-radius: 18px; background: linear-gradient(115deg, rgba(29,43,64,.95), rgba(17,29,47,.95)); }
+.launch-action { display: flex; align-items: center; gap: 13px; min-width: 0; min-height: 72px; padding: 12px 15px !important; border-radius: 13px !important; text-align: left !important; }
+.launch-primary { color: #1d2939 !important; background: linear-gradient(135deg, #ffda8c, #e8aa40) !important; border: 1px solid rgba(255,223,157,.65) !important; box-shadow: 0 8px 20px rgba(221,163,57,.14) !important; }
+.launch-secondary { color: #edf3fe !important; border: 1px solid var(--line-strong) !important; background: rgba(255,255,255,.045) !important; }
+.launch-icon { display: grid; place-items: center; width: 39px; height: 39px; flex: 0 0 auto; border-radius: 12px; background: rgba(0,0,0,.08); font-size: 20px; }
+.launch-secondary .launch-icon { background: rgba(173,151,255,.12); color: #c3b5ff; }
+.launch-copy { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.launch-copy strong { font-size: .86rem; font-weight: 850; }
+.launch-copy small { opacity: .76; font-size: .66rem; font-weight: 600; }
+.launch-arrow { margin-left: auto; font-size: 1.15rem; }
+.due-cards-badge { padding: 4px 7px !important; border-radius: 7px !important; color: #e3d9ff !important; background: rgba(153,130,255,.18) !important; font-size: .58rem !important; white-space: nowrap; }
+
+/* Stats dashboard */
+#statsScreen.stats-dashboard { display: flex; flex-direction: column; gap: 17px !important; }
+.screen-title-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 0 0 2px !important; }
+.screen-title-row h2 { margin: 0 !important; color: #f0f5ff !important; font-size: 1.35rem !important; font-weight: 850 !important; }
+.period-inline-label { display: inline-block; margin-left: 7px; padding: 5px 8px; border: 1px solid rgba(244,189,85,.18); border-radius: 8px; color: #edc779; background: rgba(244,189,85,.07); font-size: .67rem; vertical-align: middle; }
+.back-home-btn { padding: 9px 12px !important; border: 1px solid var(--line-strong) !important; border-radius: 10px !important; background: rgba(24,40,63,.88) !important; color: #afc0d7 !important; font-size: .72rem !important; font-weight: 750 !important; }
+.stats-overview-grid { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 15px !important; }
+.stats-card { min-width: 0; padding: 23px !important; border: 1px solid var(--line) !important; border-radius: 19px !important; background: linear-gradient(145deg, rgba(20,35,57,.97), rgba(14,26,44,.97)) !important; box-shadow: 0 13px 28px rgba(0,0,0,.14) !important; }
+.accuracy-card { gap: 22px !important; }
+#statDonut { width: 144px !important; height: 144px !important; flex: 0 0 144px; box-shadow: 0 0 0 8px rgba(255,255,255,.025), 0 12px 28px rgba(0,0,0,.18); }
+#statDonut > div { width: 113px !important; height: 113px !important; background: #132239 !important; }
+#statTotalPerc { font-size: 1.85rem !important; font-weight: 850 !important; }
+.accuracy-card h3, .exam-history-card h3 { color: #8fa4bf !important; font-size: .65rem !important; font-weight: 850 !important; letter-spacing: .13em; }
+.accuracy-card p { color: #afbdd0 !important; font-size: .78rem !important; }
+.accuracy-card b { color: #f0f5ff !important; font-size: 1rem; }
+#examBarChart { align-items: end; min-height: 150px; height: 150px !important; border-color: var(--line) !important; }
+#examBarChart > div > div:nth-child(2) { border-radius: 7px 7px 2px 2px !important; background: rgba(122,145,174,.19) !important; }
+#examBarChart > div > div:nth-child(2) > div { border-radius: 7px 7px 2px 2px; }
+#moduleBreakdownPanel { padding: 22px !important; border: 1px solid var(--line) !important; border-radius: 19px !important; background: rgba(16,29,48,.86) !important; box-shadow: 0 12px 28px rgba(0,0,0,.12) !important; }
+#moduleBreakdownPanel .panel-title { margin: 0 0 16px !important; padding: 0 0 14px !important; border-bottom: 1px solid var(--line); color: #e8eef8 !important; font-size: .99rem !important; font-weight: 820 !important; }
+#moduleStatsList details { margin: 9px 0; border: 1px solid var(--line) !important; border-radius: 13px !important; background: rgba(9,18,31,.52) !important; }
+#moduleStatsList summary { min-height: 55px; padding: 15px 17px !important; color: #dce7f6 !important; }
+#moduleStatsList summary:hover { background: rgba(255,255,255,.025) !important; }
+#moduleStatsList details > div { border-color: var(--line) !important; border-radius: 11px !important; background: rgba(21,35,55,.72) !important; }
+#moduleStatsList button { border-radius: 8px !important; background: rgba(118,104,205,.28) !important; border: 1px solid rgba(179,162,255,.18); color: #d4caff !important; }
+
+/* Editor workspace */
+#editorScreen.editor-workspace { display: flex; flex-direction: column; gap: 16px !important; }
+.editor-layout { display: grid; grid-template-columns: minmax(320px, .78fr) minmax(0, 1.22fr); align-items: start; gap: 16px; }
+#editorScreen .editor-panel { min-width: 0; padding: 20px !important; border: 1px solid var(--line) !important; border-radius: 18px !important; background: rgba(16,29,48,.9) !important; box-shadow: 0 12px 28px rgba(0,0,0,.13) !important; }
+#editorFormPanel { position: sticky; top: 20px; }
+#editorScreen #editorFormTitle { color: #f0c979 !important; font-size: 1rem; }
+#editorScreen input, #editorScreen textarea, #editorScreen select { min-height: 43px; border: 1px solid var(--line-strong) !important; border-radius: 10px !important; background: #0b1729 !important; color: #eaf1fc !important; padding: 11px 12px !important; }
+#editorScreen textarea { min-height: 105px; }
+#editorScreen input::placeholder, #editorScreen textarea::placeholder { color: #71849f !important; }
+#editorScreen button { border-radius: 9px !important; }
+#editorScreen #questionsList > div { border-color: var(--line) !important; }
+#editorScreen #questionsList .bg-gray-900 { background: rgba(8,17,30,.68) !important; }
+#editorScreen #questionsList .bg-gray-800 { background: #172941 !important; }
+#editorScreen #questionsList .bg-gray-700 { background: #1b2e49 !important; }
+#editorScreen #adminPanel { padding: 14px !important; border-radius: 14px !important; border-color: rgba(114,183,255,.2) !important; background: rgba(50,94,145,.1) !important; }
+#editorScreen #questionsList { max-height: 72vh !important; padding-right: 4px; }
+
+/* Quiz and flashcard focus modes */
+.app-shell.is-immersive { grid-template-columns: minmax(0,1fr); max-width: 1100px; }
+.app-shell.is-immersive .app-sidebar, .app-shell.is-immersive .app-topbar { display: none; }
+.app-shell.is-immersive .app-main { width: 100%; }
+#quizScreen.study-session-screen, #flashcardScreen.flashcard-session-screen, #resultScreen.result-session-screen { max-width: 920px; margin: 12px auto 0; }
+.study-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 15px; border: 1px solid var(--line); border-radius: 14px; background: rgba(16,29,48,.82); }
+#quizScreen .study-toolbar button, #flashcardScreen .study-toolbar button { border-radius: 9px; }
+#quizScreen .study-toolbar > div:first-child, #flashcardScreen .study-toolbar > div:first-child { gap: 10px !important; }
+#quizProgress, #fcProgressText { color: #d6e2f2; font-size: .8rem; }
+#quizCurrentStats { border-color: var(--line) !important; border-radius: 8px !important; background: rgba(4,12,23,.5) !important; }
+#quizScreen .bg-gray-700.h-2, #flashcardScreen .bg-gray-700.h-2 { height: 7px !important; margin: 15px 0 18px !important; border-radius: 20px !important; background: rgba(148,163,184,.15) !important; }
+#quizProgressBar, #fcProgressBar { height: 7px !important; border-radius: 20px !important; background: linear-gradient(90deg, #f5bc54, #ffe09a) !important; box-shadow: 0 0 16px rgba(245,189,79,.24); }
+#quizScreen .question-panel { padding: clamp(22px, 4vw, 42px) !important; border: 1px solid var(--line-strong) !important; border-radius: 22px !important; background: radial-gradient(ellipse at 90% 0%, rgba(90,117,161,.12), transparent 32rem), linear-gradient(145deg, #14243a, #0f1b2e) !important; box-shadow: 0 22px 55px rgba(0,0,0,.24) !important; }
+#quizQuestionText { max-width: 830px; margin-bottom: 23px !important; color: #f1f6ff !important; font-size: clamp(1.25rem, 2.6vw, 1.85rem) !important; line-height: 1.42 !important; font-weight: 760 !important; letter-spacing: -.03em; }
+#quizOptions { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 11px !important; margin-top: 24px !important; }
+#quizOptions button { display: flex; align-items: center; min-height: 72px; padding: 16px 18px !important; border: 1px solid var(--line-strong) !important; border-radius: 13px !important; background: rgba(28,46,71,.82) !important; color: #e3edf9 !important; font-size: .93rem !important; line-height: 1.45; font-weight: 620; }
+#quizOptions button:hover:not(:disabled) { border-color: rgba(244,189,85,.52) !important; background: rgba(43,62,88,.98) !important; transform: translateY(-2px); }
+#quizOptions button.bg-green-600 { border-color: rgba(83,214,160,.45) !important; background: rgba(25,105,80,.65) !important; }
+#quizOptions button.bg-red-600 { border-color: rgba(255,126,136,.45) !important; background: rgba(128,48,58,.65) !important; }
+#quizInputText { min-height: 60px; border-radius: 12px !important; background: rgba(7,16,29,.75) !important; border-color: rgba(244,189,85,.42) !important; }
+#quizFeedback { padding: 18px !important; border: 1px solid var(--line) !important; border-radius: 14px !important; background: rgba(6,15,27,.7) !important; }
+#fcCard.flashcard-hero { min-height: 390px !important; padding: clamp(26px,5vw,56px) !important; border: 1px solid rgba(179,162,255,.19) !important; border-radius: 24px !important; background: radial-gradient(ellipse at 50% 0%, rgba(126,103,207,.22), transparent 58%), linear-gradient(145deg, #1b2b49, #101b30) !important; box-shadow: 0 24px 60px rgba(0,0,0,.28) !important; }
+#fcQuestion { color: #f2f5ff; font-size: clamp(1.45rem,3vw,2.15rem) !important; line-height: 1.38 !important; font-weight: 760 !important; }
+#fcTapHint { color: #9fadd0 !important; }
+#fcAnswerBox { border-color: var(--line) !important; }
+#fcAnswerText { color: #7be0b4 !important; }
+#fcAnswerBox button { min-height: 52px; border-radius: 12px !important; }
+#resultScreen > div { padding: clamp(22px,4vw,42px) !important; border: 1px solid var(--line) !important; border-radius: 22px !important; background: linear-gradient(145deg, #172943, #101b2e) !important; box-shadow: var(--shadow) !important; }
+#resultTitle { color: #f1f6ff; }
+#mistakesReview { border: 1px solid var(--line) !important; border-radius: 14px !important; background: rgba(6,15,27,.58) !important; }
+
+/* Modals, forms, accessibility and motion */
+#examSettingsModal, #cheatSheetModal, #reportModal, #questionStatsModal, #imageZoomModal { backdrop-filter: blur(11px); }
+#examSettingsModal > div, #cheatSheetModal > div, #reportModal > div, #questionStatsModal > div { border: 1px solid var(--line-strong) !important; border-radius: 20px !important; background: #122139 !important; box-shadow: 0 28px 80px rgba(0,0,0,.52) !important; }
+#cheatSheetContent { line-height: 1.75; }
+* { scrollbar-color: rgba(119,143,174,.42) transparent; scrollbar-width: thin; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: rgba(119,143,174,.38); border-radius: 20px; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+@media (max-width: 1120px) {
+  .app-shell { grid-template-columns: 220px minmax(0,1fr); gap: 16px; }
+  .app-sidebar { padding-left: 12px; padding-right: 12px; }
+  .welcome-art { padding: 0 10px; }
+  #categoriesGrid #specialGrid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .editor-layout { grid-template-columns: minmax(280px,.85fr) minmax(0,1.15fr); }
+}
+@media (max-width: 820px) {
+  body { padding: 12px !important; }
+  .app-shell-container { max-width: 100% !important; }
+  .app-shell { display: flex; flex-direction: column; gap: 13px; min-height: auto; }
+  .app-sidebar { position: static; height: auto; min-height: 0; width: 100%; padding: 13px; border-radius: 18px; }
+  .sidebar-brand { padding: 0 4px 12px; border-bottom: 0; }
+  .brand-mark { width: 38px; height: 38px; border-radius: 12px; font-size: 20px; }
+  #mainAppTitle.brand-title { font-size: 1.12rem !important; }
+  .brand-subtitle { font-size: .52rem; }
+  .sidebar-section-label, .sidebar-spacer, .sidebar-note { display: none; }
+  #navButtons.app-nav { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 5px !important; margin-top: 12px; }
+  .app-nav-btn { justify-content: center; flex-direction: column; gap: 4px; min-height: 58px; padding: 6px 3px !important; border-radius: 10px !important; font-size: .65rem !important; }
+  .app-nav-btn:hover { transform: none; }
+  .app-nav-btn.active { box-shadow: inset 0 -2px #f4bd55 !important; }
+  .nav-icon { width: 25px; height: 25px; font-size: 16px; }
+  .app-topbar { padding: 6px 2px 14px; }
+  .page-eyebrow { font-size: .55rem; }
+  #pageHeading { font-size: 1.45rem; }
+  #pageSubheading { font-size: .77rem; }
+  .status-pill { display: none; }
+  .welcome-card { min-height: 150px; padding: 22px; border-radius: 18px; }
+  .welcome-art { padding: 0; }
+  .welcome-art-icon { width: 70px; height: 70px; border-radius: 22px; font-size: 36px; }
+  .welcome-art > span { display: none; }
+  .dashboard-panel { padding: 17px; border-radius: 16px; }
+  .stats-overview-grid { grid-template-columns: 1fr; }
+  .editor-layout { grid-template-columns: 1fr; }
+  #editorFormPanel { position: static; }
+  #editorScreen #questionsList { max-height: 55vh !important; }
+}
+@media (max-width: 560px) {
+  body { padding: 9px !important; }
+  #homeScreen > .welcome-card { min-height: 0 !important; padding: 21px 18px !important; }
+  .welcome-copy h2 { font-size: 1.5rem; }
+  .welcome-copy p { font-size: .79rem; }
+  .welcome-art { display: none; }
+  #homeStats.home-stats { gap: 8px; }
+  .metric-card { padding: 13px !important; border-radius: 13px !important; }
+  .metric-card p:first-child { font-size: .55rem !important; letter-spacing: .08em; }
+  .metric-card p:nth-child(2) { font-size: 1.15rem !important; }
+  .metric-card p:last-child { font-size: .6rem !important; }
+  .metric-tests p:last-child { font-size: 1.15rem !important; }
+  .metric-card::after { width: 34px; height: 34px; border-radius: 10px; font-size: 16px; }
+  #periodTabs.period-tabs { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .period-tab { min-height: 39px; font-size: .72rem !important; }
+  .quick-actions-grid { grid-template-columns: 1fr; gap: 9px; }
+  .quick-action-card { min-height: 82px; padding: 13px 15px !important; }
+  .quick-action-icon { width: 43px; height: 43px; }
+  #categoriesGrid #specialGrid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  #categoriesGrid > div.mb-6:not(:first-child) { padding: 12px !important; }
+  #categoriesGrid .card { min-height: 65px !important; }
+  .learning-launch-panel { grid-template-columns: 1fr; padding: 10px; }
+  .launch-action { min-height: 65px; }
+  .screen-title-row { align-items: flex-start; }
+  .screen-title-row h2 { font-size: 1.15rem !important; }
+  .stats-card { padding: 16px !important; }
+  .accuracy-card { flex-direction: column; align-items: flex-start; gap: 15px !important; }
+  #statDonut { width: 118px !important; height: 118px !important; flex-basis: 118px; }
+  #statDonut > div { width: 92px !important; height: 92px !important; }
+  #statTotalPerc { font-size: 1.5rem !important; }
+  .build-stamp { display: none; }
+  #quizOptions { grid-template-columns: 1fr; }
+  #quizScreen .question-panel { padding: 20px 16px !important; }
+  #quizQuestionText { font-size: 1.25rem !important; }
+  #fcCard.flashcard-hero { min-height: 320px !important; padding: 22px !important; }
+  .study-toolbar { padding: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* Electrician Hub v3: neutral copy + upgraded technical reference/editor */
+#cheatSheetModal > div {
+    width: min(100%, 1120px) !important;
+    max-width: 1120px !important;
+    max-height: min(92vh, 1050px) !important;
+    overflow: hidden;
+}
+#cheatSheetModal > div > div:first-child { padding: 1.1rem 1.35rem !important; }
+#cheatSheetContent {
+    line-height: 1.72;
+    font-size: .94rem;
+    background: linear-gradient(180deg, rgba(9,17,31,.35), rgba(9,17,31,.12));
+    overflow-wrap: anywhere;
+}
+#cheatSheetContent h3 {
+    color: #f5c46b;
+    font-size: 1.03rem;
+    font-weight: 800;
+    letter-spacing: .01em;
+    margin: 1.8rem 0 .7rem;
+    padding: 0 0 .55rem;
+    border-bottom: 1px solid rgba(148,163,184,.2);
+}
+#cheatSheetContent h3:first-child { margin-top: .1rem; }
+#cheatSheetContent p { margin: .65rem 0; color: #cbd5e1; }
+#cheatSheetContent ul, #cheatSheetContent ol { margin: .55rem 0 1rem; padding-left: 1.5rem; }
+#cheatSheetContent li { margin: .35rem 0; padding-left: .1rem; color: #d5deea; }
+#cheatSheetContent strong, #cheatSheetContent b { color: #fff; font-weight: 750; }
+#cheatSheetContent blockquote {
+    margin: .85rem 0;
+    padding: .85rem 1rem;
+    border: 1px solid rgba(245,189,79,.25);
+    border-left: 3px solid #f5bd4f;
+    border-radius: .75rem;
+    background: rgba(245,189,79,.07);
+    color: #f8e3b8;
+    font-size: 1rem;
+    font-weight: 650;
+}
+#cheatSheetContent table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: .85rem 0 1.2rem;
+    overflow: hidden;
+    border: 1px solid rgba(148,163,184,.2);
+    border-radius: .8rem;
+    font-size: .86rem;
+}
+#cheatSheetContent th, #cheatSheetContent td {
+    padding: .65rem .75rem;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid rgba(148,163,184,.14);
+    border-right: 1px solid rgba(148,163,184,.1);
+}
+#cheatSheetContent th { color: #f5c46b; background: rgba(35,52,76,.82); font-weight: 750; }
+#cheatSheetContent td { color: #d6e0ed; background: rgba(19,32,51,.48); }
+#cheatSheetContent tr:last-child td { border-bottom: 0; }
+#cheatSheetContent td:last-child, #cheatSheetContent th:last-child { border-right: 0; }
+#cheatSheetContent[contenteditable="true"] {
+    background: rgba(10,20,36,.9);
+    outline: 2px solid rgba(245,189,79,.75);
+    outline-offset: -2px;
+    border-radius: .8rem;
+    caret-color: #f5bd4f;
+}
+#cheatSheetContent[contenteditable="true"]:focus { outline-color: #ffd36b; }
+.cheat-tool {
+    border: 1px solid rgba(148,163,184,.2);
+    border-radius: .6rem;
+    background: rgba(42,57,79,.8);
+    color: #e5edf8;
+    padding: .48rem .7rem;
+    font-size: .78rem;
+    font-weight: 650;
+    white-space: nowrap;
+    transition: background .15s ease, border-color .15s ease;
+}
+.cheat-tool:hover { background: rgba(62,82,111,.95); border-color: rgba(245,189,79,.45); }
+.cheat-tool-muted { color: #fca5a5; background: rgba(85,35,47,.35); }
+.cheat-sheet-editor-hint {
+    padding: .55rem 1rem;
+    background: rgba(245,189,79,.08);
+    color: #e9c98b;
+    border-bottom: 1px solid rgba(245,189,79,.16);
+    font-size: .76rem;
+}
+#cheatSheetToolbar { position: sticky; top: 0; z-index: 2; }
+@media (max-width: 640px) {
+    #cheatSheetModal { padding: .35rem !important; }
+    #cheatSheetModal > div { max-height: 96vh !important; border-radius: 1rem !important; }
+    #cheatSheetContent { padding: 1rem !important; font-size: .9rem; }
+    #cheatSheetContent table { display: block; overflow-x: auto; white-space: normal; }
+    #cheatSheetContent th, #cheatSheetContent td { min-width: 105px; }
+    .cheat-tool { padding: .42rem .55rem; font-size: .72rem; }
+}
+
+</style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
+<!-- ЗУМ КАРТИНОК -->
+<div class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-2 backdrop-blur-sm" id="imageZoomModal" onclick="closeImageZoom()">
+<button class="absolute top-4 right-6 text-white text-5xl font-bold opacity-70 hover:opacity-100">×</button>
+<img class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" id="imageZoomSrc" src=""/>
+</div>
+<!-- ВІКНО РЕПОРТУ -->
+<div class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[60] p-4" id="reportModal">
+<div class="bg-gray-800 rounded-lg border border-gray-700 max-w-sm w-full shadow-2xl p-5">
+<h3 class="text-lg font-bold text-red-400 mb-2">🚩 Повідомити про помилку</h3>
+<p class="text-xs text-gray-400 mb-4">Знайшли хибу? Напишіть, як має бути, і автор перевірить.</p>
+<textarea class="w-full bg-gray-900 border border-gray-600 rounded p-3 text-white h-24 mb-4 focus:ring-2 focus:ring-red-500" id="reportText" placeholder="Ваш варіант або коментар..."></textarea>
+<div class="flex gap-3">
+<button class="bg-red-700 hover:bg-red-600 text-white flex-1 py-3 rounded font-bold shadow transition" id="sendReportBtn" onclick="sendReport()">Відправити</button>
+<button class="bg-gray-600 hover:bg-gray-500 text-white flex-1 py-3 rounded font-bold transition" onclick="document.getElementById('reportModal').classList.add('hidden')">Скасувати</button>
+</div>
+</div>
+</div>
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" id="questionStatsModal" role="dialog">
+<div class="w-full max-w-md rounded-xl border border-gray-600 bg-gray-800 p-6 shadow-2xl">
+<h3 class="mb-3 text-xl font-bold text-yellow-400">Зберегти статистику питання?</h3>
+<p class="mb-5 text-sm leading-relaxed text-gray-300">Ти змінив текст питання, тип або варіанти відповіді. Що зробити з попереднім прогресом?</p>
+<div class="flex flex-col gap-3">
+<button class="w-full rounded-lg bg-blue-700 px-4 py-3 font-bold text-white hover:bg-blue-600" onclick="confirmQuestionSave(false)">Зберегти статистику</button>
+<button class="w-full rounded-lg bg-red-700 px-4 py-3 font-bold text-white hover:bg-red-600" onclick="confirmQuestionSave(true)">Скинути статистику</button>
+<button class="w-full rounded-lg bg-gray-600 px-4 py-3 font-bold text-white hover:bg-gray-500" onclick="closeQuestionStatsModal()">Скасувати</button>
+</div>
+</div>
+</div>
+<div class="app-shell-container"><div class="app-shell"><aside aria-label="Основна навігація" class="app-sidebar"><div class="sidebar-brand"><div aria-hidden="true" class="brand-mark">⚡</div><div class="brand-copy"><h1 class="brand-title" id="mainAppTitle" onclick="handleAdminTrigger()">Electrician Hub</h1><span class="brand-subtitle">ELECTRICIAN STUDY HUB</span></div></div><p class="sidebar-section-label">НАВІГАЦІЯ</p><div class="app-nav" id="navButtons"><button class="app-nav-btn" data-screen-target="homeScreen" onclick="showScreen('homeScreen')" type="button"><span aria-hidden="true" class="nav-icon">⌂</span><span class="nav-label">Огляд</span></button><button class="app-nav-btn" data-screen-target="statsScreen" onclick="showScreen('statsScreen')" type="button"><span aria-hidden="true" class="nav-icon">▥</span><span class="nav-label">Аналітика</span></button><button class="app-nav-btn" onclick="toggleCheatSheet()" type="button"><span aria-hidden="true" class="nav-icon">▤</span><span class="nav-label">Довідник</span></button><button class="app-nav-btn" data-screen-target="editorScreen" onclick="showScreen('editorScreen')" type="button"><span aria-hidden="true" class="nav-icon">✎</span><span class="nav-label">Редактор</span></button></div><div class="sidebar-spacer"></div><div class="sidebar-note"><span class="sidebar-note-icon">⚡</span><div><strong>ЕЛЕКТРИЧНА ТЕОРІЯ</strong><span>DC · AC · RLC · Controls</span></div></div></aside><main class="app-main" id="appMain"><header class="app-topbar"><div class="page-heading-group"><p class="page-eyebrow">ELECTRICIAN · THEORY & PRACTICE</p><h1 id="pageHeading">Навчальна панель</h1><p id="pageSubheading">Питання, модулі, довідник та результати.</p></div><div class="topbar-meta"><span class="status-pill"><span class="status-dot"></span><span>Робоча область</span></span><span class="build-stamp">VERSION 3</span></div></header><div class="app-content" id="appContent"><div class="home-dashboard" id="homeScreen"><section class="welcome-card"><div class="welcome-copy"><span class="welcome-kicker">ELECTRICIAN · STUDY WORKSPACE</span><h2>Питання, модулі та довідник</h2><p>Матеріали з електричної теорії, електричних кіл і систем керування.</p></div><div aria-hidden="true" class="welcome-art"><div class="welcome-art-icon">⚡</div><span>DC · AC · RLC · CONTROLS</span></div></section><div class="home-stats" id="homeStats">
+<div class="metric-card metric-streak">
+<p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Поточна серія</p>
+<p class="text-xl md:text-2xl font-bold text-orange-500">🔥 <span id="streakCount">0</span> днів</p>
 
-    <!-- ЗУМ КАРТИНОК -->
-    <div id="imageZoomModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-2 backdrop-blur-sm" onclick="closeImageZoom()">
-        <button class="absolute top-4 right-6 text-white text-5xl font-bold opacity-70 hover:opacity-100">&times;</button>
-        <img id="imageZoomSrc" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" src="">
-    </div>
+</div>
+<div class="metric-card metric-tests">
+<p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Пройдено тестів</p>
+<p class="text-xl md:text-2xl font-bold text-blue-400">📝 <span id="totalTestsCompleted">0</span></p>
+</div>
+</div><section class="period-panel dashboard-panel"><div class="section-heading compact-heading"><h2>Навчальний період</h2><p>Обери період, матеріал якого хочеш опрацювати.</p></div><div class="period-tabs" id="periodTabs">
+<button class="period-tab flex-1 py-2 px-4 rounded-full font-bold text-sm whitespace-nowrap" id="tab-1st" onclick="changePeriod('1st period')">1st Period</button>
+<button class="period-tab flex-1 py-2 px-4 rounded-full font-bold text-sm whitespace-nowrap" id="tab-2nd" onclick="changePeriod('2nd period')">2nd Period</button>
+<button class="period-tab flex-1 py-2 px-4 rounded-full font-bold text-sm whitespace-nowrap" id="tab-3rd" onclick="changePeriod('3rd period')">3rd Period</button>
+<button class="period-tab flex-1 py-2 px-4 rounded-full font-bold text-sm whitespace-nowrap" id="tab-4th" onclick="changePeriod('4th period')">4th Period</button>
+</div></section><div class="quick-actions-grid">
+<button class="quick-action-card exam-action" onclick="openExamSettings()"><span class="quick-action-icon">🎓</span><span class="quick-action-copy"><strong>Симулятор іспиту</strong><small>Тест із таймером та підсумковим результатом</small></span><span class="quick-action-arrow">↗</span></button>
+<button class="quick-action-card smart-action" onclick="startSmartWorkout()"><span class="quick-action-icon">🧠</span><span class="quick-action-copy"><strong>Розумне тренування</strong><small>Добірка з урахуванням помилок і складних тем</small></span><span class="quick-action-arrow">↗</span></button>
+</div><section class="modules-section dashboard-panel"><div class="section-heading"><div><h2>Навчальні модулі</h2><p>Вибери одну або кілька тем для практики.</p></div><span class="section-tag">ОБЕРИ ТЕМИ</span></div><div class="categories-grid" id="categoriesGrid"></div></section><div class="learning-launch-panel">
+<button class="launch-action launch-primary" onclick="startMode('quiz')"><span class="launch-icon">✎</span><span class="launch-copy"><strong>Почати практику</strong><small>Перевір обрані модулі</small></span><span class="launch-arrow">→</span></button>
+<button class="launch-action launch-secondary" onclick="startMode('flashcards')"><span class="launch-icon">▣</span><span class="launch-copy"><strong>Флеш-картки</strong><small>Картки з інтервальним повторенням</small></span><span class="due-cards-badge" id="dueCardsBadge"></span><span class="launch-arrow">→</span></button>
+</div></div><div class="stats-dashboard hidden" id="statsScreen">
+<div class="screen-title-row">
+<h2 class="text-2xl font-bold text-white">Аналітика навчання <span class="period-inline-label" id="statsPeriodLabel"></span></h2>
+<button class="back-home-btn" onclick="showScreen('homeScreen')">← На головну</button>
+</div>
+<div class="stats-overview-grid">
+<!-- Загальний прогрес (Doughnut Chart) -->
+<div class="stats-card accuracy-card">
+<div class="relative w-28 h-28 rounded-full flex items-center justify-center flex-shrink-0 donut-chart" id="statDonut" style="background: conic-gradient(#10b981 0% 0%, #ef4444 0% 100%);">
+<div class="absolute w-20 h-20 bg-gray-800 rounded-full"></div>
+<span class="relative z-10 text-xl font-bold text-white" id="statTotalPerc">0%</span>
+</div>
+<div class="flex-1 space-y-2">
+<h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Точність відповідей</h3>
+<p class="text-sm">Всього відповідей: <b class="text-white" id="statTotalAnswers">0</b></p>
+<p class="text-sm text-green-400">✅ Вірно: <b id="statTotalCorrect">0</b></p>
+<p class="text-sm text-red-400">❌ Помилок: <b id="statTotalWrong">0</b></p>
+</div>
+</div>
+<!-- Графік останніх екзаменів (Bar Chart) -->
+<div class="stats-card exam-history-card">
+<h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Останні 7 екзаменів</h3>
+<div class="flex items-end gap-3 md:gap-5 h-32 w-full px-2 border-b border-gray-700 pb-1" id="examBarChart">
+<!-- Стовпчики генеруються через JS -->
+</div>
+</div>
+</div>
+<!-- Детальний розбір модулів -->
+<div class="module-breakdown-panel" id="moduleBreakdownPanel">
+<h3 class="panel-title">Детальний розбір модулів</h3>
+<div class="space-y-4" id="moduleStatsList">
+<!-- Модулі генеруються через JS -->
+</div>
+</div>
+</div><div class="editor-workspace hidden" id="editorScreen">
+<div class="screen-title-row">
+<h2 class="text-xl font-semibold">Редактор бази питань</h2>
+<button class="back-home-btn" onclick="cancelEdit(); showScreen('homeScreen')">← На головну</button>
+</div>
+<!-- АДМИН ПАНЕЛЬ -->
+<div class="admin-panel hidden flex flex-wrap gap-2" id="adminPanel">
+<span class="text-blue-400 font-bold self-center text-sm w-full mb-1">👑 Адмін-панель (GitHub Sync)</span>
+<button class="bg-blue-600 hover:bg-blue-500 text-white flex-1 py-2 rounded font-bold text-xs shadow transition" id="publishToCloudBtn" onclick="publishToCloud()">☁️ Публікація в базу</button>
+<button class="bg-indigo-600 hover:bg-indigo-500 text-white flex-1 py-2 rounded font-bold text-xs shadow transition" id="forceSyncBtn" onclick="forceSyncWithCloud()">⬇️ Завантажити з бази</button>
+<button class="bg-gray-700 hover:bg-red-900 text-gray-300 py-2 px-3 rounded font-bold text-xs shadow transition" onclick="logoutAdmin()">Вийти</button>
+</div><div class="editor-layout"><div class="editor-panel editor-form-panel" id="editorFormPanel">
+<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-yellow-500" id="editorFormTitle">Додати нове питання</h3></div>
+<div class="space-y-4">
+<select class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white font-bold focus:ring-2 focus:ring-yellow-500" id="qPeriod">
+<option value="1st period">1st Period</option>
+<option value="2nd period">2nd Period</option>
+<option value="3rd period">3rd Period</option>
+<option value="4th period">4th Period</option>
+</select>
+<div class="flex flex-col md:flex-row gap-3">
+<div class="flex-1"><input class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:ring-2 focus:ring-yellow-500" id="qCategory" list="categoryList" placeholder="Головна категорія" type="text"/><datalist id="categoryList"></datalist></div>
+<div class="flex-1"><input class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:ring-2 focus:ring-yellow-500" id="qSubCategory" list="subCategoryList" placeholder="Підкатегорія / Модуль" type="text"/><datalist id="subCategoryList"></datalist></div>
+</div>
+<select class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:ring-2 focus:ring-yellow-500" id="qType" onchange="toggleQuestionTypeUI()">
+<option value="choice">Тест (вибір правильної відповіді)</option><option value="input">Ввід тексту</option>
+</select>
+<textarea class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white h-24 focus:ring-2 focus:ring-yellow-500" id="qText" placeholder="Текст питання..."></textarea>
+<input class="w-full bg-gray-900 border-gray-600 rounded p-2 text-white text-sm" id="qImage" placeholder="🖼️ Посилання на картинку (URL)" type="url"/>
+<div class="space-y-2" id="uiTypeChoice">
+<input class="qOptionChoice w-full bg-gray-700 rounded p-2 text-white border border-green-700" placeholder="Варіант 1 (ВІРНИЙ)" type="text"/>
+<input class="qOptionChoice w-full bg-gray-700 rounded p-2 text-white" placeholder="Варіант 2" type="text"/>
+<input class="qOptionChoice w-full bg-gray-700 rounded p-2 text-white" placeholder="Варіант 3 (необов'язково)" type="text"/>
+<input class="qOptionChoice w-full bg-gray-700 rounded p-2 text-white" placeholder="Варіант 4 (необов'язково)" type="text"/>
+</div>
+<div class="space-y-2 hidden" id="uiTypeInput"><input class="w-full bg-gray-700 rounded p-3 text-white border border-green-700" id="qOptionInput" placeholder="Вірні варіанти через кому" type="text"/></div>
+<input class="w-full bg-gray-900 border-gray-600 rounded p-2 text-white text-sm" id="qExplanation" placeholder="💡 Пояснення, формула (необов'язково)" type="text"/>
+<div class="flex gap-3 mt-2">
+<button class="btn-primary flex-1 px-6 py-3 rounded text-lg shadow" id="saveQuestionBtn" onclick="saveQuestion()">Зберегти питання</button>
+<button class="hidden bg-gray-600 hover:bg-gray-500 text-white px-6 py-3 rounded font-bold shadow" id="cancelEditBtn" onclick="cancelEdit()">Скасувати</button>
+</div>
+</div>
+</div><div class="editor-panel editor-bank-panel" id="editorBankPanel">
+<div class="flex justify-between items-center mb-4 pb-3"><h3 class="font-bold text-lg">База питань (<span id="qCount">0</span>)</h3></div>
+<div class="flex gap-3 mb-4">
+<button class="btn-secondary flex-1 py-3 rounded font-bold text-sm shadow" onclick="exportFullData()">📥 Повний Backup</button>
+<button class="bg-green-700 hover:bg-green-600 text-white flex-1 py-3 rounded font-bold text-sm shadow" onclick="document.getElementById('importFile').click()">📤 Відновити / Додати</button>
+<input accept=".json" class="hidden" id="importFile" onchange="importFullData(event)" type="file"/>
+</div>
+<div class="flex flex-col md:flex-row gap-2 mb-4">
+<select class="bg-gray-900 border-gray-600 rounded p-3 text-white text-sm focus:ring-2 focus:ring-yellow-500" id="editorPeriodFilter" onchange="updateEditorList()">
+<option value="all">Всі періоди</option>
+<option value="1st period">1st Period</option>
+<option value="2nd period">2nd Period</option>
+<option value="3rd period">3rd Period</option>
+<option value="4th period">4th Period</option>
+</select>
+<input class="flex-1 bg-gray-900 border-gray-600 rounded p-3 text-white focus:ring-2 focus:ring-yellow-500" id="searchEditorInput" onkeyup="updateEditorList()" placeholder="🔍 Пошук по базі..." type="text"/>
+</div>
+<div class="max-h-[60vh] overflow-y-auto pr-2" id="questionsList"></div>
+</div></div>
 
-    <!-- ВІКНО РЕПОРТУ -->
-    <div id="reportModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[60] p-4">
-        <div class="bg-gray-800 rounded-lg border border-gray-700 max-w-sm w-full shadow-2xl p-5">
-            <h3 class="text-lg font-bold text-red-400 mb-2">🚩 Повідомити про помилку</h3>
-            <p class="text-xs text-gray-400 mb-4">Знайшли хибу? Напишіть, як має бути, і автор перевірить.</p>
-            <textarea id="reportText" class="w-full bg-gray-900 border border-gray-600 rounded p-3 text-white h-24 mb-4 focus:ring-2 focus:ring-red-500" placeholder="Ваш варіант або коментар..."></textarea>
-            <div class="flex gap-3">
-                <button onclick="sendReport()" id="sendReportBtn" class="bg-red-700 hover:bg-red-600 text-white flex-1 py-3 rounded font-bold shadow transition">Відправити</button>
-                <button onclick="document.getElementById('reportModal').classList.add('hidden')" class="bg-gray-600 hover:bg-gray-500 text-white flex-1 py-3 rounded font-bold transition">Скасувати</button>
-            </div>
-        </div>
-    </div>
 
-    <div id="questionStatsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" role="dialog">
-        <div class="w-full max-w-md rounded-xl border border-gray-600 bg-gray-800 p-6 shadow-2xl">
-            <h3 class="mb-3 text-xl font-bold text-yellow-400">Зберегти статистику питання?</h3>
-            <p class="mb-5 text-sm leading-relaxed text-gray-300">Ти змінив текст питання, тип або варіанти відповіді. Що зробити з попереднім прогресом?</p>
-            <div class="flex flex-col gap-3">
-                <button onclick="confirmQuestionSave(false)" class="w-full rounded-lg bg-blue-700 px-4 py-3 font-bold text-white hover:bg-blue-600">Зберегти статистику</button>
-                <button onclick="confirmQuestionSave(true)" class="w-full rounded-lg bg-red-700 px-4 py-3 font-bold text-white hover:bg-red-600">Скинути статистику</button>
-                <button onclick="closeQuestionStatsModal()" class="w-full rounded-lg bg-gray-600 px-4 py-3 font-bold text-white hover:bg-gray-500">Скасувати</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="max-w-3xl mx-auto mt-2">
-        <header class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-            <h1 id="mainAppTitle" class="text-3xl font-bold text-yellow-500 select-none cursor-pointer" onclick="handleAdminTrigger()">⚡ Тести</h1>
-            <div id="navButtons" class="flex space-x-2">
-                <button onclick="showScreen('statsScreen')" class="text-sm bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded shadow">📊 Стата</button>
-                <button onclick="toggleCheatSheet()" class="text-sm bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded shadow">📘 Довідник</button>
-                <button onclick="showScreen('editorScreen')" class="text-sm btn-secondary px-3 py-2 rounded">Редактор</button>
-            </div>
-        </header>
-        <p class="text-right text-[10px] text-gray-600 -mt-4 mb-3">Build 2026.11.10 · Modern UI refresh v1</p>
-
-        <!-- ГОЛОВНИЙ ЕКРАН -->
-        <div id="homeScreen" class="space-y-5">
-            <div class="flex justify-between items-center bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-md">
-                <div>
-                    <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Ударний режим</p>
-                    <p class="text-xl md:text-2xl font-bold text-orange-500">🔥 <span id="streakCount">0</span> днів</p>
-                    <p id="streakHint" class="text-[10px] text-gray-500 mt-1">Відповідай на 5 питань, щоб підтримати</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Пройдено тестів</p>
-                    <p class="text-xl md:text-2xl font-bold text-blue-400">📝 <span id="totalTestsCompleted">0</span></p>
-                </div>
-            </div>
-
-            <!-- Вкладки Періодів -->
-            <div class="flex space-x-2 overflow-x-auto pb-1 pt-1 scrollbar-hide" id="periodTabs">
-                <button id="tab-1st" onclick="changePeriod('1st period')" class="period-tab flex-1 py-2 px-4 rounded-full font-bold text-sm whitespace-nowrap">1st Period</button>
-                <button id="tab-2nd" onclick="changePeriod('2nd period')" class="period-tab flex-1 py-2 px-4 rounded-full font-bold text-sm whitespace-nowrap">2nd Period</button>
-                <button id="tab-3rd" onclick="changePeriod('3rd period')" class="period-tab flex-1 py-2 px-4 rounded-full font-bold text-sm whitespace-nowrap">3rd Period</button>
-                <button id="tab-4th" onclick="changePeriod('4th period')" class="period-tab flex-1 py-2 px-4 rounded-full font-bold text-sm whitespace-nowrap">4th Period</button>
-            </div>
-
-            <div class="flex flex-col gap-3">
-                <button onclick="openExamSettings()" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-4 rounded-lg text-lg shadow-lg border border-red-900 transition flex justify-center items-center gap-2">🎓 Симулятор Екзамену</button>
-                <button onclick="startSmartWorkout()" class="w-full bg-indigo-700 hover:bg-indigo-600 text-white font-bold py-3 rounded-lg text-md shadow border border-indigo-900 transition flex justify-center items-center gap-2">🧠 Розумне тренування</button>
-            </div>
-
-            <h2 class="text-xl font-semibold mb-2 mt-4">Виберіть модулі для практики:</h2>
-            <div id="categoriesGrid"></div>
-            
-            <div class="flex flex-col md:flex-row gap-4 mt-6">
-                <button onclick="startMode('quiz')" class="btn-primary flex-1 py-4 rounded text-lg shadow-lg">📝 Почати Практику</button>
-                <button onclick="startMode('flashcards')" class="bg-purple-600 hover:bg-purple-500 text-white font-bold flex-1 py-4 rounded text-lg shadow-lg transition-colors flex justify-center items-center gap-2">🃏 Флеш-картки <span id="dueCardsBadge" class="text-xs bg-purple-900 px-2 py-1 rounded hidden"></span></button>
-            </div>
-        </div>
-
-        <!-- ОНОВЛЕНИЙ ЕКРАН СТАТИСТИКИ (DASHBOARD) -->
-        <div id="statsScreen" class="hidden space-y-6">
-            <div class="flex justify-between items-center mb-2">
-                <h2 class="text-2xl font-bold text-white">📊 Аналітика (<span id="statsPeriodLabel"></span>)</h2>
-                <button onclick="showScreen('homeScreen')" class="text-sm btn-secondary px-4 py-2 rounded font-bold shadow">На головну</button>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Загальний прогрес (Doughnut Chart) -->
-                <div class="bg-gray-800 p-5 rounded-lg border border-gray-700 shadow-md flex items-center gap-6">
-                    <div id="statDonut" class="relative w-28 h-28 rounded-full flex items-center justify-center flex-shrink-0 donut-chart" style="background: conic-gradient(#10b981 0% 0%, #ef4444 0% 100%);">
-                        <div class="absolute w-20 h-20 bg-gray-800 rounded-full"></div>
-                        <span id="statTotalPerc" class="relative z-10 text-xl font-bold text-white">0%</span>
-                    </div>
-                    <div class="flex-1 space-y-2">
-                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Точність відповідей</h3>
-                        <p class="text-sm">Всього відповідей: <b id="statTotalAnswers" class="text-white">0</b></p>
-                        <p class="text-sm text-green-400">✅ Вірно: <b id="statTotalCorrect">0</b></p>
-                        <p class="text-sm text-red-400">❌ Помилок: <b id="statTotalWrong">0</b></p>
-                    </div>
-                </div>
-
-                <!-- Графік останніх екзаменів (Bar Chart) -->
-                <div class="bg-gray-800 p-5 rounded-lg border border-gray-700 shadow-md flex flex-col justify-between">
-                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Останні 7 екзаменів</h3>
-                    <div id="examBarChart" class="flex items-end gap-3 md:gap-5 h-32 w-full px-2 border-b border-gray-700 pb-1">
-                        <!-- Стовпчики генеруються через JS -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Детальний розбір модулів -->
-            <div class="bg-gray-800 p-5 rounded-lg border border-gray-700 shadow-md">
-                <h3 class="text-lg font-bold text-yellow-500 mb-4 border-b border-gray-700 pb-2">Детальний розбір модулів</h3>
-                <div id="moduleStatsList" class="space-y-4">
-                    <!-- Модулі генеруються через JS -->
-                </div>
-            </div>
-        </div>
-
-        <!-- ЕКРАН РЕДАКТОРА -->
-        <div id="editorScreen" class="hidden space-y-6">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-semibold">Редактор питань</h2>
-                <button onclick="cancelEdit(); showScreen('homeScreen')" class="text-sm btn-secondary px-4 py-2 rounded">На головну</button>
-            </div>
-
-            <!-- АДМИН ПАНЕЛЬ -->
-            <div id="adminPanel" class="hidden flex flex-wrap gap-2 mb-2 p-3 bg-blue-900/20 border border-blue-800 rounded-lg">
-                <span class="text-blue-400 font-bold self-center text-sm w-full mb-1">👑 Адмін-панель (GitHub Sync)</span>
-                <button id="publishToCloudBtn" onclick="publishToCloud()" class="bg-blue-600 hover:bg-blue-500 text-white flex-1 py-2 rounded font-bold text-xs shadow transition">☁️ Публікація в базу</button>
-                <button id="forceSyncBtn" onclick="forceSyncWithCloud()" class="bg-indigo-600 hover:bg-indigo-500 text-white flex-1 py-2 rounded font-bold text-xs shadow transition">⬇️ Завантажити з бази</button>
-                <button onclick="logoutAdmin()" class="bg-gray-700 hover:bg-red-900 text-gray-300 py-2 px-3 rounded font-bold text-xs shadow transition">Вийти</button>
-            </div>
-
-            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-lg">
-                <div class="flex justify-between items-center mb-4"><h3 id="editorFormTitle" class="font-bold text-yellow-500">Додати нове питання</h3></div>
-                <div class="space-y-4">
-                    <select id="qPeriod" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white font-bold focus:ring-2 focus:ring-yellow-500">
-                        <option value="1st period">1st Period</option>
-                        <option value="2nd period">2nd Period</option>
-                        <option value="3rd period">3rd Period</option>
-                        <option value="4th period">4th Period</option>
-                    </select>
-                    <div class="flex flex-col md:flex-row gap-3">
-                        <div class="flex-1"><input type="text" id="qCategory" list="categoryList" placeholder="Головна категорія" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:ring-2 focus:ring-yellow-500"><datalist id="categoryList"></datalist></div>
-                        <div class="flex-1"><input type="text" id="qSubCategory" list="subCategoryList" placeholder="Підкатегорія / Модуль" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:ring-2 focus:ring-yellow-500"><datalist id="subCategoryList"></datalist></div>
-                    </div>
-                    <select id="qType" onchange="toggleQuestionTypeUI()" class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white focus:ring-2 focus:ring-yellow-500">
-                        <option value="choice">Тест (вибір правильної відповіді)</option><option value="input">Ввід тексту</option>
-                    </select>
-                    <textarea id="qText" placeholder="Текст питання..." class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white h-24 focus:ring-2 focus:ring-yellow-500"></textarea>
-                    <input type="url" id="qImage" class="w-full bg-gray-900 border-gray-600 rounded p-2 text-white text-sm" placeholder="🖼️ Посилання на картинку (URL)">
-                    <div id="uiTypeChoice" class="space-y-2">
-                        <input type="text" class="qOptionChoice w-full bg-gray-700 rounded p-2 text-white border border-green-700" placeholder="Варіант 1 (ВІРНИЙ)">
-                        <input type="text" class="qOptionChoice w-full bg-gray-700 rounded p-2 text-white" placeholder="Варіант 2">
-                        <input type="text" class="qOptionChoice w-full bg-gray-700 rounded p-2 text-white" placeholder="Варіант 3 (необов'язково)">
-                        <input type="text" class="qOptionChoice w-full bg-gray-700 rounded p-2 text-white" placeholder="Варіант 4 (необов'язково)">
-                    </div>
-                    <div id="uiTypeInput" class="space-y-2 hidden"><input type="text" id="qOptionInput" class="w-full bg-gray-700 rounded p-3 text-white border border-green-700" placeholder="Вірні варіанти через кому"></div>
-                    <input type="text" id="qExplanation" class="w-full bg-gray-900 border-gray-600 rounded p-2 text-white text-sm" placeholder="💡 Пояснення, формула (необов'язково)">
-                    <div class="flex gap-3 mt-2">
-                        <button id="saveQuestionBtn" onclick="saveQuestion()" class="btn-primary flex-1 px-6 py-3 rounded text-lg shadow">Зберегти питання</button>
-                        <button id="cancelEditBtn" onclick="cancelEdit()" class="hidden bg-gray-600 hover:bg-gray-500 text-white px-6 py-3 rounded font-bold shadow">Скасувати</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-lg">
-                <div class="flex justify-between items-center mb-4 pb-3"><h3 class="font-bold text-lg">База питань (<span id="qCount">0</span>)</h3></div>
-                <div class="flex gap-3 mb-4">
-                    <button onclick="exportFullData()" class="btn-secondary flex-1 py-3 rounded font-bold text-sm shadow">📥 Повний Backup</button>
-                    <button onclick="document.getElementById('importFile').click()" class="bg-green-700 hover:bg-green-600 text-white flex-1 py-3 rounded font-bold text-sm shadow">📤 Відновити / Додати</button>
-                    <input type="file" id="importFile" class="hidden" accept=".json" onchange="importFullData(event)">
-                </div>
-                
-                <div class="flex flex-col md:flex-row gap-2 mb-4">
-                    <select id="editorPeriodFilter" onchange="updateEditorList()" class="bg-gray-900 border-gray-600 rounded p-3 text-white text-sm focus:ring-2 focus:ring-yellow-500">
-                        <option value="all">Всі періоди</option>
-                        <option value="1st period">1st Period</option>
-                        <option value="2nd period">2nd Period</option>
-                        <option value="3rd period">3rd Period</option>
-                        <option value="4th period">4th Period</option>
-                    </select>
-                    <input type="text" id="searchEditorInput" onkeyup="updateEditorList()" placeholder="🔍 Пошук по базі..." class="flex-1 bg-gray-900 border-gray-600 rounded p-3 text-white focus:ring-2 focus:ring-yellow-500">
-                </div>
-
-                <div id="questionsList" class="max-h-[60vh] overflow-y-auto pr-2"></div>
-            </div>
-        </div>
-
-        <!-- ЕКРАН ТЕСТУ / ЕКЗАМЕНУ -->
-        <div id="quizScreen" class="hidden space-y-6">
-            <div class="flex justify-between items-center text-sm text-gray-400 mb-2">
-                <div class="flex items-center space-x-3">
-                    <button id="quizFavBtn" onclick="toggleCurrentFavorite()" class="text-xl leading-none hover:scale-110 transition-transform" title="Додати в обране">☆</button>
-                    <button id="quizEditBtn" onclick="editFromSession()" class="hidden text-xl leading-none hover:scale-110 transition-transform" title="Редагувати">✏️</button>
-                    <button id="quizReportBtn" onclick="openReportModal()" class="hidden flex items-center gap-1.5 px-2 py-1 rounded bg-gray-800 border border-gray-600 text-xs font-bold text-gray-300 hover:text-red-400 hover:border-red-800 transition" title="Повідомити про помилку">🚩 Помилка</button>
-                    
-                    <span id="quizProgress" class="font-semibold ml-2"></span>
-                    <span id="quizCurrentStats" class="text-xs bg-gray-900 text-gray-300 px-2 py-1 rounded border border-gray-600 shadow-inner"></span>
-                    <span id="examTimerDisplay" class="hidden text-xs bg-red-900 text-white px-2 py-1 rounded border border-red-700 font-mono font-bold animate-pulse"></span>
-                </div>
-                <div class="flex space-x-4">
-                    <button onclick="toggleCheatSheet()" class="text-blue-400 hover:underline font-semibold hidden md:block">📘 Довідник</button>
-                    <button onclick="showScreen('homeScreen'); clearInterval(examInterval);" class="text-yellow-500 hover:underline font-semibold">Перервати</button>
-                </div>
-            </div>
-            
-            <div class="w-full bg-gray-700 h-2 rounded-full mb-4 overflow-hidden"><div id="quizProgressBar" class="bg-yellow-500 h-2 rounded-full progress-bar" style="width: 0%;"></div></div>
-            <div class="bg-gray-800 p-6 md:p-8 rounded-lg border border-gray-700">
-                <h2 id="quizQuestionText" class="text-xl md:text-2xl font-semibold mb-4"></h2>
-                <img id="quizImage" onclick="openImageZoom(this.src)" class="hidden w-full max-h-64 object-contain rounded mb-6 border border-gray-600 bg-gray-900 cursor-zoom-in" src="" alt="Схема">
-                <div id="quizOptions" class="space-y-3 mt-4"></div>
-                <div id="quizFeedback" class="hidden mt-6 p-4 rounded-lg bg-gray-900 border border-gray-600 shadow-inner">
-                    <div id="quizFeedbackText" class="mb-4"></div>
-                    <button onclick="nextQuestion()" class="btn-primary w-full py-3 rounded text-lg shadow">Наступне питання ➔</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ЕКРАН ФЛЕШ-КАРТОК -->
-        <div id="flashcardScreen" class="hidden space-y-6">
-            <div class="flex justify-between items-center text-sm text-gray-400 mb-2">
-                <div class="flex items-center space-x-3">
-                    <button id="fcFavBtn" onclick="toggleCurrentFavorite()" class="text-xl leading-none hover:scale-110 transition-transform" title="Додати в обране">☆</button>
-                    <button id="fcEditBtn" onclick="editFromSession()" class="hidden text-xl leading-none hover:scale-110 transition-transform" title="Редагувати">✏️</button>
-                    <button id="fcReportBtn" onclick="openReportModal()" class="hidden flex items-center gap-1.5 px-2 py-1 rounded bg-gray-800 border border-gray-600 text-xs font-bold text-gray-300 hover:text-red-400 hover:border-red-800 transition" title="Повідомити про помилку">🚩 Помилка</button>
-                    
-                    <span id="fcProgressText" class="font-semibold ml-2"></span>
-                    <span class="text-xs bg-purple-900/50 text-purple-200 px-2 py-1 rounded border border-purple-700 shadow-inner hidden md:block">Розумні інтервали</span>
-                </div>
-                <button onclick="showScreen('homeScreen')" class="text-purple-400 hover:underline font-semibold">Перервати</button>
-            </div>
-            <div class="w-full bg-gray-700 h-2 rounded-full mb-4 overflow-hidden"><div id="fcProgressBar" class="bg-purple-500 h-2 rounded-full progress-bar" style="width: 0%;"></div></div>
-            <div id="fcCard" onclick="flipFlashcard()" class="bg-gray-800 p-8 rounded-lg border border-gray-600 cursor-pointer shadow-xl text-center min-h-[300px] flex flex-col justify-center flashcard-inner">
-                <h2 id="fcQuestion" class="text-2xl md:text-3xl font-semibold mb-4"></h2>
-                <img id="fcImage" onclick="event.stopPropagation(); openImageZoom(this.src)" class="hidden w-full max-h-64 object-contain rounded mx-auto border border-gray-700 bg-gray-900 mb-4 cursor-zoom-in" src="">
-                <p id="fcTapHint" class="text-gray-500 animate-pulse mt-4 text-sm">👆 Натисніть, щоб побачити відповідь</p>
-                <div id="fcAnswerBox" class="hidden mt-6 pt-6 border-t border-gray-700 w-full">
-                    <p class="text-sm text-gray-400 mb-1">Вірна відповідь:</p>
-                    <p id="fcAnswerText" class="text-green-400 font-bold text-2xl mb-4"></p>
-                    <p id="fcExplanationText" class="text-gray-300 text-sm italic bg-gray-900 p-3 rounded hidden mb-6"></p>
-                    <div class="flex justify-center space-x-4 mt-4">
-                        <button onclick="recordFlashcard(false, event)" class="bg-gray-700 hover:bg-red-900/50 text-red-400 border border-red-800 px-6 py-3 rounded font-bold w-1/2">❌ Забув</button>
-                        <button onclick="recordFlashcard(true, event)" class="bg-gray-700 hover:bg-green-900/50 text-green-400 border border-green-800 px-6 py-3 rounded font-bold w-1/2">✅ Помню</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ЕКРАН РЕЗУЛЬТАТІВ -->
-        <div id="resultScreen" class="hidden space-y-6 text-center">
-            <div class="bg-gray-800 p-8 rounded-lg border border-gray-700">
-                <h2 id="resultTitle" class="text-3xl font-bold mb-4">Сесію завершено!</h2>
-                <p class="text-xl mb-6">Твій результат: <span id="scoreText" class="text-yellow-500 font-bold text-2xl"></span></p>
-                
-                <div id="smartWorkoutReview" class="text-left bg-indigo-900/30 p-4 rounded border border-indigo-800 mb-6 hidden">
-                    <h3 class="font-bold text-indigo-400 mb-2">Аналіз тренування:</h3>
-                    <p class="text-sm text-gray-300" id="smartWorkoutText"></p>
-                </div>
-
-                <div id="mistakesReview" class="text-left bg-gray-900 p-4 rounded mb-6 hidden">
-                    <button id="retryMistakesBtn" onclick="retryCurrentMistakes()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded text-lg mb-4 shadow border border-orange-800 transition">🔄 Повторити помилки цієї сесії</button>
-                    <h3 class="font-bold text-red-400 mb-3">Розбір помилок:</h3>
-                    <div id="mistakesList" class="space-y-5 text-sm"></div>
-                </div>
-                
-                <button onclick="showScreen('homeScreen')" class="btn-primary px-8 py-3 rounded text-lg w-full md:w-auto">На головну</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ВІКНО НАЛАШТУВАНЬ ЕКЗАМЕНУ -->
-    <div id="examSettingsModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4">
-        <div class="bg-gray-800 rounded-lg border border-gray-700 max-w-sm w-full shadow-2xl overflow-hidden">
-            <div class="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-900">
-                <h2 class="text-lg font-bold text-red-500">🎓 Налаштування екзамену</h2>
-                <button onclick="closeExamSettings()" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
-            </div>
-            <div class="p-5 space-y-4">
-                <div><label class="block text-sm text-gray-400 mb-1">Джерело питань:</label><select id="esSource" class="w-full bg-gray-700 rounded p-2 text-white text-sm focus:ring-2 focus:ring-red-500"><option value="all">З усієї бази (цього періоду)</option><option value="selected">Тільки вибрані модулі</option></select></div>
-                <div><label class="block text-sm text-gray-400 mb-1">Кількість питань:</label><select id="esCount" class="w-full bg-gray-700 rounded p-2 text-white text-sm focus:ring-2 focus:ring-red-500"><option value="10">10 питань</option><option value="20">20 питань</option><option value="30" selected>30 питань</option><option value="50">50 питань</option><option value="all">Всі доступні</option></select></div>
-                <div><label class="block text-sm text-gray-400 mb-1">Прохідний бал:</label><select id="esPass" class="w-full bg-gray-700 rounded p-2 text-white text-sm focus:ring-2 focus:ring-red-500"><option value="70" selected>70%</option><option value="75">75%</option><option value="80">80%</option></select></div>
-                <div class="flex items-center mt-2"><input type="checkbox" id="esTimer" class="w-5 h-5 bg-gray-700 border-gray-600 rounded text-red-500 focus:ring-red-500" checked><label for="esTimer" class="ml-2 text-sm text-gray-200">Таймер (2 хв / питання)</label></div>
-                <button onclick="applyExamSettings()" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-3 rounded mt-4 transition">🚀 Почати Екзамен</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ВІКНО ДОВІДНИКА -->
-    <div id="cheatSheetModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4">
-        <div class="bg-gray-800 rounded-lg border border-gray-700 max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl transition-all">
-            <div class="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-900 rounded-t-lg">
-                <h2 class="text-xl font-bold text-blue-400">📘 Шпаргалка (<span id="cheatSheetPeriodLabel"></span>)</h2>
-                <div class="flex items-center space-x-3">
-                    <button id="editCheatSheetBtn" onclick="toggleEditCheatSheet()" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded border border-gray-600">✏️ Редагувати</button>
-                    <button onclick="toggleCheatSheet()" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
-                </div>
-            </div>
-            <div id="cheatSheetToolbar" class="hidden flex space-x-2 p-2 bg-gray-900 border-b border-gray-700 overflow-x-auto">
-                <button onclick="formatText('formatBlock', 'H3')" class="px-3 py-1 bg-gray-700 rounded text-yellow-500 font-bold text-sm shrink-0">Заголовок</button>
-                <button onclick="formatText('bold')" class="px-3 py-1 bg-gray-700 rounded font-bold text-sm shrink-0">Жирний</button>
-                <button onclick="formatText('insertUnorderedList')" class="px-3 py-1 bg-gray-700 rounded font-bold text-sm shrink-0">• Список</button>
-                <button onclick="formatText('removeFormat')" class="px-3 py-1 bg-gray-700 text-red-400 text-sm shrink-0 ml-auto">Очистити</button>
-            </div>
-            <div id="cheatSheetContent" class="p-5 overflow-y-auto space-y-2 text-gray-200 min-h-[50vh]"></div>
-            <div class="p-4 border-t border-gray-700 flex justify-between items-center bg-gray-900 rounded-b-lg">
-                <button id="resetCheatSheetBtn" onclick="resetCheatSheet()" class="hidden text-xs text-red-400 hover:underline">Скинути до standardної</button>
-                <button onclick="toggleCheatSheet()" class="bg-gray-600 hover:bg-gray-500 text-white px-6 py-2 rounded font-bold ml-auto">Закрити</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // BUILD: 2026.11.10-modern-v1 — visual refresh; logic and data model preserved.
+</div><div class="study-session-screen hidden" id="quizScreen">
+<div class="study-toolbar">
+<div class="flex items-center space-x-3">
+<button class="text-xl leading-none hover:scale-110 transition-transform" id="quizFavBtn" onclick="toggleCurrentFavorite()" title="Додати в обране">☆</button>
+<button class="hidden text-xl leading-none hover:scale-110 transition-transform" id="quizEditBtn" onclick="editFromSession()" title="Редагувати">✏️</button>
+<button class="hidden flex items-center gap-1.5 px-2 py-1 rounded bg-gray-800 border border-gray-600 text-xs font-bold text-gray-300 hover:text-red-400 hover:border-red-800 transition" id="quizReportBtn" onclick="openReportModal()" title="Повідомити про помилку">🚩 Помилка</button>
+<span class="font-semibold ml-2" id="quizProgress"></span>
+<span class="text-xs bg-gray-900 text-gray-300 px-2 py-1 rounded border border-gray-600 shadow-inner" id="quizCurrentStats"></span>
+<span class="hidden text-xs bg-red-900 text-white px-2 py-1 rounded border border-red-700 font-mono font-bold animate-pulse" id="examTimerDisplay"></span>
+</div>
+<div class="flex space-x-4">
+<button class="text-blue-400 hover:underline font-semibold hidden md:block" onclick="toggleCheatSheet()">📘 Довідник</button>
+<button class="text-yellow-500 hover:underline font-semibold" onclick="showScreen('homeScreen'); clearInterval(examInterval);">Перервати</button>
+</div>
+</div>
+<div class="w-full bg-gray-700 h-2 rounded-full mb-4 overflow-hidden"><div class="bg-yellow-500 h-2 rounded-full progress-bar" id="quizProgressBar" style="width: 0%;"></div></div>
+<div class="question-panel">
+<h2 class="text-xl md:text-2xl font-semibold mb-4" id="quizQuestionText"></h2>
+<img alt="Схема" class="hidden w-full max-h-64 object-contain rounded mb-6 border border-gray-600 bg-gray-900 cursor-zoom-in" id="quizImage" onclick="openImageZoom(this.src)" src=""/>
+<div class="space-y-3 mt-4" id="quizOptions"></div>
+<div class="hidden mt-6 p-4 rounded-lg bg-gray-900 border border-gray-600 shadow-inner" id="quizFeedback">
+<div class="mb-4" id="quizFeedbackText"></div>
+<button class="btn-primary w-full py-3 rounded text-lg shadow" onclick="nextQuestion()">Наступне питання ➔</button>
+</div>
+</div>
+</div><div class="flashcard-session-screen hidden" id="flashcardScreen">
+<div class="study-toolbar">
+<div class="flex items-center space-x-3">
+<button class="text-xl leading-none hover:scale-110 transition-transform" id="fcFavBtn" onclick="toggleCurrentFavorite()" title="Додати в обране">☆</button>
+<button class="hidden text-xl leading-none hover:scale-110 transition-transform" id="fcEditBtn" onclick="editFromSession()" title="Редагувати">✏️</button>
+<button class="hidden flex items-center gap-1.5 px-2 py-1 rounded bg-gray-800 border border-gray-600 text-xs font-bold text-gray-300 hover:text-red-400 hover:border-red-800 transition" id="fcReportBtn" onclick="openReportModal()" title="Повідомити про помилку">🚩 Помилка</button>
+<span class="font-semibold ml-2" id="fcProgressText"></span>
+<span class="text-xs bg-purple-900/50 text-purple-200 px-2 py-1 rounded border border-purple-700 shadow-inner hidden md:block">Розумні інтервали</span>
+</div>
+<button class="text-purple-400 hover:underline font-semibold" onclick="showScreen('homeScreen')">Перервати</button>
+</div>
+<div class="w-full bg-gray-700 h-2 rounded-full mb-4 overflow-hidden"><div class="bg-purple-500 h-2 rounded-full progress-bar" id="fcProgressBar" style="width: 0%;"></div></div>
+<div class="flashcard-hero" id="fcCard" onclick="flipFlashcard()">
+<h2 class="text-2xl md:text-3xl font-semibold mb-4" id="fcQuestion"></h2>
+<img class="hidden w-full max-h-64 object-contain rounded mx-auto border border-gray-700 bg-gray-900 mb-4 cursor-zoom-in" id="fcImage" onclick="event.stopPropagation(); openImageZoom(this.src)" src=""/>
+<p class="text-gray-500 animate-pulse mt-4 text-sm" id="fcTapHint">👆 Натисніть, щоб побачити відповідь</p>
+<div class="hidden mt-6 pt-6 border-t border-gray-700 w-full" id="fcAnswerBox">
+<p class="text-sm text-gray-400 mb-1">Вірна відповідь:</p>
+<p class="text-green-400 font-bold text-2xl mb-4" id="fcAnswerText"></p>
+<p class="text-gray-300 text-sm italic bg-gray-900 p-3 rounded hidden mb-6" id="fcExplanationText"></p>
+<div class="flex justify-center space-x-4 mt-4">
+<button class="bg-gray-700 hover:bg-red-900/50 text-red-400 border border-red-800 px-6 py-3 rounded font-bold w-1/2" onclick="recordFlashcard(false, event)">❌ Забув</button>
+<button class="bg-gray-700 hover:bg-green-900/50 text-green-400 border border-green-800 px-6 py-3 rounded font-bold w-1/2" onclick="recordFlashcard(true, event)">✅ Помню</button>
+</div>
+</div>
+</div>
+</div><div class="result-session-screen hidden" id="resultScreen">
+<div class="bg-gray-800 p-8 rounded-lg border border-gray-700">
+<h2 class="text-3xl font-bold mb-4" id="resultTitle">Сесію завершено!</h2>
+<p class="text-xl mb-6">Твій результат: <span class="text-yellow-500 font-bold text-2xl" id="scoreText"></span></p>
+<div class="text-left bg-indigo-900/30 p-4 rounded border border-indigo-800 mb-6 hidden" id="smartWorkoutReview">
+<h3 class="font-bold text-indigo-400 mb-2">Аналіз тренування:</h3>
+<p class="text-sm text-gray-300" id="smartWorkoutText"></p>
+</div>
+<div class="text-left bg-gray-900 p-4 rounded mb-6 hidden" id="mistakesReview">
+<button class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded text-lg mb-4 shadow border border-orange-800 transition" id="retryMistakesBtn" onclick="retryCurrentMistakes()">🔄 Повторити помилки цієї сесії</button>
+<h3 class="font-bold text-red-400 mb-3">Розбір помилок:</h3>
+<div class="space-y-5 text-sm" id="mistakesList"></div>
+</div>
+<button class="btn-primary px-8 py-3 rounded text-lg w-full md:w-auto" onclick="showScreen('homeScreen')">На головну</button>
+</div>
+</div></div></main></div></div>
+<!-- ВІКНО НАЛАШТУВАНЬ ЕКЗАМЕНУ -->
+<div class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4" id="examSettingsModal">
+<div class="bg-gray-800 rounded-lg border border-gray-700 max-w-sm w-full shadow-2xl overflow-hidden">
+<div class="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-900">
+<h2 class="text-lg font-bold text-red-500">🎓 Налаштування екзамену</h2>
+<button class="text-gray-400 hover:text-white text-3xl leading-none" onclick="closeExamSettings()">×</button>
+</div>
+<div class="p-5 space-y-4">
+<div><label class="block text-sm text-gray-400 mb-1">Джерело питань:</label><select class="w-full bg-gray-700 rounded p-2 text-white text-sm focus:ring-2 focus:ring-red-500" id="esSource"><option value="all">З усієї бази (цього періоду)</option><option value="selected">Тільки вибрані модулі</option></select></div>
+<div><label class="block text-sm text-gray-400 mb-1">Кількість питань:</label><select class="w-full bg-gray-700 rounded p-2 text-white text-sm focus:ring-2 focus:ring-red-500" id="esCount"><option value="10">10 питань</option><option value="20">20 питань</option><option selected="" value="30">30 питань</option><option value="50">50 питань</option><option value="all">Всі доступні</option></select></div>
+<div><label class="block text-sm text-gray-400 mb-1">Прохідний бал:</label><select class="w-full bg-gray-700 rounded p-2 text-white text-sm focus:ring-2 focus:ring-red-500" id="esPass"><option selected="" value="70">70%</option><option value="75">75%</option><option value="80">80%</option></select></div>
+<div class="flex items-center mt-2"><input checked="" class="w-5 h-5 bg-gray-700 border-gray-600 rounded text-red-500 focus:ring-red-500" id="esTimer" type="checkbox"/><label class="ml-2 text-sm text-gray-200" for="esTimer">Таймер (2 хв / питання)</label></div>
+<button class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-3 rounded mt-4 transition" onclick="applyExamSettings()">🚀 Почати Екзамен</button>
+</div>
+</div>
+</div>
+<!-- ВІКНО ДОВІДНИКА -->
+<div class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4" id="cheatSheetModal">
+<div class="bg-gray-800 rounded-lg border border-gray-700 max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl transition-all">
+<div class="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-900 rounded-t-lg">
+<div><h2 class="text-xl font-bold text-blue-300">📘 Довідник з електричної теорії</h2><p class="text-xs text-slate-400 mt-1">Період: <span id="cheatSheetPeriodLabel"></span></p></div>
+<div class="flex items-center space-x-3">
+<button class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded border border-gray-600" id="editCheatSheetBtn" onclick="toggleEditCheatSheet()">✏️ Редагувати</button>
+<button class="text-gray-400 hover:text-white text-3xl leading-none" onclick="toggleCheatSheet()">×</button>
+</div>
+</div>
+<div class="hidden flex flex-wrap gap-2 p-3 bg-slate-950/70 border-b border-slate-700" id="cheatSheetToolbar">
+<button type="button" onmousedown="event.preventDefault()" class="cheat-tool" onclick="formatText('formatBlock', 'H3')">Заголовок</button>
+<button type="button" onmousedown="event.preventDefault()" class="cheat-tool" onclick="formatText('bold')"><strong>B</strong> Жирний</button>
+<button type="button" onmousedown="event.preventDefault()" class="cheat-tool" onclick="formatText('italic')"><em>I</em> Курсив</button>
+<button type="button" onmousedown="event.preventDefault()" class="cheat-tool" onclick="formatText('insertUnorderedList')">• Список</button>
+<button type="button" onmousedown="event.preventDefault()" class="cheat-tool" onclick="formatText('insertOrderedList')">1. Нумерація</button>
+<button type="button" onmousedown="event.preventDefault()" class="cheat-tool" onclick="insertCheatSheetFormula()">ƒx Формула</button>
+<button type="button" onmousedown="event.preventDefault()" class="cheat-tool" onclick="insertCheatSheetTable()">▦ Таблиця</button>
+<button type="button" onmousedown="event.preventDefault()" class="cheat-tool cheat-tool-muted ml-auto" onclick="formatText('removeFormat')">Очистити формат</button>
+</div>
+<div class="cheat-sheet-editor-hint hidden" id="cheatSheetEditorHint">Режим редагування · виділи текст і застосуй форматування кнопками вище. Натисни «Зберегти», щоб записати зміни.</div>
+<div class="p-6 overflow-y-auto text-gray-200 min-h-[58vh]" id="cheatSheetContent"></div>
+<div class="p-4 border-t border-gray-700 flex justify-between items-center bg-gray-900 rounded-b-lg">
+<button class="hidden text-xs text-red-400 hover:underline" id="resetCheatSheetBtn" onclick="resetCheatSheet()">Відновити початкову шпаргалку</button>
+<button class="bg-gray-600 hover:bg-gray-500 text-white px-6 py-2 rounded font-bold ml-auto" onclick="toggleCheatSheet()">Закрити</button>
+</div>
+</div>
+</div>
+<script>
+        // BUILD: 2026.11.10-electrician-hub-v3 — neutral labels, technical reference and editor refresh.
         const PUBLIC_GIST_ID = '5ee027de84d344fbe11d2a496246d8ea'; 
 
         const defaultQuestions = [{ id: "1", period: "2nd period", type: "choice", category: "AC Fundamentals", subCategory: "105A", text: "Яке значення показує мультиметр при вимірюванні AC?", options: ["RMS", "Peak", "Average", "Миттєве"], answerIndex: 0, explanation: "Завжди RMS." }];
         
         const defaultCheatSheets = {
+            '1st period': `<div>
+<h3>1. Електричні величини та одиниці</h3>
+<table><thead><tr><th>Величина</th><th>Позначення</th><th>Одиниця</th><th>Коротко</th></tr></thead><tbody>
+<tr><td>Напруга</td><td>V</td><td>вольт (V)</td><td>Різниця електричних потенціалів</td></tr>
+<tr><td>Струм</td><td>I</td><td>ампер (A)</td><td>Швидкість руху електричного заряду</td></tr>
+<tr><td>Опір</td><td>R</td><td>ом (Ω)</td><td>Протидія проходженню струму</td></tr>
+<tr><td>Потужність</td><td>P</td><td>ват (W)</td><td>Швидкість передавання або перетворення енергії</td></tr>
+<tr><td>Енергія / робота</td><td>E або W</td><td>джоуль (J), кВт·год</td><td>Потужність, помножена на час</td></tr>
+<tr><td>Заряд</td><td>Q</td><td>кулон (C)</td><td>Кількість електрики</td></tr>
+<tr><td>Провідність</td><td>G</td><td>сіменс (S)</td><td>Обернена величина опору</td></tr>
+</tbody></table>
+<p><strong>Заряд і струм:</strong> I = Q / t. <strong>Напруга:</strong> V = W / Q. <strong>Провідність:</strong> G = 1 / R.</p>
+
+<h3>2. Закон Ома та потужність</h3>
+<blockquote><strong>Закон Ома:</strong> V = I × R &nbsp; | &nbsp; I = V / R &nbsp; | &nbsp; R = V / I</blockquote>
+<blockquote><strong>Потужність:</strong> P = V × I = I² × R = V² / R</blockquote>
+<blockquote><strong>Енергія:</strong> E = P × t. Для кВт·год: P у kW, час у годинах.</blockquote>
+<ul>
+<li>1 kW = 1000 W; 1 kWh = 1000 Wh = 3.6 MJ.</li>
+<li>Для незмінного опору збільшення напруги збільшує струм пропорційно.</li>
+<li>Для незмінної напруги збільшення опору зменшує струм.</li>
+</ul>
+
+<h3>3. Послідовне коло (Series)</h3>
+<ul>
+<li>Через усі елементи проходить <strong>однаковий струм</strong>: Iₜ = I₁ = I₂ = ...</li>
+<li>Загальний опір: <strong>Rₜ = R₁ + R₂ + ...</strong></li>
+<li>Напруга джерела дорівнює сумі падінь напруги: Vₜ = V₁ + V₂ + ... (KVL).</li>
+<li>Якщо один елемент розірваний, струм у всьому колі припиняється.</li>
+<li>Подільник напруги: Vₓ = Vₜ × (Rₓ / Rₜ).</li>
+</ul>
+
+<h3>4. Паралельне коло (Parallel)</h3>
+<ul>
+<li>На кожній гілці однакова напруга: Vₜ = V₁ = V₂ = ...</li>
+<li>Загальний струм дорівнює сумі струмів гілок: Iₜ = I₁ + I₂ + ... (KCL).</li>
+<li>Еквівалентний опір: 1/Rₜ = 1/R₁ + 1/R₂ + ...</li>
+<li>Для двох паралельних резисторів: Rₜ = (R₁ × R₂) / (R₁ + R₂).</li>
+<li>Еквівалентний опір паралельного з'єднання менший за найменший опір окремої гілки.</li>
+</ul>
+
+<h3>5. Змішане коло та закони Кірхгофа</h3>
+<ul>
+<li>Спрощуй схему поетапно: спочатку знаходь очевидні послідовні або паралельні групи, замінюй їх еквівалентним опором.</li>
+<li><strong>KCL (закон струмів):</strong> сума струмів, що входять у вузол, дорівнює сумі струмів, що виходять.</li>
+<li><strong>KVL (закон напруг):</strong> алгебраїчна сума напруг у замкненому контурі дорівнює нулю.</li>
+<li>Після розрахунку перевіряй, що струми та падіння напруги узгоджуються із законами Кірхгофа.</li>
+</ul>
+
+<h3>6. Система Edison 3-Wire (120/240 V)</h3>
+<ul>
+<li>У типовій однофазній split-phase системі між двома line conductors — приблизно <strong>240 V</strong>, між кожним line conductor і нейтраллю — приблизно <strong>120 V</strong>.</li>
+<li>Навантаження 120 V підключаються між одним line conductor і нейтраллю; навантаження 240 V — між двома line conductors.</li>
+<li>За ідеально збалансованих навантажень 120 V струм у нейтралі дорівнює нулю; за незбалансованих — нейтраль проводить різницю струмів двох плечей.</li>
+</ul>
+
+<h3>7. Провідники та опір</h3>
+<blockquote><strong>Опір провідника:</strong> R = ρ × L / A</blockquote>
+<ul>
+<li>Для того самого матеріалу й температури: довший провідник має більший опір; більша площа перерізу — менший опір.</li>
+<li>Опір металевих провідників зазвичай зростає зі збільшенням температури.</li>
+<li>Фактичний опір залежить від матеріалу, довжини, площі перерізу та температури.</li>
+</ul>
+
+<h3>8. Магнетизм та електромагнітна індукція</h3>
+<ul>
+<li>Магнітні полюси: однойменні відштовхуються, різнойменні притягуються.</li>
+<li>Струм у провіднику створює магнітне поле навколо нього.</li>
+<li>Зміна магнітного потоку через котушку може індукувати ЕРС.</li>
+<li><strong>Закон Фарадея:</strong> e = −N × (ΔΦ / Δt). N — кількість витків; Φ — магнітний потік.</li>
+<li><strong>Правило Ленца:</strong> напрям індукованого струму протидіє зміні магнітного потоку, що його спричинила.</li>
+<li>Основні способи отримання ЕРС: хімічний процес (батарея), електромагнітна індукція (генератор), фотоелектричний ефект (PV).</li>
+<li>Генератор перетворює механічну енергію на електричну за рахунок електромагнітної індукції; PV-модуль перетворює світло на DC.</li>
+</ul>
+
+<h3>9. Елементи та батареї</h3>
+<ul>
+<li>Послідовне з'єднання однакових елементів: напруги додаються; ємність у Ah для однакових елементів залишається приблизно такою самою.</li>
+<li>Паралельне з'єднання однакових сумісних елементів: напруга залишається такою самою; ємності в Ah додаються.</li>
+<li>Для практичного з'єднання батарей дотримуйся вимог виробника щодо типу, стану заряду, захисту та дозволеного способу з'єднання.</li>
+</ul>
+
+<h3>10. Вимірювання</h3>
+<table><thead><tr><th>Прилад / режим</th><th>Підключення</th><th>Важливо</th></tr></thead><tbody>
+<tr><td>Амперметр</td><td>Послідовно</td><td>Має дуже малий внутрішній опір</td></tr>
+<tr><td>Вольтметр</td><td>Паралельно</td><td>Має дуже великий внутрішній опір</td></tr>
+<tr><td>Омметр</td><td>До знеструмленого кола</td><td>Перед вимірюванням ізолюй елемент від паралельних шляхів, коли це потрібно</td></tr>
+<tr><td>Кліщовий амперметр</td><td>Навколо одного провідника</td><td>Для вимірювання струму охоплюй один провідник, а не весь кабель із фазою та нейтраллю разом</td></tr>
+</tbody></table>
+<p><strong>Примітка:</strong> перед вимірюванням перевіряй режим, гнізда щупів, категорію приладу та безпечну процедуру роботи.</p>
+
+<h3>11. Корисні позначення</h3>
+<ul>
+<li>DC — постійний струм; AC — змінний струм; EMF / E — електрорушійна сила (ЕРС).</li>
+<li>ρ — питомий опір; L — довжина провідника; A — площа поперечного перерізу.</li>
+<li>Індекси t або T часто означають загальне значення; 1, 2, 3 — окремі елементи або гілки.</li>
+</ul>
+<p><em>Охоплення: базові електричні величини, резистивні DC-кола, потужність та енергія, джерела ЕРС і вимірювання. Це стислий довідник, а не заміна навчальних матеріалів або вимог CEC.</em></p>
+</div>`,
+            '2nd period': `<div>
+<h3>1. Основи змінного струму (AC)</h3>
+<ul>
+<li>Синусоїдальний сигнал періодично змінює миттєве значення та напрям.</li>
+<li><strong>Період:</strong> T — час одного циклу, секунди (s).</li>
+<li><strong>Частота:</strong> f = 1/T, герци (Hz). Для електромережі Канади — номінально 60 Hz.</li>
+<li><strong>Кутова частота:</strong> ω = 2πf, рад/с.</li>
+<li>Для 60 Hz: T = 1/60 s ≈ 16.67 ms.</li>
+</ul>
+<blockquote><strong>Синусоїда:</strong> v(t) = Vₚ × sin(ωt + φ)</blockquote>
+
+<h3>2. Peak, Peak-to-Peak та RMS</h3>
+<blockquote><strong>Для чистої синусоїди:</strong> Vᵣₘₛ = Vₚ / √2 ≈ 0.707 × Vₚ</blockquote>
+<blockquote>Vₚ = √2 × Vᵣₘₛ ≈ 1.414 × Vᵣₘₛ &nbsp; | &nbsp; Vₚ₋ₚ = 2 × Vₚ</blockquote>
+<ul>
+<li>RMS — ефективне значення; саме його зазвичай показує AC-вольтметр для синусоїдальної напруги.</li>
+<li>Пікове значення — найбільше миттєве значення від нуля.</li>
+<li>Формула 0.707 застосовується до чистої синусоїди, не до будь-якої довільної форми хвилі.</li>
+</ul>
+
+<h3>3. Індуктивність (L)</h3>
+<ul>
+<li>Індуктор зберігає енергію в магнітному полі та протидіє зміні струму.</li>
+<li>Для ідеального індуктора струм відстає від напруги на 90°.</li>
+<li>Індуктивний опір (реактивність): <strong>Xₗ = 2πfL</strong>.</li>
+<li>Зі збільшенням частоти або індуктивності Xₗ збільшується.</li>
+<li>Енергія магнітного поля: E = ½ × L × I².</li>
+</ul>
+
+<h3>4. Ємність (C)</h3>
+<ul>
+<li>Конденсатор зберігає енергію в електричному полі та протидіє зміні напруги на ньому.</li>
+<li>Для ідеального конденсатора струм випереджає напругу на 90°.</li>
+<li>Ємнісний опір (реактивність): <strong>X꜀ = 1 / (2πfC)</strong>.</li>
+<li>Зі збільшенням частоти або ємності X꜀ зменшується.</li>
+<li>Заряд: Q = C × V. Енергія поля: E = ½ × C × V².</li>
+</ul>
+
+<h3>5. Порівняння R, L та C</h3>
+<table><thead><tr><th>Елемент</th><th>Що протидіє</th><th>Фазове співвідношення (ідеальний елемент)</th><th>Одиниця</th></tr></thead><tbody>
+<tr><td>Резистор R</td><td>Струму</td><td>V та I в одній фазі</td><td>Ω</td></tr>
+<tr><td>Індуктор L</td><td>Зміні струму</td><td>Струм відстає від напруги на 90°</td><td>H; Xₗ у Ω</td></tr>
+<tr><td>Конденсатор C</td><td>Зміні напруги</td><td>Струм випереджає напругу на 90°</td><td>F; X꜀ у Ω</td></tr>
+</tbody></table>
+
+<h3>6. Послідовне RLC-коло</h3>
+<ul>
+<li>У послідовному колі струм через R, L та C однаковий.</li>
+<li>Чиста реактивність: <strong>X = Xₗ − X꜀</strong>. Позитивне X означає індуктивний характер; негативне X — ємнісний.</li>
+<li>Повний опір (імпеданс) послідовного RLC: <strong>Z = √(R² + X²)</strong>.</li>
+<li>Струм: I = V / Z. Фазовий кут: tan φ = X / R.</li>
+<li>Напруги на R, L та C додаються як вектори (фазори), а не завжди арифметично.</li>
+</ul>
+
+<h3>7. Резонанс</h3>
+<blockquote><strong>Резонансна частота ідеального RLC:</strong> f₀ = 1 / (2π√(LC))</blockquote>
+<ul>
+<li>У точці резонансу Xₗ = X꜀, тому реактивні складові компенсуються.</li>
+<li>У послідовному ідеальному RLC повний опір стає мінімальним (дорівнює R), а струм — максимальним.</li>
+<li>У паралельному RLC поведінка загального опору та струму джерела відрізняється від послідовного кола; не перенось висновки для series на parallel автоматично.</li>
+</ul>
+
+<h3>8. AC Power Relationships · однофазне коло</h3>
+<table><thead><tr><th>Тип потужності</th><th>Формула</th><th>Одиниця</th></tr></thead><tbody>
+<tr><td>Активна (Real)</td><td>P = Vᵣₘₛ × Iᵣₘₛ × cos φ</td><td>W</td></tr>
+<tr><td>Реактивна (Reactive)</td><td>Q = Vᵣₘₛ × Iᵣₘₛ × sin φ</td><td>var</td></tr>
+<tr><td>Повна (Apparent)</td><td>S = Vᵣₘₛ × Iᵣₘₛ</td><td>VA</td></tr>
+</tbody></table>
+<blockquote><strong>Power triangle:</strong> S² = P² + Q² &nbsp; | &nbsp; PF = P/S = cos φ</blockquote>
+<ul>
+<li>Активна потужність P виконує корисну роботу або перетворюється на тепло.</li>
+<li>Реактивна потужність Q пов'язана з обміном енергією між джерелом та магнітними/електричними полями.</li>
+<li>Повна потужність S — добуток RMS-напруги на RMS-струм в однофазному колі.</li>
+<li>Індуктивне навантаження зазвичай має lagging power factor; ємнісне — leading power factor.</li>
+</ul>
+
+<h3>9. Корекція коефіцієнта потужності (Power Factor Correction)</h3>
+<ul>
+<li>Індуктивні навантаження (наприклад, двигуни) часто мають відстаючий коефіцієнт потужності.</li>
+<li>Паралельно підключений конденсатор може компенсувати частину індуктивної реактивної потужності.</li>
+<li>За тієї самої активної потужності та напруги покращення PF зменшує потрібні струм і повну потужність, які має забезпечити джерело.</li>
+<li>Для розрахунку компенсації: Q꜀ = P × (tan φ₁ − tan φ₂), де φ₁ — початковий кут, φ₂ — бажаний кут; одиниці мають бути узгоджені.</li>
+</ul>
+
+<h3>10. Однофазні двигуни — коротко</h3>
+<ul>
+<li>Однофазний AC-двигун не створює самостійно такого самого стартового обертового поля, як збалансована трифазна система; тому конструкції двигунів використовують спеціальні способи запуску.</li>
+<li>Для створення пускового зсуву можуть застосовуватися допоміжна обмотка та/або конденсатор — залежно від типу двигуна.</li>
+<li>Під час аналізу дивись на схему підключення, пусковий пристрій, конденсатори, вимикач/реле та дані на шильдику конкретного двигуна.</li>
+</ul>
+
+<h3>11. Швидка перевірка одиниць</h3>
+<ul>
+<li>f — Hz; T — s; ω — rad/s; φ — градуси або радіани.</li>
+<li>L — henry (H); C — farad (F); Xₗ, X꜀ та Z — ohms (Ω).</li>
+<li>P — watts (W); Q — vars; S — volt-amperes (VA); PF — безрозмірний коефіцієнт.</li>
+<li>Формули RMS, power та impedance використовують узгоджені RMS-значення, якщо інше прямо не вказано.</li>
+</ul>
+<p><em>Охоплення: AC fundamentals, індуктивність і ємність, AC power, послідовні/паралельні RLC-кола, однофазні двигуни та корекція PF. Це стислий довідник, а не повний конспект усіх модулів.</em></p>
+</div>`,
+            '3rd period': `<div><h3>⚡ 3rd Period</h3><ul><li>Довідкові матеріали для цього періоду можна додати через режим редагування.</li></ul></div>`,
+            '4th period': `<div><h3>⚡ 4th Period</h3><ul><li>Довідкові матеріали для цього періоду можна додати через режим редагування.</li></ul></div>`
+        };
+
+        const legacyCheatSheetDefaults = {
             '1st period': `<div><h3>⚡ 1st Period Основи</h3><ul><li>Запиши сюди формули для першого року...</li></ul></div>`,
-            '2nd period': `<div><h3>⚡ AC (2nd Period)</h3><ul><li><b>V(RMS)</b> = V(Peak) × 0.707</li></ul></div>`,
-            '3rd period': `<div><h3>⚡ 3rd Period</h3><ul><li>Мотори та трансформатори (твої нотатки)...</li></ul></div>`,
-            '4th period': `<div><h3>⚡ 4th Period</h3><ul><li>Канадський електрокод та складні системи...</li></ul></div>`
+            '2nd period': `<div><h3>⚡ AC (2nd Period)</h3><ul><li><b>V(RMS)</b> = V(Peak) × 0.707</li></ul></div>`
         };
 
         let questions = JSON.parse(localStorage.getItem('quiz_questions'));
@@ -685,7 +1248,7 @@ button:active { transform: translateY(1px) scale(.99); }
         
         function escapeHtml(value) { return String(value ?? '').replace(/[&<>\"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch])); }
         function sanitizeRichHtml(html) {
-            const allowed = new Set(['DIV','H3','UL','OL','LI','B','STRONG','I','EM','U','P','BR','HR','BLOCKQUOTE']);
+            const allowed = new Set(['DIV','H3','H4','UL','OL','LI','B','STRONG','I','EM','U','P','BR','HR','BLOCKQUOTE','TABLE','THEAD','TBODY','TR','TH','TD','CODE','PRE','SUP','SUB']);
             const doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
             function clean(node) {
                 [...node.childNodes].forEach(child => {
@@ -698,7 +1261,11 @@ button:active { transform: translateY(1px) scale(.99); }
         }
 
         function loadCheatSheet() {
-            const saved = localStorage.getItem('quiz_cheatsheet_' + activePeriod);
+            let saved = localStorage.getItem('quiz_cheatsheet_' + activePeriod);
+            if (saved && legacyCheatSheetDefaults[activePeriod] && saved.trim() === legacyCheatSheetDefaults[activePeriod].trim()) {
+                localStorage.removeItem('quiz_cheatsheet_' + activePeriod);
+                saved = null;
+            }
             const content = saved || defaultCheatSheets[activePeriod] || defaultCheatSheets['2nd period'];
             document.getElementById('cheatSheetContent').innerHTML = sanitizeRichHtml(content);
             document.getElementById('cheatSheetPeriodLabel').innerText = activePeriod;
@@ -860,8 +1427,6 @@ button:active { transform: translateY(1px) scale(.99); }
             const yesterday = new Date(Date.now() - 86400000).toDateString();
             if (appStats.lastStudyDate && appStats.lastStudyDate !== today && appStats.lastStudyDate !== yesterday) { appStats.streak = 0; }
             document.getElementById('streakCount').innerText = appStats.streak; document.getElementById('totalTestsCompleted').innerText = appStats.totalQuizzes;
-            const hint = document.getElementById('streakHint');
-            if (appStats.streakUpdatedToday || appStats.lastStudyDate === today) { hint.innerText = "Ударний режим на сьогодні активовано! 🚀"; hint.classList.replace('text-gray-500', 'text-green-500'); } else { hint.innerText = `Відповів: ${appStats.questionsToday}/5 для підтримання вогню`; hint.classList.replace('text-green-500', 'text-gray-500'); }
             saveData();
         }
 
@@ -879,14 +1444,26 @@ button:active { transform: translateY(1px) scale(.99); }
         function toggleEditCheatSheet() { 
             const c = document.getElementById('cheatSheetContent'), b = document.getElementById('editCheatSheetBtn'), r = document.getElementById('resetCheatSheetBtn'), t = document.getElementById('cheatSheetToolbar'); 
             if (c.isContentEditable) { 
-                c.contentEditable = "false"; t.classList.add('hidden'); b.innerHTML = "✏️ Редагувати"; b.classList.replace('bg-green-600', 'bg-gray-700'); r.classList.add('hidden'); 
+                c.contentEditable = "false"; t.classList.add('hidden');
+                const hint = document.getElementById('cheatSheetEditorHint'); if (hint) hint.classList.add('hidden');
+                b.innerHTML = "✏️ Редагувати"; b.classList.replace('bg-green-600', 'bg-gray-700'); r.classList.add('hidden'); 
                 const cleanHtml = sanitizeRichHtml(c.innerHTML); c.innerHTML = cleanHtml; 
                 localStorage.setItem('quiz_cheatsheet_' + activePeriod, cleanHtml); 
             } else { 
-                c.contentEditable = "true"; t.classList.remove('hidden'); b.innerHTML = "💾 Зберегти"; b.classList.replace('bg-gray-700', 'bg-green-600'); r.classList.remove('hidden'); c.focus(); 
+                c.contentEditable = "true"; t.classList.remove('hidden');
+                const hint = document.getElementById('cheatSheetEditorHint'); if (hint) hint.classList.remove('hidden');
+                b.innerHTML = "💾 Зберегти"; b.classList.replace('bg-gray-700', 'bg-green-600'); r.classList.remove('hidden'); c.focus(); 
             } 
         }
         function formatText(cmd, val = null) { document.execCommand(cmd, false, val); document.getElementById('cheatSheetContent').focus(); }
+        function insertCheatSheetFormula() {
+            const c = document.getElementById('cheatSheetContent'); c.focus();
+            document.execCommand('insertHTML', false, '<blockquote><strong>Формула:</strong> [введи формулу] — [пояснення позначень]</blockquote><p><br></p>');
+        }
+        function insertCheatSheetTable() {
+            const c = document.getElementById('cheatSheetContent'); c.focus();
+            document.execCommand('insertHTML', false, '<table><thead><tr><th>Позначення</th><th>Значення</th><th>Одиниця</th></tr></thead><tbody><tr><td>[символ]</td><td>[опис]</td><td>[одиниця]</td></tr><tr><td>[символ]</td><td>[опис]</td><td>[одиниця]</td></tr></tbody></table><p><br></p>');
+        }
         function resetCheatSheet() { 
             if(confirm(`Повернути стандартний довідник для ${activePeriod}? Всі ваші особисті записи в цьому періоді будуть видалені.`)) { 
                 const def = defaultCheatSheets[activePeriod] || defaultCheatSheets['2nd period'];
@@ -1472,7 +2049,7 @@ button:active { transform: translateY(1px) scale(.99); }
                 allCheatSheets[p] = localStorage.getItem('quiz_cheatsheet_' + p) || defaultCheatSheets[p];
             });
             const dataToSave = { questions: questions, cheatSheets: allCheatSheets, quizStats: quizStats, mistakeIds: mistakeIds, favoriteIds: favoriteIds, srsStats: srsStats, examHistory: examHistory, appStats: appStats };
-            const dl = document.createElement('a'); dl.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToSave))); dl.setAttribute("download", "sait_quiz_FULL_backup.json"); dl.click(); 
+            const dl = document.createElement('a'); dl.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToSave))); dl.setAttribute("download", "electrician_quiz_FULL_backup.json"); dl.click(); 
         }
 
         const VALID_PERIODS = ['1st period', '2nd period', '3rd period', '4th period'];
@@ -1753,9 +2330,33 @@ button:active { transform: translateY(1px) scale(.99); }
         }
 
         function showScreen(screenId) {
-            ['homeScreen', 'statsScreen', 'editorScreen', 'quizScreen', 'flashcardScreen', 'resultScreen', 'navButtons'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            document.getElementById(screenId).classList.remove('hidden');
-            if(screenId === 'homeScreen') { document.getElementById('navButtons').classList.remove('hidden'); selectedCategories.clear(); renderCategories(); checkDailyProgress(); } 
+            const screenIds = ['homeScreen', 'statsScreen', 'editorScreen', 'quizScreen', 'flashcardScreen', 'resultScreen'];
+            screenIds.forEach(id => document.getElementById(id).classList.add('hidden'));
+            const target = document.getElementById(screenId);
+            if (!target) return;
+            target.classList.remove('hidden');
+
+            const shell = document.querySelector('.app-shell');
+            if (shell) shell.classList.toggle('is-immersive', ['quizScreen', 'flashcardScreen', 'resultScreen'].includes(screenId));
+            document.querySelectorAll('#navButtons [data-screen-target]').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-screen-target') === screenId);
+            });
+
+            const pageMeta = {
+                homeScreen: ['Навчальна панель', 'Питання, модулі, довідник та результати.'],
+                statsScreen: ['Аналітика', 'Результати відповідей і статистика за модулями.'],
+                editorScreen: ['Редактор бази питань', 'Додавання, редагування, імпорт та резервні копії.'],
+                quizScreen: ['Тестування', 'Поточне питання та варіанти відповіді.'],
+                flashcardScreen: ['Флеш-картки', 'Запитання, відповідь і статистика повторення.'],
+                resultScreen: ['Підсумок сесії', 'Результат тестування та перелік помилок.']
+            };
+            const meta = pageMeta[screenId] || pageMeta.homeScreen;
+            const heading = document.getElementById('pageHeading');
+            const subheading = document.getElementById('pageSubheading');
+            if (heading) heading.textContent = meta[0];
+            if (subheading) subheading.textContent = meta[1];
+
+            if (screenId === 'homeScreen') { selectedCategories.clear(); renderCategories(); checkDailyProgress(); }
             else if (screenId === 'editorScreen') { updateEditorList(); checkAdminMode(); }
             else if (screenId === 'statsScreen') { renderStatsScreen(); }
         }
