@@ -769,7 +769,16 @@ button:active { transform: translateY(1px) scale(.99); }
 </div>
 </div>
 </div>
-<div class="app-shell-container"><div class="app-shell"><aside aria-label="Основна навігація" class="app-sidebar"><div class="sidebar-brand"><div aria-hidden="true" class="brand-mark">⚡</div><div class="brand-copy"><h1 class="brand-title" id="mainAppTitle" onclick="handleAdminTrigger()">Electrician Hub</h1><span class="brand-subtitle">ELECTRICIAN STUDY HUB</span></div></div><p class="sidebar-section-label">НАВІГАЦІЯ</p><div class="app-nav" id="navButtons"><button class="app-nav-btn" data-screen-target="homeScreen" onclick="showScreen('homeScreen')" type="button"><span aria-hidden="true" class="nav-icon">⌂</span><span class="nav-label">Огляд</span></button><button class="app-nav-btn" data-screen-target="statsScreen" onclick="showScreen('statsScreen')" type="button"><span aria-hidden="true" class="nav-icon">▥</span><span class="nav-label">Аналітика</span></button><button class="app-nav-btn" onclick="toggleCheatSheet()" type="button"><span aria-hidden="true" class="nav-icon">▤</span><span class="nav-label">Довідник</span></button><button class="app-nav-btn" data-screen-target="editorScreen" onclick="showScreen('editorScreen')" type="button"><span aria-hidden="true" class="nav-icon">✎</span><span class="nav-label">Редактор</span></button></div><div class="sidebar-spacer"></div><div class="sidebar-note"><span class="sidebar-note-icon">⚡</span><div><strong>ЕЛЕКТРИЧНА ТЕОРІЯ</strong><span>DC · AC · RLC · Controls</span></div></div></aside><main class="app-main" id="appMain"><header class="app-topbar"><div class="page-heading-group"><p class="page-eyebrow">ELECTRICIAN · THEORY & PRACTICE</p><h1 id="pageHeading">Навчальна панель</h1><p id="pageSubheading">Питання, модулі, довідник та результати.</p></div><div class="topbar-meta"><span class="status-pill"><span class="status-dot"></span><span>Робоча область</span></span><span class="build-stamp">VERSION 3</span></div></header><div class="app-content" id="appContent"><div class="home-dashboard" id="homeScreen"><section class="welcome-card"><div class="welcome-copy"><span class="welcome-kicker">ELECTRICIAN · STUDY WORKSPACE</span><h2>Питання, модулі та довідник</h2><p>Матеріали з електричної теорії, електричних кіл і систем керування.</p></div><div aria-hidden="true" class="welcome-art"><div class="welcome-art-icon">⚡</div><span>DC · AC · RLC · CONTROLS</span></div></section><div class="home-stats" id="homeStats">
+<div class="app-shell-container"><div class="app-shell"><aside aria-label="Основна навігація" class="app-sidebar"><div class="sidebar-brand"><div aria-hidden="true" class="brand-mark">⚡</div><div class="brand-copy"><h1 class="brand-title" id="mainAppTitle" onclick="handleAdminTrigger()">Electrician Hub</h1><span class="brand-subtitle">ELECTRICIAN STUDY HUB</span></div></div><p class="sidebar-section-label">НАВІГАЦІЯ</p><div class="app-nav" id="navButtons"><button class="app-nav-btn" data-screen-target="homeScreen" onclick="showScreen('homeScreen')" type="button"><span aria-hidden="true" class="nav-icon">⌂</span><span class="nav-label">Огляд</span></button><button class="app-nav-btn" data-screen-target="statsScreen" onclick="showScreen('statsScreen')" type="button"><span aria-hidden="true" class="nav-icon">▥</span><span class="nav-label">Аналітика</span></button><button class="app-nav-btn" onclick="toggleCheatSheet()" type="button"><span aria-hidden="true" class="nav-icon">▤</span><span class="nav-label">Довідник</span></button><button class="app-nav-btn" data-screen-target="editorScreen" onclick="showScreen('editorScreen')" type="button"><span aria-hidden="true" class="nav-icon">✎</span><span class="nav-label">Редактор</span></button></div><div class="sidebar-spacer"></div><div class="sidebar-note"><span class="sidebar-note-icon">⚡</span><div><strong>ЕЛЕКТРИЧНА ТЕОРІЯ</strong><span>DC · AC · RLC · Controls</span></div></div></aside><main class="app-main" id="appMain"><header class="app-topbar"><div class="page-heading-group"><p class="page-eyebrow">ELECTRICIAN · THEORY & PRACTICE</p><h1 id="pageHeading">Навчальна панель</h1><p id="pageSubheading">Питання, модулі, довідник та результати.</p></div><div class="topbar-meta">
+    <button class="status-pill" id="soundToggleBtn" onclick="toggleSound()" title="Увімкнути/Вимкнути звук"><span id="soundIcon">🔊</span> <span>Звук</span></button>
+    
+    <!-- КНОПКА СИНХРОНІЗАЦІЇ -->
+    <button class="status-pill" id="syncToggleBtn" onclick="toggleAutoSync()" title="Авто-оновлення бази питань">
+        <span id="syncIcon">☁️</span> <span id="syncText">Синхр: УВІМК</span>
+    </button>
+    
+    <span class="build-stamp">VERSION 4</span>
+</div></header><div class="app-content" id="appContent"><div class="home-dashboard" id="homeScreen"><section class="welcome-card"><div class="welcome-copy"><span class="welcome-kicker">ELECTRICIAN · STUDY WORKSPACE</span><h2>Питання, модулі та довідник</h2><p>Матеріали з електричної теорії, електричних кіл і систем керування.</p></div><div aria-hidden="true" class="welcome-art"><div class="welcome-art-icon">⚡</div><span>DC · AC · RLC · CONTROLS</span></div></section><div class="home-stats" id="homeStats">
 <div class="metric-card metric-streak">
 <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Поточна серія</p>
 <p class="text-xl md:text-2xl font-bold text-orange-500">🔥 <span id="streakCount">0</span> днів</p>
@@ -1337,7 +1346,38 @@ button:active { transform: translateY(1px) scale(.99); }
         }
         function logoutAdmin() { adminSettings = { token: '', gistId: '' }; localStorage.removeItem('quiz_admin_settings'); checkAdminMode(); }
 
-        async function autoSyncOnLoad() { if (!PUBLIC_GIST_ID || PUBLIC_GIST_ID === '') return; if (adminSettings && adminSettings.token) return; await performCloudSync(PUBLIC_GIST_ID); }
+       // --- КЕРУВАННЯ АВТО-ОНОВЛЕННЯМ ---
+let autoSyncEnabled = localStorage.getItem('quiz_auto_sync') !== 'off';
+
+function initSyncUI() {
+    const icon = document.getElementById('syncIcon');
+    const text = document.getElementById('syncText');
+    const btn = document.getElementById('syncToggleBtn');
+    if (!icon || !text || !btn) return;
+    
+    if (autoSyncEnabled) {
+        icon.innerText = '☁️'; text.innerText = 'Синхр: УВІМК'; btn.style.color = '#72b7ff';
+    } else {
+        icon.innerText = '🚫'; text.innerText = 'Синхр: ВИМК'; btn.style.color = '#9caec5';
+    }
+}
+
+function toggleAutoSync() {
+    autoSyncEnabled = !autoSyncEnabled;
+    localStorage.setItem('quiz_auto_sync', autoSyncEnabled ? 'on' : 'off');
+    initSyncUI();
+    if (autoSyncEnabled) {
+        document.getElementById('syncText').innerText = 'Завантаження...';
+        autoSyncOnLoad().then(() => initSyncUI());
+    }
+}
+
+async function autoSyncOnLoad() { 
+    if (!autoSyncEnabled) return; // 🛑 Якщо вимкнено — ігноруємо хмару
+    if (!PUBLIC_GIST_ID || PUBLIC_GIST_ID === '') return; 
+    if (adminSettings && adminSettings.token) return; 
+    await performCloudSync(PUBLIC_GIST_ID); 
+}
         async function forceSyncWithCloud() { if (!adminSettings.gistId) { alert("Спершу налаштуй Gist ID!"); return; } if (confirm("⬇️ Завантажити базу з хмари?\n\n⚠️ УВАГА: Ваші неопубліковані локальні питання або зміни тексту можуть бути затерті хмарною версією!")) { const btn = document.getElementById('forceSyncBtn'); btn.innerText = "⏳..."; let ok = await performCloudSync(adminSettings.gistId); btn.innerText = "⬇️ Завантажити з бази"; if (ok) alert("✅ Базу успішно оновлено з хмари!"); } }
 
         async function performCloudSync(targetGistId) {
@@ -2369,7 +2409,7 @@ button:active { transform: translateY(1px) scale(.99); }
         fcCardElement.addEventListener('touchend', e => { if (document.getElementById('fcAnswerBox').classList.contains('hidden')) return; touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, { passive: true });
         function handleSwipe() { const deltaX = touchEndX - touchStartX; const swipeThreshold = 60; if (deltaX < -swipeThreshold) { recordFlashcard(false, { stopPropagation: () => {} }); } else if (deltaX > swipeThreshold) { recordFlashcard(true, { stopPropagation: () => {} }); } }
 
-        saveData(); checkDailyProgress(); checkAdminMode(); updatePeriodTabsUI(); showScreen('homeScreen'); loadCheatSheet(); autoSyncOnLoad();
+        saveData(); checkDailyProgress(); checkAdminMode(); updatePeriodTabsUI(); showScreen('homeScreen'); loadCheatSheet(); initSyncUI(); autoSyncOnLoad();
     </script>
 </body>
 </html>
