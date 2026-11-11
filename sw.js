@@ -5,9 +5,7 @@ const CACHE_NAME = 'sait-tests-v1';
 const URLS_TO_CACHE = [
   './',
   './index.html',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  './manifest.json'
 ];
 
 // Установка: кэшируем нужные файлы
