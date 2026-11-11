@@ -2,6 +2,9 @@
 
 <html lang="uk">
 <head>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#111827">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>Electrician Hub — Theory & Practice</title>
@@ -2806,4 +2809,17 @@ async function autoSyncOnLoad() {
         saveData(); checkDailyProgress(); checkAdminMode(); updatePeriodTabsUI(); showScreen('homeScreen'); loadCheatSheet(); initSoundUI(); initSyncUI(); autoSyncOnLoad();
     </script>
 </body>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((registration) => {
+          console.log('Service Worker успешно зарегистрирован. Область:', registration.scope);
+        })
+        .catch((error) => {
+          console.log('Ошибка регистрации Service Worker:', error);
+        });
+    });
+  }
+</script>
 </html>
