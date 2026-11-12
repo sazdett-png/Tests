@@ -949,6 +949,15 @@ button:active { transform: translateY(1px) scale(.99); }
   .home-shortcut-card { min-height: 96px; }
   .more-tools-grid { max-width: 900px; }
 }
+/* --- КАЛЬКУЛЯТОР SHARP EL-520XT --- */
+#calcModal > div { backdrop-filter: blur(10px); }
+.calc-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.calc-btn { background: #374151; border: 1px solid #4b5563; border-radius: 8px; color: #f3f4f6; font-size: 1rem; font-weight: 600; min-height: 48px; transition: transform 0.1s, background 0.1s; display: flex; align-items: center; justify-content: center; }
+.calc-btn:active { transform: scale(0.92); background: #4b5563; }
+.calc-btn.btn-orange { background: #ea580c; border-color: #c2410c; color: white; }
+.calc-btn.btn-dark { background: #1f2937; border-color: #111827; }
+.calc-btn.btn-blue { background: #2563eb; border-color: #1d4ed8; color: white; }
+.calc-screen { font-family: 'Courier New', monospace; letter-spacing: 1px; word-break: break-all; }
 
 </style>
 </head>
@@ -982,8 +991,12 @@ button:active { transform: translateY(1px) scale(.99); }
 </div>
 </div>
 <div class="app-shell-container"><div class="app-shell"><aside aria-label="Основна навігація" class="app-sidebar"><div class="sidebar-brand"><div aria-hidden="true" class="brand-mark">⚡</div><div class="brand-copy"><h1 class="brand-title" id="mainAppTitle" onclick="handleAdminTrigger()">Electrician Hub</h1><span class="brand-subtitle">ELECTRICIAN STUDY HUB</span></div></div><p class="sidebar-section-label">НАВІГАЦІЯ</p><div class="app-nav" id="navButtons"><button class="app-nav-btn" data-screen-target="homeScreen" onclick="showScreen('homeScreen')" type="button"><span aria-hidden="true" class="nav-icon">⌂</span><span class="nav-label">Огляд</span></button><button class="app-nav-btn" data-screen-target="learnScreen" onclick="showScreen('learnScreen')" type="button"><span aria-hidden="true" class="nav-icon">▦</span><span class="nav-label">Практика</span></button><button class="app-nav-btn" data-screen-target="statsScreen" onclick="showScreen('statsScreen')" type="button"><span aria-hidden="true" class="nav-icon">▥</span><span class="nav-label">Аналітика</span></button><button class="app-nav-btn" onclick="toggleCheatSheet()" type="button"><span aria-hidden="true" class="nav-icon">▤</span><span class="nav-label">Довідник</span></button><button class="app-nav-btn" data-screen-target="editorScreen" onclick="showScreen('editorScreen')" type="button"><span aria-hidden="true" class="nav-icon">✎</span><span class="nav-label">Редактор</span></button></div><div class="sidebar-spacer"></div><div class="sidebar-note"><span class="sidebar-note-icon">⚡</span><div><strong>ЕЛЕКТРИЧНА ТЕОРІЯ</strong><span>DC · AC · RLC · Controls</span></div></div></aside><main class="app-main" id="appMain"><header class="app-topbar"><div class="page-heading-group"><p class="page-eyebrow" onclick="handleAdminTrigger()" title="Electrician Hub">⚡ ELECTRICIAN HUB</p><h1 id="pageHeading">Навчальна панель</h1><p id="pageSubheading">Питання, модулі, довідник та результати.</p></div><div class="topbar-meta">
-    <button class="status-pill reference-quick-btn" id="referenceQuickBtn" type="button" onclick="toggleCheatSheet()" title="Відкрити довідник з електричної теорії" aria-label="Відкрити довідник">
+    <button class="status-pill reference-quick-btn" id="referenceQuickBtn" type="button" onclick="toggleCheatSheet()" title="Відкрити довідник з електричної теорії" aria-label="Відкрити довідник"> 
         <span class="quick-ref-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 5.5A2.5 2.5 0 0 1 7 3h12.5v17H7a2.5 2.5 0 0 0-2.5 2z"/><path d="M4.5 5.5v16.5A2.5 2.5 0 0 1 7 19.5h12.5M8 7h7M8 10h7"/></svg></span><span>Довідник</span>
+    </button>
+    <!-- КНОПКА КАЛЬКУЛЯТОРА -->
+    <button class="status-pill reference-quick-btn" id="calcToggleBtn" type="button" onclick="toggleCalculator()" title="Відкрити калькулятор">
+        <span class="quick-ref-icon">🖩</span><span class="hidden md:inline">Кальк</span>
     </button>
     <button class="status-pill" id="soundToggleBtn" type="button" onclick="toggleSound()" title="Звук увімкнений — натисніть, щоб вимкнути" aria-label="Вимкнути звук" aria-pressed="true"><span id="soundIcon" aria-hidden="true">🔊</span> <span>Звук</span></button>
     <span class="build-stamp">VERSION 7.1</span>
@@ -1268,6 +1281,57 @@ button:active { transform: translateY(1px) scale(.99); }
 <button class="bg-gray-600 hover:bg-gray-500 text-white px-6 py-2 rounded font-bold ml-auto" onclick="toggleCheatSheet()">Закрити</button>
 </div>
 </div>
+</div>
+<!-- ВІКНО КАЛЬКУЛЯТОРА -->
+<div class="hidden fixed inset-0 bg-black/70 flex justify-center items-center z-[70] p-4" id="calcModal">
+    <div class="bg-gray-800 rounded-xl border border-gray-600 max-w-xs w-full shadow-2xl overflow-hidden">
+        <div class="flex justify-between items-center p-3 border-b border-gray-700 bg-gray-900">
+            <h2 class="text-xs font-bold text-gray-400 tracking-widest">SHARP EL-520XT <span class="text-yellow-500">AC</span></h2>
+            <button class="text-gray-400 hover:text-white text-2xl leading-none px-2" onclick="toggleCalculator()">×</button>
+        </div>
+        <div class="p-4 bg-[#111827]">
+            <div class="bg-[#9caec5] text-black text-right p-3 rounded-lg mb-5 shadow-inner h-20 flex flex-col justify-end relative">
+                <div class="text-xs text-gray-700 min-h-[16px] text-left w-full overflow-hidden absolute top-2 left-3 right-3" id="calcExpression"></div>
+                <div class="text-2xl font-bold calc-screen" id="calcDisplay">0</div>
+            </div>
+            <div class="calc-grid">
+                <!-- Ряд 1 -->
+                <button class="calc-btn btn-orange text-xs" onclick="calcToggle2ndF()" id="calc2ndF">2ndF</button>
+                <button class="calc-btn" onclick="calcPress('sin')">sin</button>
+                <button class="calc-btn" onclick="calcPress('cos')">cos</button>
+                <button class="calc-btn" onclick="calcPress('tan')">tan</button>
+                <button class="calc-btn btn-orange" onclick="calcClear()">C</button>
+                <!-- Ряд 2 -->
+                <button class="calc-btn" onclick="calcPress('sqr')">x²</button>
+                <button class="calc-btn" onclick="calcPress('sqrt')">√</button>
+                <button class="calc-btn" onclick="calcPress('(')">(</button>
+                <button class="calc-btn" onclick="calcPress(')')">)</button>
+                <button class="calc-btn btn-orange text-sm" onclick="calcDel()">DEL</button>
+                <!-- Ряд 3 -->
+                <button class="calc-btn btn-dark" onclick="calcPress('7')">7</button>
+                <button class="calc-btn btn-dark" onclick="calcPress('8')">8</button>
+                <button class="calc-btn btn-dark" onclick="calcPress('9')">9</button>
+                <button class="calc-btn" onclick="calcPress('÷')">÷</button>
+                <button class="calc-btn" onclick="calcPress('pi')">π</button>
+                <!-- Ряд 4 -->
+                <button class="calc-btn btn-dark" onclick="calcPress('4')">4</button>
+                <button class="calc-btn btn-dark" onclick="calcPress('5')">5</button>
+                <button class="calc-btn btn-dark" onclick="calcPress('6')">6</button>
+                <button class="calc-btn" onclick="calcPress('×')">×</button>
+                <button class="calc-btn" onclick="calcPress('inv')">x⁻¹</button>
+                <!-- Ряд 5 -->
+                <button class="calc-btn btn-dark" onclick="calcPress('1')">1</button>
+                <button class="calc-btn btn-dark" onclick="calcPress('2')">2</button>
+                <button class="calc-btn btn-dark" onclick="calcPress('3')">3</button>
+                <button class="calc-btn" onclick="calcPress('−')">−</button>
+                <button class="calc-btn btn-blue row-span-2 text-2xl" onclick="calcCalculate()">=</button>
+                <!-- Ряд 6 -->
+                <button class="calc-btn btn-dark col-span-2" onclick="calcPress('0')">0</button>
+                <button class="calc-btn btn-dark font-bold text-xl" onclick="calcPress('.')">.</button>
+                <button class="calc-btn" onclick="calcPress('+')">+</button>
+            </div>
+        </div>
+    </div>
 </div>
 <script>
         // BUILD: 2026.11.10-electrician-hub-v7 — mobile bottom navigation and compact learning dashboard.
@@ -2805,6 +2869,81 @@ async function autoSyncOnLoad() {
         fcCardElement.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
         fcCardElement.addEventListener('touchend', e => { if (document.getElementById('fcAnswerBox').classList.contains('hidden')) return; touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, { passive: true });
         function handleSwipe() { const deltaX = touchEndX - touchStartX; const swipeThreshold = 60; if (deltaX < -swipeThreshold) { recordFlashcard(false, { stopPropagation: () => {} }); } else if (deltaX > swipeThreshold) { recordFlashcard(true, { stopPropagation: () => {} }); } }
+        // --- КАЛЬКУЛЯТОР (Логіка Sharp EL-520XT) ---
+let calcIs2ndF = false;
+
+// Глобальні функції для безпечного підрахунку кутів у градусах
+window.calc_sin = (x) => Math.sin(x * Math.PI / 180);
+window.calc_cos = (x) => Math.cos(x * Math.PI / 180);
+window.calc_tan = (x) => Math.tan(x * Math.PI / 180);
+window.calc_asin = (x) => Math.asin(x) * 180 / Math.PI;
+window.calc_acos = (x) => Math.acos(x) * 180 / Math.PI;
+window.calc_atan = (x) => Math.atan(x) * 180 / Math.PI;
+window.calc_sqrt = (x) => Math.sqrt(x);
+
+function toggleCalculator() { document.getElementById('calcModal').classList.toggle('hidden'); }
+
+function calcToggle2ndF() {
+    calcIs2ndF = !calcIs2ndF;
+    document.getElementById('calc2ndF').style.opacity = calcIs2ndF ? '0.6' : '1';
+    const btns = document.querySelectorAll('.calc-grid button');
+    btns[1].innerText = calcIs2ndF ? 'sin⁻¹' : 'sin';
+    btns[2].innerText = calcIs2ndF ? 'cos⁻¹' : 'cos';
+    btns[3].innerText = calcIs2ndF ? 'tan⁻¹' : 'tan';
+}
+
+function calcPress(val) {
+    const d = document.getElementById('calcDisplay');
+    if (d.innerText === '0' || d.innerText === 'Помилка') d.innerText = '';
+    
+    if (val === 'sin' || val === 'cos' || val === 'tan') {
+        val = calcIs2ndF ? 'a' + val : val;
+        d.innerText += val + '(';
+        if (calcIs2ndF) calcToggle2ndF();
+    } else if (val === 'sqr') { d.innerText += '²';
+    } else if (val === 'sqrt') { d.innerText += '√(';
+    } else if (val === 'pi') { d.innerText += 'π';
+    } else if (val === 'inv') { d.innerText += '⁻¹';
+    } else { d.innerText += val; }
+}
+
+function calcClear() { document.getElementById('calcDisplay').innerText = '0'; document.getElementById('calcExpression').innerText = ''; }
+function calcDel() { let v = document.getElementById('calcDisplay').innerText; document.getElementById('calcDisplay').innerText = v.length > 1 ? v.slice(0, -1) : '0'; }
+
+function calcCalculate() {
+    let expr = document.getElementById('calcDisplay').innerText;
+    document.getElementById('calcExpression').innerText = expr + ' =';
+    
+    let jsExpr = expr
+        .replace(/×/g, '*')
+        .replace(/÷/g, '/')
+        .replace(/−/g, '-')
+        .replace(/π/g, 'Math.PI')
+        .replace(/²/g, '**2')
+        .replace(/⁻¹/g, '**-1')
+        .replace(/√\(/g, 'window.calc_sqrt(')
+        .replace(/sin\(/g, 'window.calc_sin(')
+        .replace(/cos\(/g, 'window.calc_cos(')
+        .replace(/tan\(/g, 'window.calc_tan(')
+        .replace(/asin\(/g, 'window.calc_asin(')
+        .replace(/acos\(/g, 'window.calc_acos(')
+        .replace(/atan\(/g, 'window.calc_atan(');
+        
+    // Автоматично закриваємо забуті дужки, щоб код не падав
+    let openBrackets = (jsExpr.match(/\(/g) || []).length;
+    let closeBrackets = (jsExpr.match(/\)/g) || []).length;
+    for(let i=0; i < openBrackets - closeBrackets; i++) jsExpr += ')';
+    
+    try {
+        let result = new Function('return ' + jsExpr)();
+        if (!isFinite(result) || isNaN(result)) throw 'err';
+        // Округлюємо до 4 знаків після коми
+        result = Math.round(result * 10000) / 10000;
+        document.getElementById('calcDisplay').innerText = result;
+    } catch (e) {
+        document.getElementById('calcDisplay').innerText = 'Помилка';
+    }
+}
 
         saveData(); checkDailyProgress(); checkAdminMode(); updatePeriodTabsUI(); showScreen('homeScreen'); loadCheatSheet(); initSoundUI(); initSyncUI(); autoSyncOnLoad();
     </script>
