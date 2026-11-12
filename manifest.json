@@ -3,8 +3,8 @@
   "short_name": "Elec Hub",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#111827",
-  "theme_color": "#111827",
+  "background_color": "#080f1d",
+  "theme_color": "#080f1d",
   "icons": [
     {
       "src": "https://i.imgur.com/3ii8kpj.png",
