@@ -1,6 +1,6 @@
 {
-  "name": "SAIT Тести",
-  "short_name": "Тести",
+  "name": "Electrician Hub",
+  "short_name": "Elec Hub",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#111827",
