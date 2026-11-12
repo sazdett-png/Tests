@@ -959,6 +959,68 @@ button:active { transform: translateY(1px) scale(.99); }
 .calc-btn.btn-blue { background: #2563eb; border-color: #1d4ed8; color: white; }
 .calc-screen { font-family: 'Courier New', monospace; letter-spacing: 1px; word-break: break-all; }
 
+
+/* V8 — resumable sessions and time-based analytics */
+.resume-session-panel { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:17px 20px; border:1px solid rgba(244,189,85,.28); border-radius:17px; background:linear-gradient(110deg,rgba(82,61,30,.30),rgba(20,34,55,.94)); box-shadow:0 12px 28px rgba(0,0,0,.16); }
+.resume-copy { display:flex; flex-direction:column; gap:5px; min-width:0; }
+.resume-kicker { color:#f0c777; font-size:.62rem; font-weight:850; letter-spacing:.14em; }
+.resume-copy strong { color:#f2f6ff; font-size:.95rem; }
+.resume-copy span:last-child { color:#9eafc5; font-size:.75rem; }
+.resume-actions { display:flex; align-items:center; gap:8px; flex:0 0 auto; }
+.resume-primary,.resume-discard { min-height:39px; padding:9px 13px; border-radius:10px; font-size:.75rem; font-weight:800; }
+.resume-primary { color:#1a2638; background:linear-gradient(135deg,#ffda8c,#e8aa40); }
+.resume-discard { color:#aebbd0; background:rgba(255,255,255,.05); border:1px solid var(--line-strong); }
+.stats-trends-panel { padding:21px; border:1px solid var(--line); border-radius:19px; background:rgba(16,29,48,.86); box-shadow:0 12px 28px rgba(0,0,0,.12); }
+.stats-trends-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:17px; }
+.stats-trends-heading h3 { margin:0; color:#edf3fd; font-size:1rem; font-weight:850; }
+.stats-trends-heading p { margin:4px 0 0; color:#8296b1; font-size:.72rem; }
+.stats-range-buttons { display:flex; gap:5px; padding:4px; border:1px solid var(--line); border-radius:10px; background:rgba(5,13,25,.4); }
+.stats-range-buttons button { padding:7px 10px; border-radius:7px; color:#93a5bd; font-size:.68rem; font-weight:800; }
+.stats-range-buttons button.active { color:#1b2636; background:linear-gradient(135deg,#ffda8c,#e8aa40); }
+.stats-metrics-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:17px; }
+.stats-metric { display:flex; flex-direction:column; gap:5px; min-width:0; padding:14px; border:1px solid var(--line); border-radius:13px; background:rgba(7,17,31,.55); }
+.stats-metric span { color:#8ea2bc; font-size:.66rem; font-weight:750; }
+.stats-metric strong { color:#f2f6ff; font-size:1.45rem; line-height:1.1; }
+.stats-metric small { color:#71849f; font-size:.62rem; }
+.stats-chart-panel,.stats-recent-modules { padding:15px; border:1px solid var(--line); border-radius:14px; background:rgba(7,17,31,.45); }
+.stats-chart-title { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+.stats-chart-title strong { color:#dce7f6; font-size:.82rem; }
+.stats-chart-title span { color:#71849f; font-size:.62rem; text-align:right; }
+.stats-daily-chart { display:grid; grid-template-columns:repeat(30,minmax(12px,1fr)); align-items:end; gap:5px; min-height:130px; overflow-x:auto; padding:8px 2px 0; }
+.stats-day-column { display:flex; min-width:12px; height:118px; flex-direction:column; justify-content:flex-end; align-items:center; gap:5px; }
+.stats-day-track { display:flex; align-items:flex-end; width:100%; height:94px; border-radius:5px 5px 2px 2px; background:rgba(148,163,184,.07); overflow:hidden; }
+.stats-day-bar { width:100%; min-height:0; border-radius:5px 5px 1px 1px; transition:height .25s ease; }
+.stats-day-label { color:#8296b1; font-size:.55rem; white-space:nowrap; }
+.stats-data-note { margin:12px 0 0; color:#71849f; font-size:.65rem; line-height:1.5; }
+.stats-weak-list { display:grid; gap:8px; }
+.stats-weak-item { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:7px 12px; padding:10px 0; border-bottom:1px solid var(--line); }
+.stats-weak-item:last-child { border-bottom:0; }
+.stats-weak-item strong { color:#dce7f6; font-size:.76rem; }
+.stats-weak-item span { color:#ff9b9f; font-size:.74rem; font-weight:850; }
+.stats-weak-item small { grid-column:1/-1; color:#8296b1; font-size:.63rem; }
+.stats-empty { padding:14px 4px; color:#71849f; font-size:.72rem; text-align:center; line-height:1.5; }
+.stats-session-list { display:grid; gap:8px; }
+.stats-session-row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); }
+.stats-session-row:last-child { border-bottom:0; }
+.stats-session-main { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.stats-session-main strong { color:#e2eaf5; font-size:.75rem; }
+.stats-session-main small { color:#8296b1; font-size:.62rem; }
+.stats-session-score { flex:0 0 auto; text-align:right; color:#8fe0b8; font-size:.82rem; font-weight:850; }
+.stats-session-score small { display:block; color:#8296b1; font-size:.6rem; font-weight:600; }
+@media(max-width:640px) {
+ .resume-session-panel { align-items:stretch; flex-direction:column; gap:12px; padding:14px; }
+ .resume-actions { width:100%; }
+ .resume-primary { flex:1; }
+ .stats-trends-panel { padding:14px; }
+ .stats-trends-heading { align-items:flex-start; flex-direction:column; }
+ .stats-metrics-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .stats-metric { padding:11px; }
+ .stats-metric strong { font-size:1.25rem; }
+ .stats-chart-title { align-items:flex-start; flex-direction:column; gap:4px; }
+ .stats-chart-title span { text-align:left; }
+ .stats-daily-chart { grid-template-columns:repeat(30,minmax(16px,1fr)); }
+}
+
 </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
@@ -999,8 +1061,8 @@ button:active { transform: translateY(1px) scale(.99); }
         <span class="quick-ref-icon">🖩</span><span class="hidden md:inline">Кальк</span>
     </button>
     <button class="status-pill" id="soundToggleBtn" type="button" onclick="toggleSound()" title="Звук увімкнений — натисніть, щоб вимкнути" aria-label="Вимкнути звук" aria-pressed="true"><span id="soundIcon" aria-hidden="true">🔊</span> <span>Звук</span></button>
-    <span class="build-stamp">VERSION 7.1</span>
-</div></header><div class="app-content" id="appContent"><div class="home-dashboard" id="homeScreen"><section class="welcome-card"><div class="welcome-copy"><span class="welcome-kicker">ELECTRICIAN · STUDY WORKSPACE</span><h2>Питання, модулі та довідник</h2><p>Матеріали з електричної теорії, електричних кіл і систем керування.</p></div><div aria-hidden="true" class="welcome-art"><div class="welcome-art-icon">⚡</div><span>DC · AC · RLC · CONTROLS</span></div></section><div class="home-stats" id="homeStats">
+    <span class="build-stamp">VERSION 8.0</span>
+</div></header><div class="app-content" id="appContent"><div class="home-dashboard" id="homeScreen"><section class="welcome-card"><div class="welcome-copy"><span class="welcome-kicker">ELECTRICIAN · STUDY WORKSPACE</span><h2>Питання, модулі та довідник</h2><p>Матеріали з електричної теорії, електричних кіл і систем керування.</p></div><div aria-hidden="true" class="welcome-art"><div class="welcome-art-icon">⚡</div><span>DC · AC · RLC · CONTROLS</span></div></section><section aria-live="polite" class="resume-session-panel hidden" id="resumeSessionPanel"></section><div class="home-stats" id="homeStats">
 <div class="metric-card metric-streak">
 <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Поточна серія</p>
 <p class="text-xl md:text-2xl font-bold text-orange-500">🔥 <span id="streakCount">0</span> днів</p>
@@ -1085,6 +1147,19 @@ button:active { transform: translateY(1px) scale(.99); }
 </div>
 </div>
 </div>
+<section class="stats-trends-panel" aria-labelledby="statsTrendsTitle">
+  <div class="stats-trends-heading"><div><h3 id="statsTrendsTitle">Динаміка навчання</h3><p>Історія відповідей із моменту встановлення цієї версії</p></div><div class="stats-range-buttons"><button type="button" data-days="7" onclick="setStatsRange(7)">7 днів</button><button type="button" data-days="30" onclick="setStatsRange(30)">30 днів</button></div></div>
+  <div class="stats-metrics-grid">
+    <div class="stats-metric"><span>Відповідей</span><strong id="statsRangeAnswers">0</strong><small id="statsRangeAnswersNote">за вибраний період</small></div>
+    <div class="stats-metric"><span>Точність</span><strong id="statsRangeAccuracy">—</strong><small id="statsRangeAccuracyNote">за вибраний період</small></div>
+    <div class="stats-metric"><span>Завершених сесій</span><strong id="statsRangeSessions">0</strong><small id="statsRangeSessionsNote">за вибраний період</small></div>
+    <div class="stats-metric"><span>Навчальних днів</span><strong id="statsRangeDaysActive">0</strong><small>із вибраного періоду</small></div>
+  </div>
+  <div class="stats-chart-panel"><div class="stats-chart-title"><strong>Відповіді по днях</strong><span>Висота — кількість відповідей · колір — точність</span></div><div class="stats-daily-chart" id="statsDailyChart"></div></div>
+  <div class="stats-recent-modules"><div class="stats-chart-title"><strong>Слабкі теми за період</strong><span>Мінімум 3 відповіді для рейтингу</span></div><div id="statsRecentModules"></div></div>
+  <p class="stats-data-note" id="statsDataNote">Загальні лічильники охоплюють старі дані. Графіки й хронологія почнуть накопичуватися з цієї версії.</p>
+</section>
+<section class="stats-trends-panel stats-session-history"><div class="stats-chart-title"><strong>Останні навчальні сесії</strong><span>Завершені тренування та іспити</span></div><div id="statsSessionHistory"></div></section>
 <!-- Детальний розбір модулів -->
 <div class="module-breakdown-panel" id="moduleBreakdownPanel">
 <h3 class="panel-title">Детальний розбір модулів</h3>
@@ -1334,7 +1409,7 @@ button:active { transform: translateY(1px) scale(.99); }
     </div>
 </div>
 <script>
-        // BUILD: 2026.11.10-electrician-hub-v7 — mobile bottom navigation and compact learning dashboard.
+        // BUILD: 2026.11.12-electrician-hub-v8 — detailed analytics and resumable sessions.
         const PUBLIC_GIST_ID = '5ee027de84d344fbe11d2a496246d8ea'; 
 
         const defaultQuestions = [{ id: "1", period: "2nd period", type: "choice", category: "AC Fundamentals", subCategory: "105A", text: "Яке значення показує мультиметр при вимірюванні AC?", options: ["RMS", "Peak", "Average", "Миттєве"], answerIndex: 0, explanation: "Завжди RMS." }];
@@ -1582,6 +1657,9 @@ button:active { transform: translateY(1px) scale(.99); }
         let deletedCloudIds = readStoredArray('quiz_deleted_cloud');
         let srsStats = readStoredObject('quiz_srs');
         let examHistory = readStoredArray('quiz_exam_history');
+        // Timestamped answer events and completed learning sessions power the detailed analytics.
+        let answerHistory = readStoredArray('quiz_answer_history').filter(item => item && Number.isFinite(item.ts) && typeof item.correct === 'boolean');
+        let learningSessions = readStoredArray('quiz_learning_sessions').filter(item => item && Number.isFinite(item.date));
         let adminSettings = readStoredObject('quiz_admin_settings', { token: '', gistId: '' });
         adminSettings = {
             token: typeof adminSettings.token === 'string' ? adminSettings.token : '',
@@ -1636,6 +1714,8 @@ button:active { transform: translateY(1px) scale(.99); }
         let currentQuizQuestions = [];
         let currentQIndex = 0, score = 0, userMistakes = [];
         let editingQuestionId = null, pendingQuestionSave = null, currentMode = 'quiz', examInterval = null, examTimeLeft = 0, examPassTarget = 70;
+        let currentAnswerState = null, currentDraftAnswer = '', currentSessionAnswers = [], sessionStartedAt = 0, examEndsAt = null, isRestoringSession = false;
+        let statsRangeDays = 30;
         let returnToQuizAfterEdit = false;
 
         function shuffle(array) { let arr = [...array]; for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
@@ -1648,7 +1728,104 @@ button:active { transform: translateY(1px) scale(.99); }
             localStorage.setItem('quiz_stats', JSON.stringify(quizStats)); 
             localStorage.setItem('quiz_srs', JSON.stringify(srsStats));
             localStorage.setItem('quiz_exam_history', JSON.stringify(examHistory));
+            localStorage.setItem('quiz_answer_history', JSON.stringify(answerHistory));
+            localStorage.setItem('quiz_learning_sessions', JSON.stringify(learningSessions));
             localStorage.setItem('app_stats', JSON.stringify(appStats));
+        }
+
+        const ACTIVE_SESSION_KEY = 'quiz_active_session';
+        function getSavedSession() {
+            const saved = readStoredJSON(ACTIVE_SESSION_KEY, null);
+            return saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : null;
+        }
+        function clearSavedSession() { localStorage.removeItem(ACTIVE_SESSION_KEY); renderResumeSessionCard(); }
+        function initializeTrackedSession(mode) {
+            currentMode = mode; currentQIndex = 0; score = 0; userMistakes = [];
+            currentAnswerState = null; currentDraftAnswer = ''; currentSessionAnswers = []; sessionStartedAt = Date.now(); examEndsAt = null; examTimeLeft = 0;
+            localStorage.removeItem(ACTIVE_SESSION_KEY);
+        }
+        function recordAnswerEvent(q, isCorrect, mode = currentMode) {
+            const event = { ts: Date.now(), period: q.period || activePeriod, questionId: String(q.id), category: q.category || 'Без категорії', subCategory: q.subCategory || 'Загальні', correct: !!isCorrect, mode };
+            answerHistory.push(event);
+            if (answerHistory.length > 6000) answerHistory = answerHistory.slice(-6000);
+            currentSessionAnswers.push({ questionId: event.questionId, category: event.category, subCategory: event.subCategory, correct: event.correct });
+        }
+        function persistActiveSession() {
+            if (!currentQuizQuestions.length || currentQIndex >= currentQuizQuestions.length || !sessionStartedAt) return;
+            const session = {
+                version: 1, mode: currentMode, period: activePeriod, questions: currentQuizQuestions.map(q => String(q.id)), currentQIndex, score,
+                userMistakes: userMistakes.map(m => ({ questionId: String(m.q.id), sel: m.sel })), currentAnswerState, currentDraftAnswer, currentSessionAnswers, startedAt: sessionStartedAt, savedAt: Date.now(),
+                examPassTarget, examEndsAt
+            };
+            try { localStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(session)); }
+            catch (error) { console.warn('Не вдалося зберегти поточну сесію.', error); }
+        }
+        function renderResumeSessionCard() {
+            const panel = document.getElementById('resumeSessionPanel');
+            if (!panel) return;
+            const saved = getSavedSession();
+            const valid = saved && Array.isArray(saved.questions) && saved.questions.length > 0 && Number.isInteger(saved.currentQIndex) && saved.currentQIndex >= 0 && saved.currentQIndex < saved.questions.length;
+            if (!valid) { panel.classList.add('hidden'); return; }
+            const modeNames = { quiz: 'Практика', exam: 'Симулятор іспиту', smart: 'Розумне тренування', retry: 'Робота над помилками', flashcards: 'Флеш-картки' };
+            const remaining = saved.questions.length - saved.currentQIndex;
+            const answered = Array.isArray(saved.currentSessionAnswers) ? saved.currentSessionAnswers.length : 0;
+            panel.innerHTML = `<div class="resume-copy"><span class="resume-kicker">НЕЗАВЕРШЕНА СЕСІЯ</span><strong>${escapeHtml(modeNames[saved.mode] || 'Тестування')} · ${escapeHtml(saved.period || '')}</strong><span>Питання ${saved.currentQIndex + 1} з ${saved.questions.length} · залишилося ${remaining} · відповідей у сесії ${answered}</span></div><div class="resume-actions"><button type="button" class="resume-primary" onclick="resumeSavedSession()">Продовжити →</button><button type="button" class="resume-discard" onclick="discardSavedSession()">Скинути</button></div>`;
+            panel.classList.remove('hidden');
+        }
+        function discardSavedSession() {
+            if (!confirm('Видалити збережену незавершену сесію? Уже записана статистика відповідей залишиться.')) return;
+            localStorage.removeItem(ACTIVE_SESSION_KEY); renderResumeSessionCard();
+        }
+        function resumeSavedSession() {
+            const saved = getSavedSession();
+            if (!saved || !Array.isArray(saved.questions) || !saved.questions.length || !Number.isInteger(saved.currentQIndex) || saved.currentQIndex < 0 || saved.currentQIndex >= saved.questions.length) {
+                alert('Не вдалося відновити сесію: збережені дані пошкоджені або неповні.');
+                localStorage.removeItem(ACTIVE_SESSION_KEY); renderResumeSessionCard(); return;
+            }
+            if (!['quiz','exam','smart','retry','flashcards'].includes(saved.mode)) { alert('Цей тип сесії більше не підтримується.'); return; }
+            clearInterval(examInterval);
+            currentMode = saved.mode; activePeriod = VALID_PERIODS.includes(saved.period) ? saved.period : activePeriod;
+            localStorage.setItem('quiz_active_period', activePeriod);
+            const questionById = new Map(questions.map(q => [String(q.id), q]));
+            const restoredQuestions = saved.questions.map(item => item && typeof item === 'object' ? item : questionById.get(String(item))).filter(Boolean);
+            if (restoredQuestions.length !== saved.questions.length) {
+                alert('Частина питань цієї сесії більше не знайдена в локальній базі. Щоб не відновлювати тест із пропусками, збережену сесію буде скинуто.');
+                localStorage.removeItem(ACTIVE_SESSION_KEY); renderResumeSessionCard(); return;
+            }
+            currentQuizQuestions = restoredQuestions; currentQIndex = saved.currentQIndex; score = Number(saved.score) || 0;
+            userMistakes = Array.isArray(saved.userMistakes) ? saved.userMistakes.map(m => ({ q: m.q || questionById.get(String(m.questionId)), sel: m.sel || '' })).filter(m => m.q) : [];
+            currentSessionAnswers = Array.isArray(saved.currentSessionAnswers) ? saved.currentSessionAnswers : [];
+            currentAnswerState = saved.currentAnswerState || null; currentDraftAnswer = typeof saved.currentDraftAnswer === 'string' ? saved.currentDraftAnswer : ''; sessionStartedAt = Number(saved.startedAt) || Date.now();
+            examPassTarget = Number(saved.examPassTarget) || 70; examEndsAt = Number(saved.examEndsAt) || null;
+            examTimeLeft = examEndsAt ? Math.max(0, Math.ceil((examEndsAt - Date.now()) / 1000)) : 0;
+            updatePeriodTabsUI();
+            document.getElementById('quizFeedback').classList.add('hidden');
+            if (currentMode === 'flashcards') { showScreen('flashcardScreen'); document.getElementById('examTimerDisplay').classList.add('hidden'); loadNextFlashcard(); }
+            else {
+                showScreen('quizScreen'); loadNextQuestion();
+                if (currentAnswerState && currentMode !== 'exam' && currentAnswerState.questionId === String(currentQuizQuestions[currentQIndex].id)) {
+                    const state = currentAnswerState; const q = currentQuizQuestions[currentQIndex];
+                    if (q.type === 'input') { const input = document.getElementById('quizInputText'); if (input) input.value = state.selectedText || ''; }
+                    const savedChoice = q.type === 'choice' ? Array.from(document.querySelectorAll('#quizOptions button')).find(button => button.innerText === String(state.selectedText || '')) : null;
+                    isRestoringSession = true;
+                    try { processAnswer(!!state.isCorrect, q, state.selectedText || '', savedChoice || null); } finally { isRestoringSession = false; }
+                }
+                if (currentMode === 'exam' && examEndsAt) {
+                    if (examTimeLeft <= 0) { alert('Час іспиту минув, поки застосунок був закритий. Показую результат.'); finishSession(); }
+                    else { document.getElementById('examTimerDisplay').classList.remove('hidden'); startExamCountdown(); }
+                } else document.getElementById('examTimerDisplay').classList.add('hidden');
+            }
+            persistActiveSession();
+        }
+        function startExamCountdown() {
+            clearInterval(examInterval);
+            if (!examEndsAt) return;
+            const tick = () => {
+                examTimeLeft = Math.max(0, Math.ceil((examEndsAt - Date.now()) / 1000)); updateExamTimerUI();
+                if (examTimeLeft <= 0) { clearInterval(examInterval); examInterval = null; alert('⏱️ Час вийшов!'); finishSession(); return; }
+                if (examTimeLeft % 5 === 0) persistActiveSession();
+            };
+            tick(); if (examTimeLeft > 0) examInterval = setInterval(tick, 1000);
         }
 
         // --- Вкладки Периодов ---
@@ -2017,6 +2194,59 @@ async function autoSyncOnLoad() {
             if (dueCount > 0) { badge.innerText = `${dueCount} на сьогодні`; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
         }
 
+        // --- ДОДАТКОВА АНАЛІТИКА V8 ---
+        function setStatsRange(days) {
+            statsRangeDays = days === 7 ? 7 : 30;
+            document.querySelectorAll('.stats-range-buttons button').forEach(button => button.classList.toggle('active', Number(button.dataset.days) === statsRangeDays));
+            renderExtendedAnalytics();
+        }
+        function formatDuration(seconds) {
+            const value = Math.max(0, Math.floor(Number(seconds) || 0));
+            const minutes = Math.floor(value / 60), remainder = value % 60;
+            return minutes ? `${minutes} хв ${remainder} с` : `${remainder} с`;
+        }
+        function renderExtendedAnalytics() {
+            const now = new Date(); const start = new Date(now); start.setHours(0,0,0,0); start.setDate(start.getDate() - statsRangeDays + 1);
+            const periodEvents = answerHistory.filter(item => item.period === activePeriod && item.ts >= start.getTime() && item.ts <= now.getTime());
+            const periodSessions = learningSessions.filter(item => item.period === activePeriod && item.date >= start.getTime() && item.date <= now.getTime());
+            const correct = periodEvents.filter(item => item.correct).length;
+            const accuracy = periodEvents.length ? Math.round(correct / periodEvents.length * 100) : null;
+            const activeDays = new Set(periodEvents.map(item => new Date(item.ts).toDateString())).size;
+            document.getElementById('statsRangeAnswers').textContent = periodEvents.length;
+            document.getElementById('statsRangeAccuracy').textContent = accuracy === null ? '—' : accuracy + '%';
+            document.getElementById('statsRangeSessions').textContent = periodSessions.length;
+            document.getElementById('statsRangeDaysActive').textContent = activeDays;
+            document.getElementById('statsRangeAnswersNote').textContent = `за ${statsRangeDays} дн.`;
+            document.getElementById('statsRangeAccuracyNote').textContent = accuracy === null ? 'ще немає нових відповідей' : `${correct} правильних із ${periodEvents.length}`;
+            document.getElementById('statsRangeSessionsNote').textContent = periodSessions.length ? `середня тривалість ${formatDuration(periodSessions.reduce((sum,item)=>sum+(Number(item.durationSeconds)||0),0)/periodSessions.length)}` : 'завершені сесії';
+            document.querySelectorAll('.stats-range-buttons button').forEach(button => button.classList.toggle('active', Number(button.dataset.days) === statsRangeDays));
+
+            const dayMap = new Map();
+            periodEvents.forEach(item => { const d = new Date(item.ts); const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; if (!dayMap.has(key)) dayMap.set(key,{total:0,correct:0}); const row=dayMap.get(key); row.total++; if(item.correct) row.correct++; });
+            const days = []; const cursor = new Date(start);
+            for (let i=0; i<statsRangeDays; i++) { const d = new Date(cursor); const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; days.push({date:d,key,...(dayMap.get(key)||{total:0,correct:0})}); cursor.setDate(cursor.getDate()+1); }
+            const maxCount = Math.max(1, ...days.map(day => day.total));
+            const dailyChart = document.getElementById('statsDailyChart');
+            dailyChart.style.gridTemplateColumns = `repeat(${statsRangeDays}, minmax(${statsRangeDays === 7 ? '0' : '12px'}, 1fr))`;
+            dailyChart.innerHTML = days.map(day => {
+                const height = day.total ? Math.max(5, Math.round(day.total / maxCount * 94)) : 0;
+                const pct = day.total ? Math.round(day.correct / day.total * 100) : 0;
+                const color = !day.total ? 'transparent' : pct >= 80 ? '#36c98b' : pct >= 60 ? '#e6b34d' : '#f07882';
+                const label = day.date.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'});
+                const title = `${day.date.toLocaleDateString('uk-UA')} · ${day.total} відповідей · точність ${day.total ? pct+'%' : '—'}`;
+                return `<div class="stats-day-column" title="${escapeHtml(title)}"><div class="stats-day-track"><div class="stats-day-bar" style="height:${height}px;background:${color}"></div></div><span class="stats-day-label">${label}</span></div>`;
+            }).join('');
+
+            const modules = {};
+            periodEvents.forEach(item => { const key = `${item.category || 'Без категорії'}|||${item.subCategory || 'Загальні'}`; if(!modules[key]) modules[key]={category:item.category||'Без категорії',subCategory:item.subCategory||'Загальні',total:0,correct:0}; modules[key].total++; if(item.correct) modules[key].correct++; });
+            const weak = Object.values(modules).filter(item=>item.total>=3).sort((a,b)=>(a.correct/a.total)-(b.correct/b.total)).slice(0,4);
+            document.getElementById('statsRecentModules').innerHTML = weak.length ? `<div class="stats-weak-list">${weak.map(item=>{const pct=Math.round(item.correct/item.total*100);return `<div class="stats-weak-item"><strong>${escapeHtml(item.category)} → ${escapeHtml(item.subCategory)}</strong><span>${pct}%</span><small>${item.correct} правильно · ${item.total-item.correct} помилок · ${item.total} відповідей</small></div>`;}).join('')}</div>` : '<div class="stats-empty">Поки недостатньо нових відповідей у модулях. Для рейтингу тем потрібно хоча б 3 відповіді на модуль.</div>';
+
+            const latestSessions = [...periodSessions].sort((a,b)=>b.date-a.date).slice(0,8);
+            const modeLabels = {quiz:'Практика',exam:'Іспит',smart:'Розумне тренування',retry:'Робота над помилками',flashcards:'Флеш-картки'};
+            document.getElementById('statsSessionHistory').innerHTML = latestSessions.length ? `<div class="stats-session-list">${latestSessions.map(item=>{const date=new Date(item.date).toLocaleString('uk-UA',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});const total=Number(item.total)||0, score=Number(item.score)||0, pct=Number(item.perc)||0;return `<div class="stats-session-row"><div class="stats-session-main"><strong>${escapeHtml(modeLabels[item.mode]||'Сесія')} · ${escapeHtml(date)}</strong><small>${score}/${total} правильно · ${formatDuration(item.durationSeconds||0)}${item.mode==='exam' && item.targetPass ? ` · прохідний ${item.targetPass}%` : ''}</small></div><div class="stats-session-score">${pct}%<small>${pct>=80?'Сильно':pct>=60?'Непогано':'Потрібно повторити'}</small></div></div>`;}).join('')}</div>` : '<div class="stats-empty">Історія завершених сесій почне збиратися з цього оновлення. Попередні загальні лічильники нікуди не зникли.</div>';
+        }
+
         // --- ЕКРАН АНАЛІТИКИ: статистика за категоріями та конкретними модулями ---
         function renderStatsScreen() {
             document.getElementById('statsPeriodLabel').innerText = activePeriod;
@@ -2144,6 +2374,7 @@ async function autoSyncOnLoad() {
                     trainSpecificModule(button.dataset.category, button.dataset.subcategory);
                 });
             });
+            renderExtendedAnalytics();
         }
 
         function trainSpecificModule(category, subCategory) {
@@ -2153,8 +2384,15 @@ async function autoSyncOnLoad() {
             startMode('quiz');
         }
 
+        function confirmReplacePausedSession() {
+            const saved = getSavedSession();
+            if (!saved) return true;
+            const proceed = confirm('У тебе є незавершена сесія. Почати нову й замінити її? Натисни «Скасувати», щоб зберегти стару та продовжити її пізніше.');
+            return proceed;
+        }
+
         function startMode(mode) {
-            currentMode = mode; clearInterval(examInterval);
+            clearInterval(examInterval);
             if (selectedCategories.size === 0) { alert("Виберіть категорію чи модуль!"); return; }
             
             const periodQuestions = questions.filter(q => q.period === activePeriod);
@@ -2170,13 +2408,14 @@ async function autoSyncOnLoad() {
                 if (dueCards.length > 0) { pool = dueCards; } else { alert("На сьогодні всі картки у цих модулях вивчені! Покажу випадкові для повторення."); }
             }
             if (pool.length === 0) return;
-            currentQuizQuestions = shuffle(pool); currentQIndex = 0; score = 0; userMistakes = [];
+            if (!confirmReplacePausedSession()) return;
+            currentQuizQuestions = shuffle(pool); initializeTrackedSession(mode);
             document.getElementById('examTimerDisplay').classList.add('hidden'); document.getElementById('quizFeedback').classList.add('hidden');
             if (mode === 'quiz') { showScreen('quizScreen'); loadNextQuestion(); } else { showScreen('flashcardScreen'); loadNextFlashcard(); }
         }
 
         function startSmartWorkout() {
-            currentMode = 'smart'; clearInterval(examInterval);
+            clearInterval(examInterval);
             const periodQuestions = questions.filter(q => q.period === activePeriod);
             if (periodQuestions.length === 0) { alert("У цьому періоді поки немає питань для тренування."); return; }
 
@@ -2216,14 +2455,16 @@ async function autoSyncOnLoad() {
 
             currentQuizQuestions = shuffle(selected);
             if (currentQuizQuestions.length === 0) { alert("Не вдалося підготувати питання для тренування."); return; }
-            currentQIndex = 0; score = 0; userMistakes = [];
+            if (!confirmReplacePausedSession()) return;
+            initializeTrackedSession('smart');
             document.getElementById('examTimerDisplay').classList.add('hidden'); document.getElementById('quizFeedback').classList.add('hidden');
             showScreen('quizScreen'); loadNextQuestion();
         }
 
         function retryCurrentMistakes() {
             if (userMistakes.length === 0) return;
-            currentMode = 'retry'; currentQuizQuestions = shuffle(userMistakes.map(m => m.q)); currentQIndex = 0; score = 0; userMistakes = [];
+            if (!confirmReplacePausedSession()) return;
+            currentQuizQuestions = shuffle(userMistakes.map(m => m.q)); initializeTrackedSession('retry');
             document.getElementById('examTimerDisplay').classList.add('hidden'); document.getElementById('quizFeedback').classList.add('hidden');
             showScreen('quizScreen'); loadNextQuestion();
         }
@@ -2235,7 +2476,7 @@ async function autoSyncOnLoad() {
         function closeExamSettings() { document.getElementById('examSettingsModal').classList.add('hidden'); }
         
         function applyExamSettings() {
-            currentMode = 'exam'; clearInterval(examInterval);
+            clearInterval(examInterval);
             let src = document.getElementById('esSource').value, cnt = document.getElementById('esCount').value, hasTimer = document.getElementById('esTimer').checked; examPassTarget = parseInt(document.getElementById('esPass').value);
             
             const periodQuestions = questions.filter(q => q.period === activePeriod);
@@ -2254,13 +2495,13 @@ async function autoSyncOnLoad() {
             pool = shuffle(pool);
             const finalCount = (cnt === 'all') ? pool.length : Math.min(parseInt(cnt, 10) || 0, pool.length);
             if (finalCount <= 0) { alert("Немає питань для запуску екзамену."); return; }
-            currentQuizQuestions = pool.slice(0, finalCount);
-            currentQIndex = 0; score = 0; userMistakes = []; closeExamSettings();
+            if (!confirmReplacePausedSession()) return;
+            currentQuizQuestions = pool.slice(0, finalCount); initializeTrackedSession('exam'); closeExamSettings();
             if (hasTimer) {
-                examTimeLeft = currentQuizQuestions.length * 120; document.getElementById('examTimerDisplay').classList.remove('hidden'); updateExamTimerUI();
-                examInterval = setInterval(() => { examTimeLeft--; updateExamTimerUI(); if (examTimeLeft <= 0) { clearInterval(examInterval); alert("⏱️ Час вийшов!"); finishSession(); } }, 1000);
-            } else { document.getElementById('examTimerDisplay').classList.add('hidden'); }
+                examTimeLeft = currentQuizQuestions.length * 120; examEndsAt = Date.now() + examTimeLeft * 1000; document.getElementById('examTimerDisplay').classList.remove('hidden'); updateExamTimerUI();
+            } else { examEndsAt = null; document.getElementById('examTimerDisplay').classList.add('hidden'); }
             document.getElementById('quizFeedback').classList.add('hidden'); showScreen('quizScreen'); loadNextQuestion();
+            if (hasTimer) startExamCountdown();
         }
 
         function updateExamTimerUI() { let m = Math.floor(examTimeLeft / 60), s = examTimeLeft % 60; document.getElementById('examTimerDisplay').innerText = `⏱️ ${m}:${s.toString().padStart(2, '0')}`; }
@@ -2305,35 +2546,59 @@ async function autoSyncOnLoad() {
                 mapped.forEach(opt => { const b = document.createElement('button'); b.className = 'w-full text-left bg-gray-700 hover:bg-gray-600 p-4 rounded border border-gray-600 text-lg transition'; b.innerText = opt.text; b.onclick = (e) => processAnswer(opt.isCorrect, q, opt.text, e.target); optCont.appendChild(b); });
             } else {
                 optCont.innerHTML = `<input type="text" id="quizInputText" class="w-full bg-gray-900 border-2 border-yellow-600 rounded p-4 text-white text-xl mb-4 focus:outline-none" autocomplete="off"><button id="quizInputSubmitBtn" class="btn-primary w-full py-4 rounded text-lg shadow">Відповісти</button>`;
+                document.getElementById('quizInputText').value = currentDraftAnswer;
+                document.getElementById('quizInputText').addEventListener('input', e => { currentDraftAnswer = e.target.value; persistActiveSession(); });
                 document.getElementById('quizInputText').focus(); const check = () => { const v = document.getElementById('quizInputText').value.trim(); if(v) processAnswer(q.options.some(o => answersMatch(v, o)), q, v, null); };
                 document.getElementById('quizInputSubmitBtn').onclick = check; document.getElementById('quizInputText').addEventListener('keypress', e => { if (e.key === 'Enter') check(); });
             }
+            if (!isRestoringSession) persistActiveSession();
         }
 
         function processAnswer(isCorrect, qObj, selText, btnEl) {
-            playAnswerSound(isCorrect);
-            if (!quizStats[qObj.id]) quizStats[qObj.id] = { c: 0, w: 0 };
-            if (isCorrect) { score++; mistakeIds = mistakeIds.filter(id => id !== qObj.id); quizStats[qObj.id].c++; } else { userMistakes.push({ q: qObj, sel: selText }); if (!mistakeIds.includes(qObj.id)) mistakeIds.push(qObj.id); quizStats[qObj.id].w++; }
-            addProgressPoint(); 
+            const restoring = isRestoringSession;
+            if (!restoring) {
+                currentDraftAnswer = ''; 
+                playAnswerSound(isCorrect);
+                if (!quizStats[qObj.id]) quizStats[qObj.id] = { c: 0, w: 0 };
+                if (isCorrect) { score++; mistakeIds = mistakeIds.filter(id => id !== qObj.id); quizStats[qObj.id].c++; }
+                else { userMistakes.push({ q: qObj, sel: selText }); if (!mistakeIds.includes(qObj.id)) mistakeIds.push(qObj.id); quizStats[qObj.id].w++; }
+                recordAnswerEvent(qObj, isCorrect);
+                addProgressPoint();
+                saveData();
+            }
+            currentAnswerState = { questionId: String(qObj.id), isCorrect: !!isCorrect, selectedText: String(selText ?? '') };
             if (currentMode === 'exam') {
-                currentQIndex++; loadNextQuestion();
+                currentAnswerState = null;
+                currentQIndex++; persistActiveSession(); loadNextQuestion();
             } else {
                 const optCont = document.getElementById('quizOptions');
-                optCont.querySelectorAll('button').forEach(b => { b.disabled = true; b.classList.add('opacity-80', 'cursor-not-allowed'); if (qObj.type === 'choice' && b.innerText === qObj.options[qObj.answerIndex]) { b.classList.replace('bg-gray-700', 'bg-green-600'); b.classList.replace('hover:bg-gray-600', 'border-green-500'); b.classList.add('text-white'); } });
-                if (qObj.type === 'choice' && !isCorrect && btnEl) { btnEl.classList.replace('bg-gray-700', 'bg-red-600'); btnEl.classList.replace('hover:bg-gray-600', 'border-red-500'); btnEl.classList.add('text-white'); } else if (qObj.type === 'input') { const inp = document.getElementById('quizInputText'); const sBtn = document.getElementById('quizInputSubmitBtn'); inp.disabled = true; sBtn.disabled = true; if(isCorrect) { inp.classList.replace('border-yellow-600', 'border-green-500'); inp.classList.add('bg-green-900/30'); } else { inp.classList.replace('border-yellow-600', 'border-red-500'); inp.classList.add('bg-red-900/30'); } }
+                optCont.querySelectorAll('button').forEach(b => {
+                    b.disabled = true; b.classList.add('opacity-80', 'cursor-not-allowed');
+                    if (qObj.type === 'choice' && b.innerText === qObj.options[qObj.answerIndex]) { b.classList.replace('bg-gray-700', 'bg-green-600'); b.classList.replace('hover:bg-gray-600', 'border-green-500'); b.classList.add('text-white'); }
+                });
+                if (qObj.type === 'choice' && !isCorrect && btnEl) { btnEl.classList.replace('bg-gray-700', 'bg-red-600'); btnEl.classList.replace('hover:bg-gray-600', 'border-red-500'); btnEl.classList.add('text-white'); }
+                else if (qObj.type === 'input') {
+                    const inp = document.getElementById('quizInputText'), sBtn = document.getElementById('quizInputSubmitBtn');
+                    if (restoring && inp) inp.value = String(selText ?? '');
+                    if (inp) { inp.disabled = true; if (isCorrect) { inp.classList.replace('border-yellow-600', 'border-green-500'); inp.classList.add('bg-green-900/30'); } else { inp.classList.replace('border-yellow-600', 'border-red-500'); inp.classList.add('bg-red-900/30'); } }
+                    if (sBtn) sBtn.disabled = true;
+                }
                 const fb = document.getElementById('quizFeedback'), fbText = document.getElementById('quizFeedbackText'); fbText.replaceChildren();
                 const title = document.createElement('div'); title.className = isCorrect ? 'text-green-400 font-bold text-lg' : 'text-red-400 font-bold text-lg'; title.textContent = isCorrect ? '✅ Правильно!' : '❌ Помилка'; fbText.appendChild(title);
                 if (!isCorrect) { const answer = document.createElement('div'); answer.className = 'text-gray-300 text-sm mt-1'; const answerLabel = document.createElement('span'); answerLabel.textContent = 'Вірна відповідь: '; const answerValue = document.createElement('b'); answerValue.className = 'text-green-400'; answerValue.textContent = (qObj.type === 'input') ? qObj.options.join(' АБО ') : qObj.options[qObj.answerIndex]; answer.append(answerLabel, answerValue); fbText.appendChild(answer); }
                 if (qObj.explanation) { const explanation = document.createElement('div'); explanation.className = 'mt-3 p-3 bg-gray-800 rounded border border-gray-600 text-sm text-gray-300'; const label = document.createElement('b'); label.textContent = '💡 Пояснення:'; explanation.append(label, document.createElement('br'), document.createTextNode(qObj.explanation)); fbText.appendChild(explanation); }
-                fb.classList.remove('hidden'); document.getElementById('quizCurrentStats').innerText = `✅ ${quizStats[qObj.id].c} | ❌ ${quizStats[qObj.id].w}`;
+                fb.classList.remove('hidden');
+                if (quizStats[qObj.id]) document.getElementById('quizCurrentStats').innerText = `✅ ${quizStats[qObj.id].c} | ❌ ${quizStats[qObj.id].w}`;
+                persistActiveSession();
             }
         }
 
-        function nextQuestion() { document.getElementById('quizFeedback').classList.add('hidden'); currentQIndex++; loadNextQuestion(); }
+        function nextQuestion() { document.getElementById('quizFeedback').classList.add('hidden'); currentAnswerState = null; currentDraftAnswer = ''; currentQIndex++; loadNextQuestion(); }
 
         function loadNextFlashcard() {
             if (currentQIndex >= currentQuizQuestions.length) { finishSession(); return; }
             const q = currentQuizQuestions[currentQIndex];
+            persistActiveSession();
             document.getElementById('fcProgressBar').style.width = ((currentQIndex + 1) / currentQuizQuestions.length * 100) + '%';
             document.getElementById('fcProgressText').innerText = `Картка ${currentQIndex + 1}/${currentQuizQuestions.length} (${q.category || 'Без категорії'})`;
             document.getElementById('fcQuestion').innerText = q.text; 
@@ -2358,11 +2623,24 @@ async function autoSyncOnLoad() {
             playAnswerSound(isCorrect);
             const q = currentQuizQuestions[currentQIndex]; let srs = srsStats[q.id] || { interval: 0, nextReview: 0 };
             if (isCorrect) { score++; if (srs.interval === 0) srs.interval = 1; else if (srs.interval === 1) srs.interval = 3; else srs.interval = Math.ceil(srs.interval * 2); } else { srs.interval = 0; userMistakes.push({ q: q, sel: "Не згадав" }); }
-            addProgressPoint(); srs.nextReview = Date.now() + (srs.interval * 86400000); srsStats[q.id] = srs; saveData(); currentQIndex++; loadNextFlashcard();
+            recordAnswerEvent(q, isCorrect, 'flashcards');
+            addProgressPoint(); srs.nextReview = Date.now() + (srs.interval * 86400000); srsStats[q.id] = srs; saveData(); currentQIndex++; persistActiveSession(); loadNextFlashcard();
         }
 
         function finishSession() {
-            clearInterval(examInterval); document.getElementById('quizFeedback').classList.add('hidden'); 
+            clearInterval(examInterval); examInterval = null; document.getElementById('quizFeedback').classList.add('hidden');
+            const completedAt = Date.now();
+            const answeredCount = currentSessionAnswers.length;
+            const finalTotal = currentQuizQuestions.length;
+            const finalPerc = currentMode === 'exam' ? (finalTotal ? Math.round(score / finalTotal * 100) : 0) : (answeredCount ? Math.round(score / answeredCount * 100) : 0);
+            const breakdown = {};
+            currentSessionAnswers.forEach(item => { const key = `${item.category || 'Без категорії'}|||${item.subCategory || 'Загальні'}`; if (!breakdown[key]) breakdown[key] = { category: item.category || 'Без категорії', subCategory: item.subCategory || 'Загальні', total: 0, correct: 0 }; breakdown[key].total++; if (item.correct) breakdown[key].correct++; });
+            if (finalTotal > 0 && sessionStartedAt) {
+                learningSessions.push({ date: completedAt, period: activePeriod, mode: currentMode, score, total: finalTotal, answered: answeredCount, perc: finalPerc, durationSeconds: Math.max(0, Math.round((completedAt - sessionStartedAt) / 1000)), targetPass: currentMode === 'exam' ? examPassTarget : null, breakdown: Object.values(breakdown) });
+                if (learningSessions.length > 300) learningSessions = learningSessions.slice(-300);
+            }
+            localStorage.removeItem(ACTIVE_SESSION_KEY); renderResumeSessionCard(); examEndsAt = null; currentAnswerState = null; currentDraftAnswer = ''; sessionStartedAt = 0;
+            saveData();
             if (currentMode === 'quiz' || currentMode === 'exam' || currentMode === 'smart') { appStats.totalQuizzes++; saveData(); }
             showScreen('resultScreen'); const rTitle = document.getElementById('resultTitle'); const smartReview = document.getElementById('smartWorkoutReview'); smartReview.classList.add('hidden');
             if (currentMode === 'exam') {
@@ -2542,7 +2820,7 @@ async function autoSyncOnLoad() {
             ['1st period', '2nd period', '3rd period', '4th period'].forEach(p => {
                 allCheatSheets[p] = localStorage.getItem('quiz_cheatsheet_' + p) || defaultCheatSheets[p];
             });
-            const dataToSave = { questions: questions, cheatSheets: allCheatSheets, quizStats: quizStats, mistakeIds: mistakeIds, favoriteIds: favoriteIds, srsStats: srsStats, examHistory: examHistory, appStats: appStats };
+            const dataToSave = { questions: questions, cheatSheets: allCheatSheets, quizStats: quizStats, mistakeIds: mistakeIds, favoriteIds: favoriteIds, srsStats: srsStats, examHistory: examHistory, answerHistory: answerHistory, learningSessions: learningSessions, appStats: appStats };
             const dl = document.createElement('a'); dl.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToSave))); dl.setAttribute("download", "electrician_quiz_FULL_backup.json"); dl.click(); 
         }
 
@@ -2718,6 +2996,10 @@ async function autoSyncOnLoad() {
             if (!Array.isArray(importedExamHistory) || importedExamHistory.some(item => !isPlainObject(item) || typeof item.date !== 'string' || !Number.isFinite(item.score) || !Number.isFinite(item.total) || item.total <= 0 || !Number.isFinite(item.perc) || item.perc < 0 || item.perc > 100 || !Number.isFinite(item.targetPass))) {
                 throw new Error('examHistory має містити коректні записи результатів екзаменів.');
             }
+            const importedAnswerHistory = imp.answerHistory === undefined ? answerHistory : imp.answerHistory;
+            if (!Array.isArray(importedAnswerHistory) || importedAnswerHistory.some(item => !isPlainObject(item) || !Number.isFinite(item.ts) || typeof item.questionId !== 'string' || typeof item.period !== 'string' || typeof item.category !== 'string' || typeof item.subCategory !== 'string' || typeof item.correct !== 'boolean' || typeof item.mode !== 'string')) throw new Error('answerHistory має містити коректні події відповідей.');
+            const importedLearningSessions = imp.learningSessions === undefined ? learningSessions : imp.learningSessions;
+            if (!Array.isArray(importedLearningSessions) || importedLearningSessions.some(item => !isPlainObject(item) || !Number.isFinite(item.date) || typeof item.period !== 'string' || typeof item.mode !== 'string' || !Number.isFinite(item.score) || !Number.isFinite(item.total) || item.total <= 0 || !Number.isFinite(item.perc) || item.perc < 0 || item.perc > 100 || !Number.isFinite(item.durationSeconds))) throw new Error('learningSessions має містити коректні записи завершених сесій.');
 
             let importedCheatSheets = null;
             if (imp.cheatSheets !== undefined) {
@@ -2756,6 +3038,8 @@ async function autoSyncOnLoad() {
                 favoriteIds: importedFavorites,
                 srsStats: importedSrs,
                 examHistory: importedExamHistory,
+                answerHistory: importedAnswerHistory.slice(-6000),
+                learningSessions: importedLearningSessions.slice(-300),
                 appStats: normalizeAppStats(importedAppStats),
                 cheatSheets: importedCheatSheets
             };
@@ -2794,6 +3078,9 @@ async function autoSyncOnLoad() {
                         favoriteIds = backup.favoriteIds;
                         srsStats = backup.srsStats;
                         examHistory = backup.examHistory;
+                        answerHistory = backup.answerHistory;
+                        learningSessions = backup.learningSessions;
+                        localStorage.removeItem(ACTIVE_SESSION_KEY);
                         appStats = backup.appStats;
                         if (backup.cheatSheets) {
                             Object.entries(backup.cheatSheets).forEach(([period, content]) => localStorage.setItem('quiz_cheatsheet_' + period, content));
@@ -2856,7 +3143,7 @@ async function autoSyncOnLoad() {
             if (heading) heading.textContent = meta[0];
             if (subheading) subheading.textContent = meta[1];
 
-            if (screenId === 'homeScreen') { selectedCategories.clear(); renderCategories(); checkDailyProgress(); }
+            if (screenId === 'homeScreen') { selectedCategories.clear(); renderCategories(); checkDailyProgress(); renderResumeSessionCard(); }
             else if (screenId === 'learnScreen') { updatePeriodTabsUI(); renderCategories(); }
             else if (screenId === 'editorScreen') { updateEditorList(); checkAdminMode(); }
             else if (screenId === 'statsScreen') { renderStatsScreen(); }
@@ -2945,7 +3232,9 @@ function calcCalculate() {
     }
 }
 
-        saveData(); checkDailyProgress(); checkAdminMode(); updatePeriodTabsUI(); showScreen('homeScreen'); loadCheatSheet(); initSoundUI(); initSyncUI(); autoSyncOnLoad();
+        saveData(); checkDailyProgress(); checkAdminMode(); updatePeriodTabsUI(); showScreen('homeScreen'); renderResumeSessionCard(); loadCheatSheet(); initSoundUI(); initSyncUI(); autoSyncOnLoad();
+        window.addEventListener('pagehide', persistActiveSession);
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') persistActiveSession(); });
     </script>
 </body>
 <script>
