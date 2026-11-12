@@ -2751,9 +2751,13 @@ async function autoSyncOnLoad() {
             
             saveData(); updateEditorList();
             
-            if (returnToQuizAfterEdit) { currentQuizQuestions[currentQIndex] = newQ; }
-            cancelEdit();
-        }
+    if (returnToQuizAfterEdit) { currentQuizQuestions[currentQIndex] = newQ; }
+    cancelEdit();
+    
+    // Запам'ятовуємо категорію та підкатегорію для зручного додавання наступних питань
+    document.getElementById('qCategory').value = cat === 'Без категорії' ? '' : cat;
+    document.getElementById('qSubCategory').value = sub;
+}
 
         function closeQuestionStatsModal() { document.getElementById('questionStatsModal').classList.add('hidden'); pendingQuestionSave = null; }
         function confirmQuestionSave(resetStats) {
