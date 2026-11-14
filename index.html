@@ -1111,6 +1111,49 @@ button:active { transform: translateY(1px) scale(.99); }
   .submission-queue-card-top { flex-direction:column; }
 }
 
+
+/* v8.3 — complete contribution review and pre-approval editor */
+.submission-package-details { margin-top: 12px; border: 1px solid rgba(114,183,255,.17); border-radius: 11px; background: rgba(8,18,32,.48); overflow: hidden; }
+.submission-package-details > summary { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 13px; color:#c9dcf2; cursor:pointer; font-size:.73rem; font-weight:850; list-style:none; }
+.submission-package-details > summary::-webkit-details-marker { display:none; }
+.submission-package-details > summary::after { content:'＋'; color:#9ecfff; font-size:1rem; }
+.submission-package-details[open] > summary::after { content:'−'; }
+.submission-editor-root { padding:0 12px 13px; }
+.submission-editor-intro { margin:0 0 10px; color:#8298b4; font-size:.66rem; line-height:1.5; }
+.submission-question-edit { margin:9px 0; border:1px solid rgba(148,163,184,.15); border-radius:10px; background:rgba(17,31,50,.78); overflow:hidden; }
+.submission-question-edit > summary { display:flex; gap:8px; align-items:center; padding:10px 11px; cursor:pointer; color:#e2ecfa; font-size:.7rem; font-weight:800; list-style:none; }
+.submission-question-edit > summary::-webkit-details-marker { display:none; }
+.submission-question-edit > summary .question-summary-text { min-width:0; flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; color:#b8c9df; font-weight:650; }
+.submission-question-edit[open] > summary { border-bottom:1px solid rgba(148,163,184,.13); color:#ffd98e; }
+.submission-question-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; padding:11px; }
+.submission-field { display:flex; flex-direction:column; gap:5px; min-width:0; }
+.submission-field.wide { grid-column:1/-1; }
+.submission-field label { color:#8398b4; font-size:.59rem; font-weight:850; letter-spacing:.055em; }
+.submission-field input, .submission-field textarea, .submission-field select { width:100%; min-width:0; border:1px solid rgba(148,163,184,.22); border-radius:8px; padding:8px 9px; background:#0a1728; color:#eaf2ff; font:inherit; font-size:.69rem; }
+.submission-field textarea { min-height:62px; resize:vertical; line-height:1.45; }
+.submission-field textarea.question-text { min-height:76px; }
+.submission-options-list { display:grid; gap:6px; }
+.submission-option-row { display:grid; grid-template-columns:28px minmax(0,1fr) 30px; gap:6px; align-items:center; }
+.submission-option-index { color:#8296b1; font-size:.65rem; text-align:center; font-weight:800; }
+.submission-option-remove { height:32px; border:1px solid rgba(255,126,136,.22); border-radius:7px; background:rgba(128,48,58,.15); color:#ffadb2; }
+.submission-mini-btn { padding:7px 9px; border:1px solid rgba(114,183,255,.22); border-radius:7px; background:rgba(50,94,145,.15); color:#b9dcff; font-size:.63rem; font-weight:800; }
+.submission-correct-answer { border-color:rgba(83,214,160,.26)!important; background:rgba(24,112,82,.12)!important; }
+.submission-question-footer { display:flex; flex-wrap:wrap; justify-content:space-between; gap:7px; padding:0 11px 11px; }
+.submission-question-delete { padding:6px 9px; border:1px solid rgba(255,126,136,.22); border-radius:7px; background:rgba(128,48,58,.15); color:#ffadb2; font-size:.62rem; font-weight:800; }
+.submission-editor-toolbar { display:flex; flex-wrap:wrap; gap:7px; align-items:center; margin:12px 0 2px; }
+.submission-save-btn { padding:9px 12px; border:1px solid rgba(83,214,160,.3); border-radius:8px; background:rgba(24,112,82,.2); color:#9be8c5; font-size:.66rem; font-weight:900; }
+.submission-add-question-btn { padding:9px 12px; border:1px solid rgba(114,183,255,.25); border-radius:8px; background:rgba(50,94,145,.16); color:#b9dcff; font-size:.66rem; font-weight:850; }
+.submission-save-hint { flex:1 1 100%; color:#7188a4; font-size:.6rem; line-height:1.4; }
+.submission-readonly-question { margin-top:10px; padding:10px 12px; border:1px solid var(--line); border-radius:9px; background:rgba(8,18,32,.45); }
+.submission-readonly-question strong { display:block; margin-bottom:5px; color:#e7effb; font-size:.68rem; }
+.submission-readonly-question p, .submission-readonly-question li { color:#a6b8ce; font-size:.64rem; line-height:1.5; }
+.submission-readonly-question ul { margin:5px 0 0; padding-left:18px; }
+@media(max-width:680px) {
+  .submission-question-fields { grid-template-columns:1fr; }
+  .submission-field.wide { grid-column:auto; }
+  .submission-package-details > summary { align-items:flex-start; }
+}
+
 </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
@@ -1142,7 +1185,7 @@ button:active { transform: translateY(1px) scale(.99); }
 </div>
 </div>
 </div>
-<div class="app-shell-container"><div class="app-shell"><aside aria-label="Основна навігація" class="app-sidebar"><div class="sidebar-brand"><div aria-hidden="true" class="brand-mark">⚡</div><div class="brand-copy"><h1 class="brand-title" id="mainAppTitle" onclick="handleAdminTrigger()">Electrician Hub</h1><span class="brand-subtitle">ELECTRICIAN STUDY HUB</span></div></div><p class="sidebar-section-label">НАВІГАЦІЯ</p><div class="app-nav" id="navButtons"><button class="app-nav-btn" data-screen-target="homeScreen" onclick="showScreen('homeScreen')" type="button"><span aria-hidden="true" class="nav-icon">⌂</span><span class="nav-label">Огляд</span></button><button class="app-nav-btn" data-screen-target="learnScreen" onclick="showScreen('learnScreen')" type="button"><span aria-hidden="true" class="nav-icon">▦</span><span class="nav-label">Практика</span></button><button class="app-nav-btn" data-screen-target="statsScreen" onclick="showScreen('statsScreen')" type="button"><span aria-hidden="true" class="nav-icon">▥</span><span class="nav-label">Аналітика</span></button><button class="app-nav-btn" onclick="toggleCheatSheet()" type="button"><span aria-hidden="true" class="nav-icon">▤</span><span class="nav-label">Довідник</span></button><button class="app-nav-btn" data-screen-target="editorScreen" onclick="showScreen('editorScreen')" type="button"><span aria-hidden="true" class="nav-icon">✎</span><span class="nav-label">Редактор</span></button></div><div class="sidebar-spacer"></div><div class="sidebar-note"><span class="sidebar-note-icon">⚡</span><div><strong>ЕЛЕКТРИЧНА ТЕОРІЯ</strong><span>DC · AC · RLC · Controls</span></div></div></aside><main class="app-main" id="appMain"><header class="app-topbar"><div class="page-heading-group"><p class="page-eyebrow" onclick="handleAdminTrigger()" title="Electrician Hub">⚡ ELECTRICIAN HUB</p><h1 id="pageHeading">Навчальна панель</h1><p id="pageSubheading">Питання, модулі, довідник та результати.</p></div><div class="topbar-meta">
+<div class="app-shell-container"><div class="app-shell"><aside aria-label="Основна навігація" class="app-sidebar"><div class="sidebar-brand"><div aria-hidden="true" class="brand-mark">⚡</div><div class="brand-copy"><h1 class="brand-title" id="mainAppTitle" onclick="handleAdminTrigger()">Electrician Hub</h1><span class="brand-subtitle">ELECTRICIAN STUDY HUB</span></div></div><p class="sidebar-section-label">НАВІГАЦІЯ</p><div class="app-nav" id="navButtons"><button class="app-nav-btn" data-screen-target="homeScreen" onclick="showScreen('homeScreen')" type="button"><span aria-hidden="true" class="nav-icon">⌂</span><span class="nav-label">Огляд</span></button><button class="app-nav-btn" data-screen-target="learnScreen" onclick="showScreen('learnScreen')" type="button"><span aria-hidden="true" class="nav-icon">▦</span><span class="nav-label">Практика</span></button><button class="app-nav-btn" data-screen-target="statsScreen" onclick="showScreen('statsScreen')" type="button"><span aria-hidden="true" class="nav-icon">▥</span><span class="nav-label">Аналітика</span></button><button class="app-nav-btn" data-screen-target="moreScreen" onclick="showScreen('moreScreen')" type="button"><span aria-hidden="true" class="nav-icon">⋯</span><span class="nav-label">Інструменти</span></button><button class="app-nav-btn" onclick="toggleCheatSheet()" type="button"><span aria-hidden="true" class="nav-icon">▤</span><span class="nav-label">Довідник</span></button><button class="app-nav-btn" data-screen-target="editorScreen" onclick="showScreen('editorScreen')" type="button"><span aria-hidden="true" class="nav-icon">✎</span><span class="nav-label">Редактор</span></button></div><div class="sidebar-spacer"></div><div class="sidebar-note"><span class="sidebar-note-icon">⚡</span><div><strong>ЕЛЕКТРИЧНА ТЕОРІЯ</strong><span>DC · AC · RLC · Controls</span></div></div></aside><main class="app-main" id="appMain"><header class="app-topbar"><div class="page-heading-group"><p class="page-eyebrow" onclick="handleAdminTrigger()" title="Electrician Hub">⚡ ELECTRICIAN HUB</p><h1 id="pageHeading">Навчальна панель</h1><p id="pageSubheading">Питання, модулі, довідник та результати.</p></div><div class="topbar-meta">
     <button class="status-pill reference-quick-btn" id="referenceQuickBtn" type="button" onclick="toggleCheatSheet()" title="Відкрити довідник з електричної теорії" aria-label="Відкрити довідник"> 
         <span class="quick-ref-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 5.5A2.5 2.5 0 0 1 7 3h12.5v17H7a2.5 2.5 0 0 0-2.5 2z"/><path d="M4.5 5.5v16.5A2.5 2.5 0 0 1 7 19.5h12.5M8 7h7M8 10h7"/></svg></span><span>Довідник</span>
     </button>
@@ -1151,7 +1194,7 @@ button:active { transform: translateY(1px) scale(.99); }
         <span class="quick-ref-icon">🖩</span><span class="hidden md:inline">Кальк</span>
     </button>
     <button class="status-pill" id="soundToggleBtn" type="button" onclick="toggleSound()" title="Звук увімкнений — натисніть, щоб вимкнути" aria-label="Вимкнути звук" aria-pressed="true"><span id="soundIcon" aria-hidden="true">🔊</span> <span>Звук</span></button>
-    <span class="build-stamp">VERSION 8.1</span>
+    <span class="build-stamp">VERSION 8.3</span>
 </div></header><div class="app-content" id="appContent"><div class="home-dashboard" id="homeScreen"><section class="welcome-card"><div class="welcome-copy"><span class="welcome-kicker">ELECTRICIAN · STUDY WORKSPACE</span><h2>Питання, модулі та довідник</h2><p>Матеріали з електричної теорії, електричних кіл і систем керування.</p></div><div aria-hidden="true" class="welcome-art"><div class="welcome-art-icon">⚡</div><span>DC · AC · RLC · CONTROLS</span></div></section><section aria-live="polite" class="resume-session-panel hidden" id="resumeSessionPanel"></section><div class="home-stats" id="homeStats">
 <div class="metric-card metric-streak">
 <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Поточна серія</p>
@@ -1514,7 +1557,7 @@ button:active { transform: translateY(1px) scale(.99); }
     </div>
 </div>
 <script>
-        // BUILD: 2026.11.14-electrician-hub-v8.2 — Apps Script submission queue and GitHub auto-publishing moderation.
+        // BUILD: 2026.11.14-electrician-hub-v8.3 — editable submission review before moderation.
         const PUBLIC_GIST_ID = '5ee027de84d344fbe11d2a496246d8ea';
         // Після розгортання Google Apps Script встав сюди URL вебзастосунку, що закінчується на /exec.
         const CONTRIBUTION_API_URL = 'https://script.google.com/macros/s/AKfycbyQhg1nQMNYOEKL9UFXcLDqwVsUcUZr_6u4K_QSKPfB1q-ETs39eOhLpho2wifbFMNXLQ/exec';
@@ -2370,7 +2413,7 @@ async function autoSyncOnLoad() {
             if (status) { status.textContent = 'Завантаження черги…'; status.classList.remove('error'); }
             try {
                 const data = await contributionApiJsonp({ action: 'list', key: adminSettings.submissionAdminKey });
-                submissionQueueItems = Array.isArray(data.items) ? data.items : [];
+                submissionQueueItems = Array.isArray(data.items) ? data.items.map(item => ({ ...item, savedQuestionsJson: JSON.stringify(canonicalSubmissionQuestions(item.questions || [])) })) : [];
                 submissionQueueLoaded = true;
                 renderSubmissionQueue();
                 if (status) status.textContent = `Оновлено: ${new Date().toLocaleString('uk-CA')} · заявок: ${submissionQueueItems.length}`;
@@ -2383,6 +2426,49 @@ async function autoSyncOnLoad() {
                 submissionQueueBusy = false;
                 if (button) { button.disabled = false; button.textContent = '↻ Оновити чергу'; }
             }
+        }
+
+        function submissionSafeDomId(value) {
+            return String(value || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 100);
+        }
+
+        function renderSubmissionQuestionEditor(item) {
+            const sid = submissionSafeDomId(item.id);
+            const questions = Array.isArray(item.questions) ? item.questions : [];
+            const questionEditors = questions.map((q, qi) => {
+                const type = q.type === 'input' ? 'input' : 'choice';
+                const options = Array.isArray(q.options) ? q.options : [];
+                const optionRows = type === 'choice' ? `
+                    <div class="submission-field wide"><label>ВАРИАНТЫ ОТВЕТА</label>
+                      <div class="submission-options-list">${options.map((option, oi) => `
+                        <div class="submission-option-row"><span class="submission-option-index">${String.fromCharCode(65 + oi)}</span><input class="submission-option-input" data-option-index="${oi}" value="${escapeHtml(option)}" aria-label="Варіант ${oi + 1}"><button type="button" class="submission-option-remove" title="Видалити варіант" onclick="removeSubmissionOption('${sid}',${qi},${oi})">×</button></div>`).join('')}
+                      </div>
+                      <button type="button" class="submission-mini-btn mt-2" onclick="addSubmissionOption('${sid}',${qi})">＋ Додати варіант</button>
+                    </div>
+                    <div class="submission-field wide"><label>ПРАВИЛЬНА ВІДПОВІДЬ</label><select class="submission-correct-answer" data-field="answerIndex">${options.map((option, oi) => `<option value="${oi}" ${Number(q.answerIndex) === oi ? 'selected' : ''}>${String.fromCharCode(65 + oi)} — ${escapeHtml(option || '(порожній варіант)')}</option>`).join('')}</select></div>` : `
+                    <div class="submission-field wide"><label>ПРИЙНЯТІ ПРАВИЛЬНІ ВІДПОВІДІ (КОЖНА З НОВОГО РЯДКА)</label><textarea data-field="acceptedAnswers" placeholder="Наприклад:\n120 V\n120 volts">${escapeHtml(options.join('\n'))}</textarea></div>`;
+                const excerpt = String(q.text || 'Нове питання без тексту').replace(/\s+/g, ' ').slice(0, 100);
+                return `<details class="submission-question-edit" data-question-index="${qi}">
+                  <summary><span>№${qi + 1}</span><span class="question-summary-text">${escapeHtml(excerpt)}</span><span>${type === 'choice' ? 'CHOICE' : 'INPUT'}</span></summary>
+                  <div class="submission-question-fields">
+                    <div class="submission-field wide"><label>ТЕКСТ ПИТАННЯ</label><textarea class="question-text" data-field="text" placeholder="Текст питання">${escapeHtml(q.text || '')}</textarea></div>
+                    <div class="submission-field"><label>ПЕРІОД</label><select data-field="period">${['1st period','2nd period','3rd period','4th period'].map(p => `<option value="${p}" ${q.period === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>
+                    <div class="submission-field"><label>ТИП ПИТАННЯ</label><select data-field="type" onchange="changeSubmissionQuestionType('${sid}',${qi},this.value)"><option value="choice" ${type === 'choice' ? 'selected' : ''}>Вибір варіанта (Choice)</option><option value="input" ${type === 'input' ? 'selected' : ''}>Вписати відповідь (Input)</option></select></div>
+                    <div class="submission-field"><label>ГОЛОВНА КАТЕГОРІЯ</label><input data-field="category" value="${escapeHtml(q.category || '')}" placeholder="AC Fundamentals"></div>
+                    <div class="submission-field"><label>ПІДКАТЕГОРІЯ / МОДУЛЬ</label><input data-field="subCategory" value="${escapeHtml(q.subCategory || '')}" placeholder="Motors"></div>
+                    ${optionRows}
+                    <div class="submission-field wide"><label>ПОЯСНЕННЯ ПРАВИЛЬНОЇ ВІДПОВІДІ</label><textarea data-field="explanation" placeholder="Пояснення (необов'язково)">${escapeHtml(q.explanation || '')}</textarea></div>
+                    <div class="submission-field wide"><label>URL ЗОБРАЖЕННЯ (HTTPS, НЕОБОВ'ЯЗКОВО)</label><input data-field="imageUrl" value="${escapeHtml(q.imageUrl || '')}" placeholder="https://..."></div>
+                  </div>
+                  <div class="submission-question-footer"><span class="submission-save-hint">Правильна відповідь зберігається разом із питанням у черзі.</span><button type="button" class="submission-question-delete" onclick="removeSubmissionQuestion('${sid}',${qi})">Видалити це питання</button></div>
+                </details>`;
+            }).join('');
+            const buttons = item.status === 'pending' ? `<div class="submission-editor-toolbar"><button type="button" class="submission-save-btn" onclick="saveSubmissionQuestionEdits('${sid}').catch(error => alert(error.message || 'Не вдалося зберегти зміни.'))">💾 Зберегти зміни</button><button type="button" class="submission-add-question-btn" onclick="addSubmissionQuestion('${sid}')">＋ Додати питання</button><span class="submission-save-hint">Зміни збережуться в Google-таблиці. Лише після цього можна схвалити заявку.</span></div>` : '';
+            return `<details class="submission-package-details"><summary><span>Переглянути всі ${questions.length} питань та відповіді · ${item.status === 'pending' ? 'можна редагувати' : 'лише перегляд'}</span></summary><div class="submission-editor-root" id="submissionEditor_${sid}" data-submission-id="${sid}"><p class="submission-editor-intro">Відкрий кожне питання, щоб побачити всі варіанти та правильну відповідь. Для CHOICE правильний варіант позначений окремим списком. Для INPUT вказані всі прийняті відповіді.</p>${item.status === 'pending' ? questionEditors : questions.map((q, qi) => {
+                const options = Array.isArray(q.options) ? q.options : [];
+                const correct = q.type === 'choice' ? (options[Number(q.answerIndex)] || 'Не визначено') : options.join(' / ');
+                return `<div class="submission-readonly-question"><strong>№${qi + 1}. ${escapeHtml(q.text || '')}</strong><p>${escapeHtml(q.period || '')} · ${escapeHtml(q.category || 'Без категорії')} → ${escapeHtml(q.subCategory || 'Загальні')}</p><ul>${options.map((option, oi) => `<li>${q.type === 'choice' && oi === Number(q.answerIndex) ? '✅ ' : ''}${escapeHtml(option)}</li>`).join('')}</ul><p>Правильна відповідь: <b>${escapeHtml(correct)}</b></p>${q.explanation ? `<p>Пояснення: ${escapeHtml(q.explanation)}</p>` : ''}</div>`;
+            }).join('')}${buttons}</div></details>`;
         }
 
         function renderSubmissionQueue() {
@@ -2403,21 +2489,205 @@ async function autoSyncOnLoad() {
             list.innerHTML = active.map(item => {
                 const statusLabel = item.status === 'pending' ? 'НА ПЕРЕВІРЦІ' : 'СХВАЛЕНО · ОЧІКУЄ ПУБЛІКАЦІЇ';
                 const date = item.submittedAt ? new Date(item.submittedAt).toLocaleString('uk-CA') : 'Дата невідома';
-                const preview = (item.questions || []).slice(0, 4).map(q => `<li>${escapeHtml(String(q.text || '').slice(0, 210))}</li>`).join('');
-                const extra = Number(item.questionCount) > 4 ? `<li>…ще ${Number(item.questionCount) - 4} питань</li>` : '';
                 const note = item.note ? `<div class="submission-review-note">Коментар автора: ${escapeHtml(item.note)}</div>` : '';
                 const reviewNote = item.reviewNote ? `<div class="submission-review-note">Нотатка модератора: ${escapeHtml(item.reviewNote)}</div>` : '';
                 const actions = item.status === 'pending'
                     ? `<div class="submission-queue-actions"><button class="submission-approve-btn" onclick="moderateQuestionSubmission('${escapeHtml(item.id)}','approved')">✓ Схвалити й опублікувати</button><button class="submission-reject-btn" onclick="moderateQuestionSubmission('${escapeHtml(item.id)}','rejected')">✕ Відхилити</button></div>`
                     : `<div class="submission-queue-actions"><button class="submission-publish-btn" onclick="publishApprovedSubmissions()">☁️ Повторити публікацію схвалених</button><button class="submission-reject-btn" onclick="moderateQuestionSubmission('${escapeHtml(item.id)}','rejected')">Відхилити</button></div>`;
-                return `<article class="submission-queue-card"><div class="submission-queue-card-top"><div><h4>${escapeHtml(item.author || 'Без імені')} · ${Number(item.questionCount) || (item.questions || []).length} питань</h4><div class="submission-queue-meta">${escapeHtml(date)} · ${escapeHtml(item.periods || 'Період не вказано')}<br>ID: ${escapeHtml(item.id)}</div></div><span class="submission-status-pill ${escapeHtml(item.status)}">${statusLabel}</span></div>${note}<ul class="submission-question-preview">${preview}${extra}</ul>${reviewNote}${actions}</article>`;
+                return `<article class="submission-queue-card"><div class="submission-queue-card-top"><div><h4>${escapeHtml(item.author || 'Без імені')} · ${Number(item.questionCount) || (item.questions || []).length} питань</h4><div class="submission-queue-meta">${escapeHtml(date)} · ${escapeHtml(item.periods || 'Період не вказано')}<br>ID: ${escapeHtml(item.id)}</div></div><span class="submission-status-pill ${escapeHtml(item.status)}">${statusLabel}</span></div>${note}${renderSubmissionQuestionEditor(item)}${reviewNote}${actions}</article>`;
             }).join('');
         }
 
+        function collectSubmissionEditorQuestions(submissionId) {
+            const sid = submissionSafeDomId(submissionId);
+            const root = document.getElementById(`submissionEditor_${sid}`);
+            if (!root) throw new Error('Редактор заявки не знайдено. Розкрий блок перегляду питань.');
+            return [...root.querySelectorAll('.submission-question-edit')].map(card => {
+                const field = name => card.querySelector(`[data-field="${name}"]`);
+                const get = name => field(name)?.value ?? '';
+                const type = get('type') === 'input' ? 'input' : 'choice';
+                let options;
+                let answerIndex = 0;
+                const optionInputs = [...card.querySelectorAll('.submission-option-input')];
+                const acceptedAnswersField = card.querySelector('[data-field="acceptedAnswers"]');
+                if (optionInputs.length) {
+                    options = optionInputs.map(input => input.value.trim());
+                    answerIndex = Number.parseInt(get('answerIndex'), 10);
+                } else if (acceptedAnswersField) {
+                    options = String(acceptedAnswersField.value || '').split(/\r?\n/).map(value => value.trim()).filter(Boolean);
+                } else {
+                    options = Array.isArray(getSubmissionItem(submissionId)?.questions?.[Number(card.dataset.questionIndex)]?.options)
+                        ? getSubmissionItem(submissionId).questions[Number(card.dataset.questionIndex)].options.slice() : [];
+                }
+                return {
+                    text: String(get('text')).trim(), period: get('period'), type, options,
+                    answerIndex: type === 'choice' ? answerIndex : 0,
+                    category: String(get('category')).trim(), subCategory: String(get('subCategory')).trim(),
+                    imageUrl: String(get('imageUrl')).trim(), explanation: String(get('explanation')).trim()
+                };
+            });
+        }
+
+        function getSubmissionItem(submissionId) {
+            return submissionQueueItems.find(item => item.id === submissionId);
+        }
+
+        function rerenderSubmissionEditor(submissionId, openLast = false) {
+            const item = getSubmissionItem(submissionId);
+            if (!item) return;
+            renderSubmissionQueue();
+            const sid = submissionSafeDomId(submissionId);
+            const packageDetails = document.querySelector(`#submissionEditor_${sid}`)?.closest('.submission-package-details');
+            if (packageDetails) packageDetails.open = true;
+            if (openLast) {
+                const cards = document.querySelectorAll(`#submissionEditor_${sid} .submission-question-edit`);
+                if (cards.length) cards[cards.length - 1].open = true;
+            }
+        }
+
+        function addSubmissionQuestion(submissionId) {
+            const item = getSubmissionItem(submissionId);
+            if (!item || item.status !== 'pending') return;
+            try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (_) { item.questions = JSON.parse(JSON.stringify(item.questions || [])); }
+            if (item.questions.length >= 50) { alert('В одній заявці може бути не більше 50 питань.'); return; }
+            item.questions.push({ text:'', period:item.questions[0]?.period || '2nd period', type:'choice', options:['',''], answerIndex:0, category:'', subCategory:'', imageUrl:'', explanation:'' });
+            item.questionCount = item.questions.length;
+            rerenderSubmissionEditor(submissionId, true);
+        }
+
+        function removeSubmissionQuestion(submissionId, questionIndex) {
+            const item = getSubmissionItem(submissionId);
+            if (!item || item.status !== 'pending') return;
+            try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (error) { alert(error.message); return; }
+            if (item.questions.length <= 1) { alert('У заявці має залишитися хоча б одне питання.'); return; }
+            if (!confirm(`Видалити питання №${questionIndex + 1} із цієї пропозиції?`)) return;
+            item.questions.splice(questionIndex, 1);
+            item.questionCount = item.questions.length;
+            rerenderSubmissionEditor(submissionId);
+        }
+
+        function addSubmissionOption(submissionId, questionIndex) {
+            const item = getSubmissionItem(submissionId);
+            if (!item) return;
+            try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (error) { alert(error.message); return; }
+            const q = item.questions[questionIndex];
+            if (!q || q.type !== 'choice') return;
+            if (q.options.length >= 8) { alert('Максимум 8 варіантів відповіді.'); return; }
+            q.options.push('');
+            rerenderSubmissionEditor(submissionId);
+            const packageDetails = document.querySelector(`#submissionEditor_${submissionSafeDomId(submissionId)}`)?.closest('.submission-package-details');
+            const cards = document.querySelectorAll(`#submissionEditor_${submissionSafeDomId(submissionId)} .submission-question-edit`);
+            if (packageDetails) packageDetails.open = true;
+            if (cards[questionIndex]) cards[questionIndex].open = true;
+        }
+
+        function removeSubmissionOption(submissionId, questionIndex, optionIndex) {
+            const item = getSubmissionItem(submissionId);
+            if (!item) return;
+            try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (error) { alert(error.message); return; }
+            const q = item.questions[questionIndex];
+            if (!q || q.type !== 'choice') return;
+            if (q.options.length <= 2) { alert('У тесті має залишитися щонайменше два варіанти.'); return; }
+            q.options.splice(optionIndex, 1);
+            if (q.answerIndex >= q.options.length) q.answerIndex = q.options.length - 1;
+            else if (q.answerIndex > optionIndex) q.answerIndex--;
+            rerenderSubmissionEditor(submissionId);
+            const packageDetails = document.querySelector(`#submissionEditor_${submissionSafeDomId(submissionId)}`)?.closest('.submission-package-details');
+            const cards = document.querySelectorAll(`#submissionEditor_${submissionSafeDomId(submissionId)} .submission-question-edit`);
+            if (packageDetails) packageDetails.open = true;
+            if (cards[questionIndex]) cards[questionIndex].open = true;
+        }
+
+        function changeSubmissionQuestionType(submissionId, questionIndex, newType) {
+            const item = getSubmissionItem(submissionId);
+            if (!item) return;
+            const sid = submissionSafeDomId(submissionId);
+            const root = document.getElementById(`submissionEditor_${sid}`);
+            const card = root?.querySelectorAll('.submission-question-edit')[questionIndex];
+            if (!card) return;
+            const oldRenderedType = card.querySelectorAll('.submission-option-input').length ? 'choice' : 'input';
+            try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (error) { alert(error.message); return; }
+            const q = item.questions[questionIndex];
+            if (!q) return;
+            const targetType = newType === 'input' ? 'input' : 'choice';
+            if (oldRenderedType === 'choice' && targetType === 'input') {
+                const selected = Number.isInteger(q.answerIndex) ? q.answerIndex : 0;
+                q.options = [q.options[selected] || q.options[0] || ''];
+                q.answerIndex = 0;
+            } else if (oldRenderedType === 'input' && targetType === 'choice') {
+                q.options = [q.options[0] || '', ''];
+                q.answerIndex = 0;
+            }
+            q.type = targetType;
+            rerenderSubmissionEditor(submissionId);
+            const packageDetails = document.querySelector(`#submissionEditor_${sid}`)?.closest('.submission-package-details');
+            const cards = document.querySelectorAll(`#submissionEditor_${sid} .submission-question-edit`);
+            if (packageDetails) packageDetails.open = true;
+            if (cards[questionIndex]) cards[questionIndex].open = true;
+        }
+
+        function canonicalSubmissionQuestions(questions) {
+            return questions.map(q => ({
+                text:String(q.text || '').trim(), period:q.period || '2nd period', type:q.type || 'choice',
+                options:(q.options || []).map(value => String(value).trim()),
+                answerIndex:q.type === 'choice' ? Number(q.answerIndex) : 0,
+                category:String(q.category || '').trim(), subCategory:String(q.subCategory || '').trim(),
+                imageUrl:String(q.imageUrl || '').trim(), explanation:String(q.explanation || '').trim()
+            }));
+        }
+
+        async function saveSubmissionQuestionEdits(submissionId, silent = false) {
+            const item = getSubmissionItem(submissionId);
+            if (!item || item.status !== 'pending') throw new Error('Редагувати можна лише заявки зі статусом «На перевірці».');
+            const draft = canonicalSubmissionQuestions(collectSubmissionEditorQuestions(submissionId));
+            if (draft.length < 1 || draft.length > 50) throw new Error('У заявці має бути від 1 до 50 питань.');
+            draft.forEach((q, index) => {
+                const n = index + 1;
+                if (!q.text) throw new Error(`Питання №${n}: додай текст питання.`);
+                if (!['1st period','2nd period','3rd period','4th period'].includes(q.period)) throw new Error(`Питання №${n}: невірний період.`);
+                if (q.type === 'choice') {
+                    if (q.options.length < 2 || q.options.some(option => !option)) throw new Error(`Питання №${n}: заповни щонайменше два варіанти відповіді.`);
+                    if (!Number.isInteger(q.answerIndex) || q.answerIndex < 0 || q.answerIndex >= q.options.length) throw new Error(`Питання №${n}: вибери правильну відповідь.`);
+                } else if (q.options.length < 1 || q.options.some(option => !option)) {
+                    throw new Error(`Питання №${n}: додай хоча б одну прийняту правильну відповідь.`);
+                }
+                if (q.imageUrl && !/^https:\/\//i.test(q.imageUrl)) throw new Error(`Питання №${n}: URL зображення має починатися з https://`);
+            });
+
+            const before = item.savedQuestionsJson || JSON.stringify(canonicalSubmissionQuestions(item.questions || []));
+            if (before === JSON.stringify(draft)) {
+                if (!silent) alert('Змін немає — заявка вже містить ці питання.');
+                return true;
+            }
+            await postContributionApi({ action:'update', adminKey:adminSettings.submissionAdminKey, submissionId, questions:draft });
+            await sleep(450);
+            const latest = await refreshSubmissionQueue(true);
+            const saved = latest.find(entry => entry.id === submissionId);
+            if (!saved || JSON.stringify(canonicalSubmissionQuestions(saved.questions || [])) !== JSON.stringify(draft)) {
+                throw new Error('Сервер не підтвердив збереження змін. Онови чергу та перевір заявку.');
+            }
+            if (!silent) alert(`✅ Збережено ${draft.length} питань у черзі. Тепер їх можна схвалити.`);
+            return true;
+        }
+
         async function moderateQuestionSubmission(submissionId, decision) {
-            const item = submissionQueueItems.find(entry => entry.id === submissionId);
+            let item = submissionQueueItems.find(entry => entry.id === submissionId);
             if (!item) { alert('Заявку не знайдено. Онови чергу.'); return; }
-            if (decision === 'approved' && !confirm(`Схвалити ${item.questionCount} питань від «${item.author || 'Без імені'}» та опублікувати їх у спільній базі?`)) return;
+            if (decision === 'approved') {
+                try {
+                    const draft = canonicalSubmissionQuestions(collectSubmissionEditorQuestions(submissionId));
+                    const saved = item.savedQuestionsJson || JSON.stringify(canonicalSubmissionQuestions(item.questions || []));
+                    if (JSON.stringify(draft) !== saved) {
+                        if (!confirm('Є незбережені правки. Зберегти їх у Google-таблиці перед схваленням?')) return;
+                        await saveSubmissionQuestionEdits(submissionId, true);
+                        item = submissionQueueItems.find(entry => entry.id === submissionId);
+                    }
+                } catch (error) {
+                    alert('Спочатку виправ питання: ' + (error.message || 'помилка перевірки'));
+                    return;
+                }
+                if (!confirm(`Схвалити ${item.questions.length} перевірених питань від «${item.author || 'Без імені'}» та опублікувати їх у спільній базі?`)) return;
+            }
             let reviewNote = '';
             if (decision === 'rejected') {
                 if (!confirm(`Відхилити пропозицію від «${item.author || 'Без імені'}»?`)) return;
