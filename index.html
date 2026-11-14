@@ -1998,9 +1998,16 @@ async function autoSyncOnLoad() {
                 let res = await fetch(`https://api.github.com/gists/${targetGistId}?t=${Date.now()}`);
                 if (!res.ok) throw new Error("Network response not ok");
                 let data = await res.json();
-                if (!data.files['questions.json']) throw new Error("Файл questions.json не знайдено в Gist");
+                const fileObj = data.files['questions.json'];
+                if (!fileObj) throw new Error("Файл questions.json не знайдено в Gist");
                 
-                let cloudContent = data.files['questions.json'].content;
+                let cloudContent = fileObj.content;
+                if (fileObj.truncated && fileObj.raw_url) {
+                    let rawRes = await fetch(fileObj.raw_url);
+                    if (!rawRes.ok) throw new Error("Не вдалося завантажити повний файл із raw_url");
+                    cloudContent = await rawRes.text();
+                }
+
                 let cloudQuestions = JSON.parse(cloudContent);
                 let finalQuestions = cloudQuestions.filter(q => !deletedCloudIds.includes(q.id));
                 finalQuestions = finalQuestions.map(q => { if (!q.period) q.period = '2nd period'; return q; });
