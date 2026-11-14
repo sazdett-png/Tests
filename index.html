@@ -1021,6 +1021,96 @@ button:active { transform: translateY(1px) scale(.99); }
  .stats-daily-chart { grid-template-columns:repeat(30,minmax(16px,1fr)); }
 }
 
+
+
+/* v8.1 — compact learning categories, statistics reset and question handoff */
+#categoriesGrid .category-group {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 1px solid var(--line) !important;
+  border-radius: 15px !important;
+  background: rgba(9,18,32,.55) !important;
+}
+#categoriesGrid .category-group-toggle {
+  display: flex;
+  width: 100%;
+  min-height: 68px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #eaf1fc;
+  text-align: left;
+}
+#categoriesGrid .category-group-toggle:hover { background: rgba(255,255,255,.035); }
+#categoriesGrid .category-group-copy { display: flex; align-items: center; gap: 12px; min-width: 0; }
+#categoriesGrid .category-group-icon { display: grid; place-items: center; width: 38px; height: 38px; flex: 0 0 auto; border: 1px solid rgba(244,189,85,.16); border-radius: 11px; background: rgba(244,189,85,.08); font-size: 17px; }
+#categoriesGrid .category-group-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+#categoriesGrid .category-group-text strong { overflow-wrap: anywhere; color: #e8effb; font-size: .85rem; font-weight: 820; }
+#categoriesGrid .category-group-text small { color: #8194ae; font-size: .65rem; }
+#categoriesGrid .category-group-chevron { display: grid; place-items: center; width: 29px; height: 29px; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 9px; color: #aabbd1; font-size: 19px; line-height: 1; transition: transform .2s ease, background .2s ease; }
+#categoriesGrid .category-group.expanded .category-group-chevron { transform: rotate(180deg); color: #ffda91; background: rgba(244,189,85,.09); }
+#categoriesGrid .category-subgrid { padding: 0 13px 14px; }
+#categoriesGrid .category-subgrid .card { min-height: 67px !important; }
+.stats-header-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.stats-reset-btn { padding: 9px 12px; border: 1px solid rgba(255,126,136,.25); border-radius: 10px; background: rgba(128,48,58,.17); color: #ffadb2; font-size: .72rem; font-weight: 780; }
+.stats-reset-btn:hover { border-color: rgba(255,126,136,.5); background: rgba(128,48,58,.28); }
+.submission-icon { color: #d8caff; background: rgba(169,155,255,.13) !important; }
+.submission-tool-card { border-color: rgba(169,155,255,.2) !important; }
+.submission-tool-card:hover { border-color: rgba(169,155,255,.42) !important; }
+.submission-help-note { margin: -2px 2px 0; color: #7f94b0; font-size: .68rem; line-height: 1.55; }
+@media (max-width: 640px) {
+  .stats-screen-heading { align-items: flex-start; flex-direction: column; }
+  .stats-header-actions { width: 100%; flex-wrap: wrap; }
+  .stats-header-actions button { flex: 1 1 auto; }
+  #categoriesGrid .category-group-toggle { min-height: 62px; padding: 11px 12px; }
+  #categoriesGrid .category-subgrid { padding: 0 9px 10px; }
+}
+
+
+/* v8.2 — Google Apps Script contribution queue and moderation */
+.submission-moderation-panel { margin: 0 0 17px; padding: 18px; border: 1px solid rgba(114,183,255,.22); border-radius: 18px; background: linear-gradient(145deg, rgba(16,34,55,.97), rgba(12,24,41,.97)); box-shadow: 0 14px 32px rgba(0,0,0,.16); }
+.submission-moderation-header { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:14px; }
+.submission-moderation-header h3 { margin:4px 0 5px; color:#eef5ff; font-size:1rem; font-weight:850; }
+.submission-moderation-header p { margin:0; max-width:720px; color:#91a5bf; font-size:.72rem; line-height:1.5; }
+.submission-moderation-kicker { color:#79bfff; font-size:.58rem; font-weight:900; letter-spacing:.16em; }
+.submission-refresh-btn { flex:0 0 auto; padding:9px 12px; border:1px solid rgba(114,183,255,.25); border-radius:10px; background:rgba(50,94,145,.18); color:#b9dcff; font-size:.7rem; font-weight:800; }
+.submission-queue-status { margin:0 0 10px; color:#91a5bf; font-size:.7rem; }
+.submission-queue-status.error { color:#ff9da5; }
+.submission-queue-counters { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+.submission-queue-counter { padding:9px 10px; border:1px solid var(--line); border-radius:10px; background:rgba(5,15,27,.42); }
+.submission-queue-counter strong { display:block; color:#f0f5ff; font-size:1.12rem; font-weight:850; }
+.submission-queue-counter span { color:#8296b1; font-size:.58rem; }
+.submission-queue-list { display:grid; gap:10px; }
+.submission-queue-card { padding:13px; border:1px solid var(--line); border-radius:13px; background:rgba(7,16,29,.58); }
+.submission-queue-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.submission-queue-card h4 { margin:0; color:#eaf2ff; font-size:.82rem; font-weight:850; }
+.submission-queue-meta { margin-top:4px; color:#8296b1; font-size:.62rem; line-height:1.5; }
+.submission-status-pill { display:inline-flex; align-items:center; flex:0 0 auto; padding:5px 8px; border:1px solid var(--line); border-radius:999px; color:#b8c8dc; font-size:.58rem; font-weight:850; }
+.submission-status-pill.pending { border-color:rgba(244,189,85,.25); background:rgba(244,189,85,.08); color:#f6d28d; }
+.submission-status-pill.approved { border-color:rgba(83,214,160,.25); background:rgba(83,214,160,.08); color:#8ee5bd; }
+.submission-status-pill.published { border-color:rgba(114,183,255,.25); background:rgba(114,183,255,.08); color:#a7d3ff; }
+.submission-status-pill.rejected { border-color:rgba(255,126,136,.25); background:rgba(255,126,136,.08); color:#ffabb1; }
+.submission-question-preview { display:grid; gap:4px; margin:10px 0 0; padding-left:17px; color:#aabbd0; font-size:.66rem; line-height:1.45; }
+.submission-review-note { margin-top:9px; padding:8px 10px; border-left:2px solid rgba(244,189,85,.5); border-radius:0 8px 8px 0; background:rgba(244,189,85,.055); color:#c7b58f; font-size:.65rem; }
+.submission-queue-actions { display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; }
+.submission-queue-actions button { padding:7px 10px; border:1px solid var(--line-strong); border-radius:8px; font-size:.64rem; font-weight:850; }
+.submission-approve-btn { border-color:rgba(83,214,160,.28)!important; background:rgba(24,112,82,.24)!important; color:#9be8c5!important; }
+.submission-reject-btn { border-color:rgba(255,126,136,.24)!important; background:rgba(128,48,58,.18)!important; color:#ffadb2!important; }
+.submission-publish-btn { border-color:rgba(114,183,255,.28)!important; background:rgba(50,94,145,.22)!important; color:#b9dcff!important; }
+.submission-queue-empty { margin:0; padding:16px 8px; color:#71849f; font-size:.7rem; text-align:center; }
+@media(max-width:640px) {
+  .submission-moderation-panel { padding:13px; }
+  .submission-moderation-header { flex-direction:column; }
+  .submission-refresh-btn { width:100%; }
+  .submission-queue-counters { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .submission-queue-card-top { flex-direction:column; }
+}
+
 </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
@@ -1061,7 +1151,7 @@ button:active { transform: translateY(1px) scale(.99); }
         <span class="quick-ref-icon">🖩</span><span class="hidden md:inline">Кальк</span>
     </button>
     <button class="status-pill" id="soundToggleBtn" type="button" onclick="toggleSound()" title="Звук увімкнений — натисніть, щоб вимкнути" aria-label="Вимкнути звук" aria-pressed="true"><span id="soundIcon" aria-hidden="true">🔊</span> <span>Звук</span></button>
-    <span class="build-stamp">VERSION 8.0</span>
+    <span class="build-stamp">VERSION 8.1</span>
 </div></header><div class="app-content" id="appContent"><div class="home-dashboard" id="homeScreen"><section class="welcome-card"><div class="welcome-copy"><span class="welcome-kicker">ELECTRICIAN · STUDY WORKSPACE</span><h2>Питання, модулі та довідник</h2><p>Матеріали з електричної теорії, електричних кіл і систем керування.</p></div><div aria-hidden="true" class="welcome-art"><div class="welcome-art-icon">⚡</div><span>DC · AC · RLC · CONTROLS</span></div></section><section aria-live="polite" class="resume-session-panel hidden" id="resumeSessionPanel"></section><div class="home-stats" id="homeStats">
 <div class="metric-card metric-streak">
 <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Поточна серія</p>
@@ -1117,13 +1207,18 @@ button:active { transform: translateY(1px) scale(.99); }
     <button class="more-tool-card" type="button" onclick="showScreen('editorScreen')"><span class="more-tool-icon editor-icon">✎</span><span><strong>Редактор питань</strong><small>Додавання, зміна та керування навчальними питаннями</small></span><span class="more-tool-arrow">↗</span></button>
     <button class="more-tool-card" type="button" onclick="exportFullData()"><span class="more-tool-icon backup-icon">↓</span><span><strong>Експорт резервної копії</strong><small>Зберегти питання, довідники та особистий прогрес у файл JSON</small></span><span class="more-tool-arrow">↓</span></button>
     <button class="more-tool-card" type="button" onclick="document.getElementById('importFile').click()"><span class="more-tool-icon import-icon">↑</span><span><strong>Імпорт резервної копії</strong><small>Відновити дані з раніше збереженого JSON-файлу</small></span><span class="more-tool-arrow">↑</span></button>
+    <button class="more-tool-card submission-tool-card" type="button" onclick="submitQuestionContribution()"><span class="more-tool-icon submission-icon">✉</span><span><strong>Запропонувати питання</strong><small>Надіслати власні питання на перевірку автору</small></span><span class="more-tool-arrow">↗</span></button>
   </div>
+  <p class="submission-help-note">Питання потраплять у чергу модерації. Після перевірки автор зможе схвалити їх і додати до спільної бази. Особисті дані, крім вказаного тобою імені або нікнейму, не збираються.</p>
   <section class="more-tip"><span>📘</span><div><strong>Довідник завжди під рукою</strong><p>Натисни кнопку з книжкою у верхній панелі. Вона доступна навіть під час тесту та перегляду флеш-карток.</p></div></section>
 </div>
 <div class="stats-dashboard hidden" id="statsScreen">
-<div class="screen-title-row">
+<div class="screen-title-row stats-screen-heading">
 <h2 class="text-2xl font-bold text-white">Аналітика навчання <span class="period-inline-label" id="statsPeriodLabel"></span></h2>
+<div class="stats-header-actions">
+<button class="stats-reset-btn" type="button" onclick="resetAllStatistics()">↺ Скинути статистику</button>
 <button class="back-home-btn" onclick="showScreen('homeScreen')">← На головну</button>
+</div>
 </div>
 <div class="stats-overview-grid">
 <!-- Загальний прогрес (Doughnut Chart) -->
@@ -1179,7 +1274,17 @@ button:active { transform: translateY(1px) scale(.99); }
 <button class="bg-blue-600 hover:bg-blue-500 text-white flex-1 py-2 rounded font-bold text-xs shadow transition" id="publishToCloudBtn" onclick="publishToCloud()">☁️ Опублікувати питання</button>
 <button class="bg-indigo-600 hover:bg-indigo-500 text-white flex-1 py-2 rounded font-bold text-xs shadow transition" id="forceSyncBtn" onclick="forceSyncWithCloud()">⬇️ Завантажити базу</button>
 <button class="bg-gray-700 hover:bg-red-900 text-gray-300 py-2 px-3 rounded font-bold text-xs shadow transition" onclick="logoutAdmin()">Вийти</button>
-</div><div class="editor-layout"><div class="editor-panel editor-form-panel" id="editorFormPanel">
+</div>
+<section class="submission-moderation-panel hidden" id="submissionModerationPanel" aria-label="Модерація запропонованих питань">
+  <div class="submission-moderation-header">
+    <div><span class="submission-moderation-kicker">COMMUNITY CONTRIBUTIONS</span><h3>Черга запропонованих питань</h3><p>Схвалені питання автоматично додаються до локальної бази та публікуються у спільний GitHub Gist.</p></div>
+    <button type="button" class="submission-refresh-btn" id="refreshSubmissionQueueBtn" onclick="refreshSubmissionQueue()">↻ Оновити чергу</button>
+  </div>
+  <div class="submission-queue-status" id="submissionQueueStatus">Чергу ще не завантажено.</div>
+  <div class="submission-queue-counters" id="submissionQueueCounters"></div>
+  <div class="submission-queue-list" id="submissionQueueList"><p class="submission-queue-empty">Натисни «Оновити чергу», щоб завантажити пропозиції.</p></div>
+</section>
+<div class="editor-layout"><div class="editor-panel editor-form-panel" id="editorFormPanel">
 <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-yellow-500" id="editorFormTitle">Додати нове питання</h3></div>
 <div class="space-y-4">
 <select class="w-full bg-gray-700 border-gray-600 rounded p-3 text-white font-bold focus:ring-2 focus:ring-yellow-500" id="qPeriod">
@@ -1409,8 +1514,15 @@ button:active { transform: translateY(1px) scale(.99); }
     </div>
 </div>
 <script>
-        // BUILD: 2026.11.12-electrician-hub-v8 — detailed analytics and resumable sessions.
-        const PUBLIC_GIST_ID = '5ee027de84d344fbe11d2a496246d8ea'; 
+        // BUILD: 2026.11.14-electrician-hub-v8.2 — Apps Script submission queue and GitHub auto-publishing moderation.
+        const PUBLIC_GIST_ID = '5ee027de84d344fbe11d2a496246d8ea';
+        // Після розгортання Google Apps Script встав сюди URL вебзастосунку, що закінчується на /exec.
+        const CONTRIBUTION_API_URL = 'https://script.google.com/macros/s/AKfycbyQhg1nQMNYOEKL9UFXcLDqwVsUcUZr_6u4K_QSKPfB1q-ETs39eOhLpho2wifbFMNXLQ/exec';
+        const CONTRIBUTION_SUBMITTED_IDS_KEY = 'quiz_contribution_submitted_ids';
+
+        function isContributionApiConfigured() {
+            return /^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec(?:\?.*)?$/.test(String(CONTRIBUTION_API_URL || '').trim());
+        }
 
         const defaultQuestions = [{ id: "1", period: "2nd period", type: "choice", category: "AC Fundamentals", subCategory: "105A", text: "Яке значення показує мультиметр при вимірюванні AC?", options: ["RMS", "Peak", "Average", "Миттєве"], answerIndex: 0, explanation: "Завжди RMS." }];
         
@@ -1660,10 +1772,11 @@ button:active { transform: translateY(1px) scale(.99); }
         // Timestamped answer events and completed learning sessions power the detailed analytics.
         let answerHistory = readStoredArray('quiz_answer_history').filter(item => item && Number.isFinite(item.ts) && typeof item.correct === 'boolean');
         let learningSessions = readStoredArray('quiz_learning_sessions').filter(item => item && Number.isFinite(item.date));
-        let adminSettings = readStoredObject('quiz_admin_settings', { token: '', gistId: '' });
+        let adminSettings = readStoredObject('quiz_admin_settings', { token: '', gistId: '', submissionAdminKey: '' });
         adminSettings = {
             token: typeof adminSettings.token === 'string' ? adminSettings.token : '',
-            gistId: typeof adminSettings.gistId === 'string' ? adminSettings.gistId : ''
+            gistId: typeof adminSettings.gistId === 'string' ? adminSettings.gistId : '',
+            submissionAdminKey: typeof adminSettings.submissionAdminKey === 'string' ? adminSettings.submissionAdminKey : ''
         };
         
         const storedAppStats = readStoredObject('app_stats');
@@ -1711,6 +1824,8 @@ button:active { transform: translateY(1px) scale(.99); }
         }
 
         let selectedCategories = new Set();
+        // Categories on the learning screen start collapsed; expanded state lasts for this app session.
+        let expandedCategoryNames = new Set();
         let currentQuizQuestions = [];
         let currentQIndex = 0, score = 0, userMistakes = [];
         let editingQuestionId = null, pendingQuestionSave = null, currentMode = 'quiz', examInterval = null, examTimeLeft = 0, examPassTarget = 70;
@@ -1858,22 +1973,41 @@ button:active { transform: translateY(1px) scale(.99); }
             adminTaps++; clearTimeout(adminTapTimeout); adminTapTimeout = setTimeout(() => { adminTaps = 0; }, 1500);
             if (adminTaps >= 5) {
                 adminTaps = 0;
-                let pwd = prompt("👑 Режим Адміна. Введіть пароль (GitHub Token):", adminSettings.token || "");
-                if (pwd !== null) {
-                    let gid = prompt("Введіть ваш Gist ID:", adminSettings.gistId || PUBLIC_GIST_ID || "");
-                    if (gid !== null) { adminSettings.token = pwd.trim(); adminSettings.gistId = gid.trim(); localStorage.setItem('quiz_admin_settings', JSON.stringify(adminSettings)); checkAdminMode(); alert("✅ Налаштування адміна збережено!"); }
+                const token = prompt("👑 Режим Адміна. Введіть GitHub Token:", adminSettings.token || "");
+                if (token === null) return;
+                const gistId = prompt("Введіть ваш Gist ID:", adminSettings.gistId || PUBLIC_GIST_ID || "");
+                if (gistId === null) return;
+                let submissionAdminKey = adminSettings.submissionAdminKey || '';
+                if (isContributionApiConfigured()) {
+                    const enteredKey = prompt("Ключ модератора Google Apps Script (ADMIN_KEY з setup()):", submissionAdminKey);
+                    if (enteredKey === null) return;
+                    submissionAdminKey = enteredKey.trim();
                 }
+                adminSettings = { token: token.trim(), gistId: gistId.trim(), submissionAdminKey };
+                localStorage.setItem('quiz_admin_settings', JSON.stringify(adminSettings));
+                checkAdminMode();
+                alert("✅ Налаштування адміна збережено!");
             }
         }
 
-        function checkAdminMode() { 
-            if (adminSettings && adminSettings.token && adminSettings.gistId) { 
-                document.getElementById('adminPanel').classList.remove('hidden'); 
-            } else { 
-                document.getElementById('adminPanel').classList.add('hidden'); 
-            } 
+        function checkAdminMode() {
+            const adminReady = !!(adminSettings && adminSettings.token && adminSettings.gistId);
+            const adminPanel = document.getElementById('adminPanel');
+            const moderationPanel = document.getElementById('submissionModerationPanel');
+            if (adminPanel) adminPanel.classList.toggle('hidden', !adminReady);
+            const moderationReady = adminReady && isContributionApiConfigured() && !!adminSettings.submissionAdminKey;
+            if (moderationPanel) moderationPanel.classList.toggle('hidden', !moderationReady);
+            if (moderationReady && !submissionQueueLoaded) {
+                // Do not block editor rendering; the admin can also refresh manually.
+                refreshSubmissionQueue(true).catch(() => {});
+            }
         }
-        function logoutAdmin() { adminSettings = { token: '', gistId: '' }; localStorage.removeItem('quiz_admin_settings'); checkAdminMode(); }
+
+        function logoutAdmin() {
+            adminSettings = { token: '', gistId: '', submissionAdminKey: '' };
+            localStorage.removeItem('quiz_admin_settings');
+            checkAdminMode();
+        }
 
        // --- КЕРУВАННЯ ЗВУКОМ ---
 // Sounds are generated locally with Web Audio API; no audio files or network requests are needed.
@@ -2021,16 +2155,371 @@ async function autoSyncOnLoad() {
             } catch(e) { console.warn("Синхронізація не вдалася:", e); return false; }
         }
 
-        async function publishToCloud() {
-            if (!adminSettings.token || !adminSettings.gistId) { alert("Немає токена або Gist ID!"); return; }
-            const btn = document.getElementById('publishToCloudBtn'); btn.innerText = "⏳ Відправка...";
+        async function publishToCloud(options = {}) {
+            const silent = !!(options && options.silent);
+            if (!adminSettings.token || !adminSettings.gistId) { if (!silent) alert("Немає токена або Gist ID!"); return false; }
+            const btn = document.getElementById('publishToCloudBtn');
+            const originalText = btn ? btn.innerText : '☁️ Публікація в базу';
+            if (btn) btn.innerText = "⏳ Відправка...";
             try {
                 const cloudReadyQuestions = questions.map(q => { const { isCustom, ...rest } = q; return rest; });
                 const payload = { files: { 'questions.json': { content: JSON.stringify(cloudReadyQuestions, null, 2) } } };
-                let res = await fetch(`https://api.github.com/gists/${adminSettings.gistId}`, { method: 'PATCH', headers: { 'Accept': 'application/vnd.github.v3+json', 'Authorization': `token ${adminSettings.token}` }, body: JSON.stringify(payload) });
-                if (!res.ok) throw new Error("Помилка відправки (перевірте токен)");
-                alert("✅ Базу успішно опубліковано у хмару!");
-            } catch(e) { alert("❌ Помилка: " + e.message); } finally { btn.innerText = "☁️ Публікація в базу"; }
+                const res = await fetch(`https://api.github.com/gists/${adminSettings.gistId}`, { method: 'PATCH', headers: { 'Accept': 'application/vnd.github.v3+json', 'Authorization': `token ${adminSettings.token}` }, body: JSON.stringify(payload) });
+                if (!res.ok) throw new Error("Помилка відправки (перевірте токен і доступ до Gist)");
+                if (!silent) alert("✅ Базу успішно опубліковано у хмару!");
+                return true;
+            } catch(e) {
+                console.error('Публікація в GitHub Gist не вдалася:', e);
+                if (!silent) alert("❌ Помилка: " + e.message);
+                return false;
+            } finally { if (btn) btn.innerText = originalText; }
+        }
+
+        // --- GOOGLE APPS SCRIPT: ПРОПОЗИЦІЇ ПИТАНЬ І МОДЕРАЦІЯ ---
+        let submissionQueueLoaded = false;
+        let submissionQueueItems = [];
+        let submissionQueueBusy = false;
+        let submissionPublishBusy = false;
+
+        function getContributionApiBase() {
+            return isContributionApiConfigured() ? String(CONTRIBUTION_API_URL).trim() : '';
+        }
+
+        function contributionApiJsonp(params = {}, timeoutMs = 15000) {
+            return new Promise((resolve, reject) => {
+                const base = getContributionApiBase();
+                if (!base) { reject(new Error('Google Apps Script URL ще не налаштовано.')); return; }
+                const callbackName = 'ehJsonp_' + Date.now() + '_' + Math.floor(Math.random() * 1000000);
+                const query = { ...params, callback: callbackName, _: Date.now() };
+                const queryString = Object.entries(query).map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`).join('&');
+                const script = document.createElement('script');
+                let finished = false;
+                const cleanup = () => {
+                    if (finished) return;
+                    finished = true;
+                    clearTimeout(timer);
+                    script.remove();
+                    try { delete window[callbackName]; } catch (_) { window[callbackName] = undefined; }
+                };
+                const timer = setTimeout(() => { cleanup(); reject(new Error('Google Apps Script не відповів. Перевір URL і доступ «Anyone».')); }, timeoutMs);
+                window[callbackName] = data => {
+                    cleanup();
+                    if (!data || data.ok !== true) reject(new Error(data && data.error ? data.error : 'Не вдалося отримати відповідь сервера.'));
+                    else resolve(data);
+                };
+                script.onerror = () => { cleanup(); reject(new Error('Не вдалося підключитися до Google Apps Script.')); };
+                script.src = `${base}?${queryString}`;
+                document.head.appendChild(script);
+            });
+        }
+
+        async function postContributionApi(payload) {
+            const base = getContributionApiBase();
+            if (!base) throw new Error('Google Apps Script URL ще не налаштовано.');
+            // text/plain is a CORS-safelisted content type; no-cors avoids a preflight.
+            // The response is opaque by browser design, so we verify writes via a JSONP read.
+            await fetch(base, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                body: JSON.stringify(payload)
+            });
+        }
+
+        function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+        async function getSubmissionStatusWithRetry(submissionId, clientToken) {
+            let lastError = null;
+            for (let attempt = 0; attempt < 5; attempt++) {
+                try {
+                    const data = await contributionApiJsonp({ action: 'status', id: submissionId, proof: clientToken }, 10000);
+                    return data;
+                } catch (error) {
+                    lastError = error;
+                    await sleep(550 + attempt * 350);
+                }
+            }
+            throw lastError || new Error('Не вдалося перевірити стан заявки.');
+        }
+
+        function getContributionClientToken() {
+            let token = localStorage.getItem('quiz_contribution_client_token') || '';
+            if (!/^[A-Za-z0-9_-]{20,120}$/.test(token)) {
+                const randomPart = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID().replace(/-/g, '') : (Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
+                token = 'ehclient_' + randomPart;
+                localStorage.setItem('quiz_contribution_client_token', token);
+            }
+            return token;
+        }
+
+        function getSubmittedQuestionIds() {
+            try {
+                const value = JSON.parse(localStorage.getItem(CONTRIBUTION_SUBMITTED_IDS_KEY) || '[]');
+                return Array.isArray(value) ? value.map(String) : [];
+            } catch (_) { return []; }
+        }
+
+        function markQuestionsAsSubmitted(ids) {
+            const current = new Set(getSubmittedQuestionIds());
+            ids.forEach(id => current.add(String(id)));
+            localStorage.setItem(CONTRIBUTION_SUBMITTED_IDS_KEY, JSON.stringify([...current].slice(-3000)));
+        }
+
+        function unmarkSubmittedQuestion(id) {
+            const target = String(id);
+            const next = getSubmittedQuestionIds().filter(existing => existing !== target);
+            localStorage.setItem(CONTRIBUTION_SUBMITTED_IDS_KEY, JSON.stringify(next));
+        }
+
+        async function submitQuestionContribution() {
+            const alreadySubmitted = new Set(getSubmittedQuestionIds());
+            const contributedQuestions = questions.filter(q => q && q.isCustom === true && !alreadySubmitted.has(String(q.id)));
+            if (contributedQuestions.length === 0) {
+                alert('Немає нових власних питань для відправки. Питання, які вже були подані, не дублюються. Відредагуй питання, щоб надіслати оновлену версію.');
+                return;
+            }
+
+            if (!isContributionApiConfigured()) {
+                alert('Онлайн-приймальня ще не підключена. Поки що можна створити JSON-файл і передати його автору вручну.');
+                await exportQuestionSubmissionFile(contributedQuestions);
+                return;
+            }
+
+            const batch = contributedQuestions.slice(0, 50);
+            if (contributedQuestions.length > batch.length && !confirm(`Знайдено ${contributedQuestions.length} нових питань. За один раз можна надіслати до 50. Надіслати перші ${batch.length}? Решта залишиться для наступної відправки.`)) return;
+
+            const authorInput = prompt('Як підписати автора? Введи ім’я або нікнейм (необов’язково):', '');
+            if (authorInput === null) return;
+            const author = authorInput.trim().slice(0, 80) || 'Без імені';
+            const noteInput = prompt('Коментар до пакета (необов’язково):', '');
+            const note = noteInput === null ? '' : noteInput.trim().slice(0, 600);
+            const clientToken = getContributionClientToken();
+            const submissionId = 'ehsub_' + ((typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID().replace(/-/g, '') : Date.now().toString(36) + Math.random().toString(36).slice(2));
+            const submitBtn = document.querySelector('.submission-tool-card');
+            if (submitBtn) submitBtn.disabled = true;
+
+            try {
+                await postContributionApi({
+                    action: 'submit', submissionId, clientToken, author, note,
+                    questions: batch.map(q => ({
+                        text: q.text, period: q.period || '2nd period', type: q.type || 'choice',
+                        options: Array.isArray(q.options) ? q.options : [], answerIndex: Number(q.answerIndex) || 0,
+                        category: q.category || '', subCategory: q.subCategory || '',
+                        imageUrl: q.imageUrl || '', explanation: q.explanation || ''
+                    }))
+                });
+
+                const receipt = await getSubmissionStatusWithRetry(submissionId, clientToken);
+                if (receipt.status !== 'pending') throw new Error('Заявку отримано, але її статус не «На перевірці».');
+                markQuestionsAsSubmitted(batch.map(q => q.id));
+                alert(`✅ Питання надіслано на перевірку!\n\nНомер заявки: ${submissionId}\nАвтор: ${author}\nПитань: ${batch.length}\nСтатус: На перевірці.\n\nПісля модерації вони можуть потрапити до спільної бази.`);
+            } catch (error) {
+                console.error('Не вдалося підтвердити відправку питань:', error);
+                alert('⚠️ Не вдалося підтвердити отримання заявки. Не натискай відправку багато разів поспіль. Перевір інтернет і спробуй ще раз.\n\n' + (error.message || 'Невідома помилка'));
+            } finally {
+                if (submitBtn) submitBtn.disabled = false;
+            }
+        }
+
+        async function exportQuestionSubmissionFile(sourceQuestions = null) {
+            const contributedQuestions = Array.isArray(sourceQuestions) ? sourceQuestions : questions.filter(q => q && q.isCustom === true);
+            if (contributedQuestions.length === 0) {
+                alert('Поки немає власних питань для відправки. Додай їх через редактор або імпортуй список питань.');
+                return;
+            }
+            const moduleNames = [...new Set(contributedQuestions.map(q => `${q.period || '2nd period'} · ${q.category || 'Без категорії'} → ${q.subCategory || 'Загальні'}`))];
+            const packageName = 'electrician-hub-question-submission.json';
+            try {
+                const blob = new Blob([JSON.stringify(contributedQuestions, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = packageName;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1500);
+                alert(`Підготовлено ${contributedQuestions.length} питань у ${moduleNames.length} модулях. Надішли цей JSON-файл автору для ручної перевірки.`);
+            } catch (error) {
+                console.error('Не вдалося створити пакет питань.', error);
+                alert('Не вдалося створити файл. Спробуй ще раз у сучасному браузері.');
+            }
+        }
+
+        async function refreshSubmissionQueue(silent = false) {
+            if (submissionQueueBusy) return submissionQueueItems;
+            if (!isContributionApiConfigured()) {
+                const message = 'Спочатку додай URL розгорнутого Google Apps Script у конфігурацію застосунку.';
+                const status = document.getElementById('submissionQueueStatus');
+                if (status) { status.textContent = message; status.classList.add('error'); }
+                if (!silent) alert(message);
+                return [];
+            }
+            if (!adminSettings.submissionAdminKey) {
+                const message = 'Не задано ADMIN_KEY Google Apps Script. Повторно відкрий адмін-режим через п’ять натискань на назву застосунку.';
+                const status = document.getElementById('submissionQueueStatus');
+                if (status) { status.textContent = message; status.classList.add('error'); }
+                if (!silent) alert(message);
+                return [];
+            }
+
+            submissionQueueBusy = true;
+            const button = document.getElementById('refreshSubmissionQueueBtn');
+            if (button) { button.disabled = true; button.textContent = '⏳ Завантаження…'; }
+            const status = document.getElementById('submissionQueueStatus');
+            if (status) { status.textContent = 'Завантаження черги…'; status.classList.remove('error'); }
+            try {
+                const data = await contributionApiJsonp({ action: 'list', key: adminSettings.submissionAdminKey });
+                submissionQueueItems = Array.isArray(data.items) ? data.items : [];
+                submissionQueueLoaded = true;
+                renderSubmissionQueue();
+                if (status) status.textContent = `Оновлено: ${new Date().toLocaleString('uk-CA')} · заявок: ${submissionQueueItems.length}`;
+                return submissionQueueItems;
+            } catch (error) {
+                if (status) { status.textContent = error.message || 'Помилка завантаження черги.'; status.classList.add('error'); }
+                if (!silent) alert('Не вдалося завантажити чергу: ' + (error.message || 'невідома помилка'));
+                return [];
+            } finally {
+                submissionQueueBusy = false;
+                if (button) { button.disabled = false; button.textContent = '↻ Оновити чергу'; }
+            }
+        }
+
+        function renderSubmissionQueue() {
+            const list = document.getElementById('submissionQueueList');
+            const counters = document.getElementById('submissionQueueCounters');
+            if (!list || !counters) return;
+            const count = status => submissionQueueItems.filter(item => item.status === status).length;
+            counters.innerHTML = [
+                ['На перевірці', count('pending')], ['Схвалено', count('approved')],
+                ['Опубліковано', count('published')], ['Відхилено', count('rejected')]
+            ].map(([label, value]) => `<div class="submission-queue-counter"><strong>${value}</strong><span>${label}</span></div>`).join('');
+
+            const active = submissionQueueItems.filter(item => item.status === 'pending' || item.status === 'approved');
+            if (!active.length) {
+                list.innerHTML = '<p class="submission-queue-empty">Черга порожня. Нові пропозиції з’являться тут автоматично після відправки користувачами.</p>';
+                return;
+            }
+            list.innerHTML = active.map(item => {
+                const statusLabel = item.status === 'pending' ? 'НА ПЕРЕВІРЦІ' : 'СХВАЛЕНО · ОЧІКУЄ ПУБЛІКАЦІЇ';
+                const date = item.submittedAt ? new Date(item.submittedAt).toLocaleString('uk-CA') : 'Дата невідома';
+                const preview = (item.questions || []).slice(0, 4).map(q => `<li>${escapeHtml(String(q.text || '').slice(0, 210))}</li>`).join('');
+                const extra = Number(item.questionCount) > 4 ? `<li>…ще ${Number(item.questionCount) - 4} питань</li>` : '';
+                const note = item.note ? `<div class="submission-review-note">Коментар автора: ${escapeHtml(item.note)}</div>` : '';
+                const reviewNote = item.reviewNote ? `<div class="submission-review-note">Нотатка модератора: ${escapeHtml(item.reviewNote)}</div>` : '';
+                const actions = item.status === 'pending'
+                    ? `<div class="submission-queue-actions"><button class="submission-approve-btn" onclick="moderateQuestionSubmission('${escapeHtml(item.id)}','approved')">✓ Схвалити й опублікувати</button><button class="submission-reject-btn" onclick="moderateQuestionSubmission('${escapeHtml(item.id)}','rejected')">✕ Відхилити</button></div>`
+                    : `<div class="submission-queue-actions"><button class="submission-publish-btn" onclick="publishApprovedSubmissions()">☁️ Повторити публікацію схвалених</button><button class="submission-reject-btn" onclick="moderateQuestionSubmission('${escapeHtml(item.id)}','rejected')">Відхилити</button></div>`;
+                return `<article class="submission-queue-card"><div class="submission-queue-card-top"><div><h4>${escapeHtml(item.author || 'Без імені')} · ${Number(item.questionCount) || (item.questions || []).length} питань</h4><div class="submission-queue-meta">${escapeHtml(date)} · ${escapeHtml(item.periods || 'Період не вказано')}<br>ID: ${escapeHtml(item.id)}</div></div><span class="submission-status-pill ${escapeHtml(item.status)}">${statusLabel}</span></div>${note}<ul class="submission-question-preview">${preview}${extra}</ul>${reviewNote}${actions}</article>`;
+            }).join('');
+        }
+
+        async function moderateQuestionSubmission(submissionId, decision) {
+            const item = submissionQueueItems.find(entry => entry.id === submissionId);
+            if (!item) { alert('Заявку не знайдено. Онови чергу.'); return; }
+            if (decision === 'approved' && !confirm(`Схвалити ${item.questionCount} питань від «${item.author || 'Без імені'}» та опублікувати їх у спільній базі?`)) return;
+            let reviewNote = '';
+            if (decision === 'rejected') {
+                if (!confirm(`Відхилити пропозицію від «${item.author || 'Без імені'}»?`)) return;
+                reviewNote = prompt('Причина відхилення (необов’язково):', '') || '';
+            }
+
+            try {
+                await postContributionApi({ action: 'moderate', adminKey: adminSettings.submissionAdminKey, submissionId, decision, reviewNote });
+                await sleep(350);
+                const latest = await refreshSubmissionQueue(true);
+                if (!latest.some(entry => entry.id === submissionId && entry.status === decision)) {
+                    throw new Error('Сервер не підтвердив зміну статусу. Онови чергу й перевір заявку.');
+                }
+                if (decision === 'approved') {
+                    await publishApprovedSubmissions();
+                } else {
+                    alert('Пропозицію відхилено.');
+                }
+            } catch (error) {
+                alert('Не вдалося змінити статус заявки: ' + (error.message || 'невідома помилка'));
+            }
+        }
+
+        function contributionQuestionSignature(q) {
+            return JSON.stringify([
+                String(q.text || '').trim().toLocaleLowerCase(), q.period || '2nd period', q.type || 'choice',
+                q.category || '', q.subCategory || '', (q.options || []).map(value => String(value).trim().toLocaleLowerCase()),
+                Number(q.answerIndex) || 0
+            ]);
+        }
+
+        async function publishApprovedSubmissions() {
+            if (submissionPublishBusy) return;
+            if (!adminSettings.token || !adminSettings.gistId || !adminSettings.submissionAdminKey) {
+                alert('Для публікації потрібні GitHub Token, Gist ID і ADMIN_KEY Apps Script.');
+                return;
+            }
+            if (!submissionQueueLoaded) await refreshSubmissionQueue(true);
+            const approved = submissionQueueItems.filter(item => item.status === 'approved');
+            if (!approved.length) { alert('Немає схвалених заявок для публікації.'); return; }
+            submissionPublishBusy = true;
+            const status = document.getElementById('submissionQueueStatus');
+            if (status) { status.textContent = 'Підготовка схвалених питань до публікації…'; status.classList.remove('error'); }
+
+            try {
+                const existingIds = new Set(questions.map(q => String(q.id)));
+                const signatures = new Set(questions.map(contributionQuestionSignature));
+                const addedCounts = {};
+                const additions = [];
+                for (const item of approved) {
+                    const incoming = Array.isArray(item.questions) ? item.questions : [];
+                    let validQuestions;
+                    try {
+                        const normalized = incoming.map((q, index) => ({ ...q, id: `community-${String(item.id).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 48)}-${index + 1}` }));
+                        validQuestions = validateQuestionArray(normalized, existingIds, false);
+                    } catch (error) {
+                        throw new Error(`Заявка ${item.id}: ${error.message || 'помилка структури питань'}`);
+                    }
+                    let addedForItem = 0;
+                    validQuestions.forEach(q => {
+                        const signature = contributionQuestionSignature(q);
+                        if (signatures.has(signature)) return;
+                        signatures.add(signature);
+                        existingIds.add(String(q.id));
+                        delete q.isCustom;
+                        additions.push(q);
+                        addedForItem++;
+                    });
+                    addedCounts[item.id] = addedForItem;
+                }
+
+                if (additions.length) {
+                    questions = [...additions, ...questions];
+                    saveData();
+                    updateEditorList();
+                    renderCategories();
+                }
+
+                // Publish once for the whole approved batch. If this fails, rows remain approved for retry.
+                const published = await publishToCloud({ silent: true });
+                if (!published) throw new Error('GitHub не прийняв публікацію. Схвалені заявки залишились у черзі — виправ токен або права доступу й натисни повторну публікацію.');
+
+                for (const item of approved) {
+                    await postContributionApi({
+                        action: 'moderate', adminKey: adminSettings.submissionAdminKey,
+                        submissionId: item.id, decision: 'published', publishedCount: addedCounts[item.id] || 0
+                    });
+                }
+                await sleep(300);
+                const afterPublish = await refreshSubmissionQueue(true);
+                const stillApproved = approved.filter(item => !afterPublish.some(entry => entry.id === item.id && entry.status === 'published'));
+                if (stillApproved.length) throw new Error('GitHub оновлено, але не всі заявки отримали статус «Опубліковано» у таблиці. Натисни оновлення черги; якщо вони лишилися схваленими — повтори публікацію.');
+                const addedTotal = Object.values(addedCounts).reduce((sum, value) => sum + value, 0);
+                alert(`✅ Публікацію завершено.\n\nЗаявок оброблено: ${approved.length}\nНових питань додано: ${addedTotal}\n\nСпільну базу GitHub оновлено.`);
+            } catch (error) {
+                console.error('Публікація схвалених пропозицій не вдалася:', error);
+                if (status) { status.textContent = error.message || 'Публікація не вдалася.'; status.classList.add('error'); }
+                alert('⚠️ ' + (error.message || 'Не вдалося опублікувати схвалені питання.'));
+                await refreshSubmissionQueue(true);
+            } finally {
+                submissionPublishBusy = false;
+            }
         }
 
         // --- GOOGLE SHEETS ВІДПРАВКА ПОМИЛОК ---
@@ -2135,36 +2624,76 @@ async function autoSyncOnLoad() {
 
         // ГОЛОВНИЙ ЕКРАН
         function renderCategories() {
-            const container = document.getElementById('categoriesGrid'); container.innerHTML = '';
-            
+            const container = document.getElementById('categoriesGrid');
+            container.innerHTML = '';
             const periodQuestions = questions.filter(q => q.period === activePeriod);
 
-            const specialDiv = document.createElement('div'); specialDiv.className = 'mb-6';
+            const specialDiv = document.createElement('div');
+            specialDiv.className = 'mb-6 category-special-group';
+            specialDiv.dataset.specialGroup = 'true';
             specialDiv.innerHTML = '<div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="specialGrid"></div>';
             container.appendChild(specialDiv);
-            
+
             const sGrid = specialDiv.querySelector('#specialGrid');
             sGrid.appendChild(createCatCard('Всі питання', periodQuestions.length, 'all'));
-            let validFavorites = favoriteIds.filter(id => periodQuestions.find(q => q.id === id));
+            const validFavorites = favoriteIds.filter(id => periodQuestions.find(q => String(q.id) === String(id)));
             if (validFavorites.length > 0) sGrid.appendChild(createCatCard('⭐ Обране', validFavorites.length, 'favorites', 'border-yellow-600 bg-yellow-900/20 text-yellow-100'));
-            let validMistakes = mistakeIds.filter(id => periodQuestions.find(q => q.id === id));
+            const validMistakes = mistakeIds.filter(id => periodQuestions.find(q => String(q.id) === String(id)));
             if (validMistakes.length > 0) sGrid.appendChild(createCatCard('🔥 Помилки (Всі)', validMistakes.length, 'mistakes', 'border-red-900 bg-red-900/20 text-red-100'));
             const hardestIds = periodQuestions.filter(q => quizStats[q.id] && quizStats[q.id].w > quizStats[q.id].c).map(q => q.id);
             if (hardestIds.length > 0) sGrid.appendChild(createCatCard('💀 Найскладніші', hardestIds.length, 'hardest', 'border-purple-800 bg-purple-900/20 text-purple-100'));
 
             const groups = {};
-            periodQuestions.forEach(q => { const main = q.category || 'Без категорії', sub = q.subCategory || 'Загальні'; if (!groups[main]) groups[main] = {}; groups[main][sub] = (groups[main][sub] || 0) + 1; });
-
-            Object.keys(groups).sort().forEach(main => {
-                const groupDiv = document.createElement('div'); groupDiv.className = 'mb-6 bg-gray-800 p-4 rounded-lg border border-gray-700';
-                groupDiv.innerHTML = `<h3 class="text-lg font-bold text-yellow-500 mb-3 border-b border-gray-600 pb-2 flex items-center gap-2"></h3><div class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>`;
-                groupDiv.querySelector('h3').textContent = `📂 ${main}`;
-                container.appendChild(groupDiv);
-                const grid = groupDiv.querySelector('div');
-                Object.keys(groups[main]).sort().forEach(sub => grid.appendChild(createCatCard(sub, groups[main][sub], `cat|${main}|${sub}`)));
+            periodQuestions.forEach(q => {
+                const main = q.category || 'Без категорії';
+                const sub = q.subCategory || 'Загальні';
+                if (!groups[main]) groups[main] = {};
+                groups[main][sub] = (groups[main][sub] || 0) + 1;
             });
+
+            Object.keys(groups).sort((a, b) => a.localeCompare(b, 'uk')).forEach(main => {
+                const subCategories = Object.keys(groups[main]).sort((a, b) => a.localeCompare(b, 'uk'));
+                const totalQuestions = subCategories.reduce((sum, sub) => sum + groups[main][sub], 0);
+                const isExpanded = expandedCategoryNames.has(main);
+                const groupDiv = document.createElement('section');
+                groupDiv.className = `mb-6 category-group${isExpanded ? ' expanded' : ''}`;
+                groupDiv.dataset.categoryName = main;
+
+                const toggle = document.createElement('button');
+                toggle.type = 'button';
+                toggle.className = 'category-group-toggle';
+                toggle.setAttribute('aria-expanded', String(isExpanded));
+                toggle.innerHTML = `
+                    <span class="category-group-copy">
+                        <span class="category-group-icon" aria-hidden="true">📂</span>
+                        <span class="category-group-text"><strong>${escapeHtml(main)}</strong><small>${subCategories.length} підкатегорій · ${totalQuestions} питань</small></span>
+                    </span>
+                    <span class="category-group-chevron" aria-hidden="true">⌄</span>`;
+                toggle.addEventListener('click', () => toggleCategoryGroup(groupDiv));
+                groupDiv.appendChild(toggle);
+
+                const grid = document.createElement('div');
+                grid.className = `category-subgrid grid grid-cols-2 md:grid-cols-3 gap-3${isExpanded ? '' : ' hidden'}`;
+                subCategories.forEach(sub => grid.appendChild(createCatCard(sub, groups[main][sub], `cat|${main}|${sub}`)));
+                groupDiv.appendChild(grid);
+                container.appendChild(groupDiv);
+            });
+
             updateDueCardsCount(periodQuestions);
             filterLearningModules();
+        }
+
+        function toggleCategoryGroup(groupDiv) {
+            if (!groupDiv || !groupDiv.dataset.categoryName) return;
+            const name = groupDiv.dataset.categoryName;
+            const grid = groupDiv.querySelector('.category-subgrid');
+            const button = groupDiv.querySelector('.category-group-toggle');
+            const willExpand = !expandedCategoryNames.has(name);
+            if (willExpand) expandedCategoryNames.add(name);
+            else expandedCategoryNames.delete(name);
+            if (grid) grid.classList.toggle('hidden', !willExpand);
+            if (button) button.setAttribute('aria-expanded', String(willExpand));
+            groupDiv.classList.toggle('expanded', willExpand);
         }
 
         function filterLearningModules() {
@@ -2172,23 +2701,78 @@ async function autoSyncOnLoad() {
             const container = document.getElementById('categoriesGrid');
             const empty = document.getElementById('noModuleResults');
             if (!input || !container) return;
+
             const query = input.value.trim().toLocaleLowerCase();
-            let visible = 0;
+            let visibleGroups = 0;
             Array.from(container.children).forEach(group => {
-                const match = !query || group.textContent.toLocaleLowerCase().includes(query);
-                group.classList.toggle('hidden', !match);
-                if (match) visible++;
+                if (group.dataset.categoryName !== undefined) {
+                    const categoryName = group.dataset.categoryName;
+                    const parentMatches = !!query && categoryName.toLocaleLowerCase().includes(query);
+                    const grid = group.querySelector('.category-subgrid');
+                    const cards = grid ? Array.from(grid.querySelectorAll('.card')) : [];
+                    let childMatches = false;
+                    cards.forEach(card => {
+                        const cardMatches = !query || parentMatches || (card.dataset.searchText || '').includes(query);
+                        card.classList.toggle('hidden', !cardMatches);
+                        if (cardMatches) childMatches = true;
+                    });
+                    const groupMatches = !query || parentMatches || childMatches;
+                    group.classList.toggle('hidden', !groupMatches);
+                    // Searching opens matching groups temporarily; clearing search restores manual open/closed state.
+                    const shouldExpand = query ? groupMatches : expandedCategoryNames.has(categoryName);
+                    if (grid) grid.classList.toggle('hidden', !shouldExpand);
+                    const toggle = group.querySelector('.category-group-toggle');
+                    if (toggle) toggle.setAttribute('aria-expanded', String(shouldExpand));
+                    group.classList.toggle('expanded', shouldExpand);
+                    if (groupMatches) visibleGroups++;
+                } else {
+                    const cards = Array.from(group.querySelectorAll('.card'));
+                    let groupMatches = !query;
+                    cards.forEach(card => {
+                        const cardMatches = !query || (card.dataset.searchText || '').includes(query);
+                        card.classList.toggle('hidden', !cardMatches);
+                        if (cardMatches) groupMatches = true;
+                    });
+                    group.classList.toggle('hidden', !groupMatches);
+                    if (groupMatches) visibleGroups++;
+                }
             });
-            if (empty) empty.classList.toggle('hidden', visible > 0);
+            if (empty) empty.classList.toggle('hidden', visibleGroups > 0);
         }
 
         function createCatCard(title, count, id, customClass = '') {
-            const div = document.createElement('div'); div.className = `card p-3 rounded-lg flex flex-col justify-center items-center text-center min-h-[5rem] ${customClass}`;
+            const div = document.createElement('div');
+            div.className = `card p-3 rounded-lg flex flex-col justify-center items-center text-center min-h-[5rem] ${customClass}`;
+            div.dataset.searchText = String(title).toLocaleLowerCase();
+            div.setAttribute('role', 'button');
+            div.setAttribute('tabindex', '0');
+            div.setAttribute('aria-pressed', String(selectedCategories.has(id)));
             if (selectedCategories.has(id)) div.classList.add('active');
-            const titleEl = document.createElement('span'); titleEl.className = 'font-bold text-sm text-gray-100'; titleEl.textContent = title;
-            const countEl = document.createElement('span'); countEl.className = 'text-xs text-gray-400 mt-1'; countEl.textContent = `${count} питань`;
+            const titleEl = document.createElement('span');
+            titleEl.className = 'font-bold text-sm text-gray-100';
+            titleEl.textContent = title;
+            const countEl = document.createElement('span');
+            countEl.className = 'text-xs text-gray-400 mt-1';
+            countEl.textContent = `${count} питань`;
             div.append(titleEl, countEl);
-            div.onclick = () => { if (id === 'all') { selectedCategories.clear(); selectedCategories.add('all'); } else { selectedCategories.delete('all'); if (selectedCategories.has(id)) selectedCategories.delete(id); else selectedCategories.add(id); } renderCategories(); };
+            const selectCard = () => {
+                if (id === 'all') {
+                    selectedCategories.clear();
+                    selectedCategories.add('all');
+                } else {
+                    selectedCategories.delete('all');
+                    if (selectedCategories.has(id)) selectedCategories.delete(id);
+                    else selectedCategories.add(id);
+                }
+                renderCategories();
+            };
+            div.addEventListener('click', selectCard);
+            div.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    selectCard();
+                }
+            });
             return div;
         }
 
@@ -2382,6 +2966,48 @@ async function autoSyncOnLoad() {
                 });
             });
             renderExtendedAnalytics();
+        }
+
+        function resetAllStatistics() {
+            const confirmed = confirm(
+                'Скинути ВСЮ особисту статистику на цьому пристрої?\n\n' +
+                'Буде видалено: точність відповідей, кількість правильних/неправильних відповідей, список помилок, інтервальне повторення, історію іспитів, графіки, історію сесій, серію днів та лічильник тестів.\n\n' +
+                'Питання, категорії, обране та довідник залишаться на місці. Дію не можна скасувати.'
+            );
+            if (!confirmed) return;
+
+            quizStats = {};
+            mistakeIds = [];
+            srsStats = {};
+            examHistory = [];
+            answerHistory = [];
+            learningSessions = [];
+            appStats = normalizeAppStats({});
+
+            clearInterval(examInterval);
+            examInterval = null;
+            localStorage.removeItem(ACTIVE_SESSION_KEY);
+            currentQuizQuestions = [];
+            currentQIndex = 0;
+            score = 0;
+            userMistakes = [];
+            currentSessionAnswers = [];
+            currentAnswerState = null;
+            currentDraftAnswer = '';
+            sessionStartedAt = 0;
+            examEndsAt = null;
+            currentMode = 'quiz';
+
+            saveData();
+            renderStatsScreen();
+            renderCategories();
+            updateEditorList();
+            renderResumeSessionCard();
+            alert('✅ Статистику скинуто. База питань, обране та довідник не змінені.');
+        }
+
+        async function exportQuestionSubmission() {
+            return submitQuestionContribution();
         }
 
         function trainSpecificModule(category, subCategory) {
@@ -2754,6 +3380,7 @@ async function autoSyncOnLoad() {
                 const oldQ = questions[idx], oldType = oldQ.type || 'choice', oldCorrect = oldType === 'choice' ? (oldQ.options || [])[oldQ.answerIndex] : null, newCorrect = newQ.type === 'choice' ? newQ.options[newQ.answerIndex] : null, oldOptionsKey = JSON.stringify([...(oldQ.options || [])].sort()), newOptionsKey = JSON.stringify([...newQ.options].sort());
                 if (oldQ.text !== newQ.text || oldQ.period !== newQ.period || oldType !== newQ.type || oldOptionsKey !== newOptionsKey || oldCorrect !== newCorrect) { pendingQuestionSave = { question: newQ, index: idx, questionId: editingQuestionId }; document.getElementById('questionStatsModal').classList.remove('hidden'); return; }
                 questions[idx] = newQ;
+                unmarkSubmittedQuestion(editingQuestionId);
             } else { questions.unshift(newQ); }
             
             saveData(); updateEditorList();
@@ -2773,6 +3400,7 @@ async function autoSyncOnLoad() {
             if (!pendingQuestionSave) { closeQuestionStatsModal(); return; } const { question, index, questionId } = pendingQuestionSave;
             if (!questions[index] || questions[index].id !== questionId) { closeQuestionStatsModal(); alert('Питання змінилося або більше не існує. Збереження скасовано.'); return; }
             questions[index] = question;
+            unmarkSubmittedQuestion(questionId);
             if (resetStats) { delete quizStats[questionId]; delete srsStats[questionId]; mistakeIds = mistakeIds.filter(id => id !== questionId); }
             closeQuestionStatsModal(); saveData(); updateEditorList();
             
@@ -3083,7 +3711,7 @@ async function autoSyncOnLoad() {
 
                     if (Array.isArray(imp)) {
                         const existingIds = new Set(questions.map(q => String(q.id)));
-                        const newQuestions = validateQuestionArray(imp, existingIds, true);
+                        const newQuestions = validateQuestionArray(imp, existingIds, true).map(q => ({ ...q, isCustom: true }));
                         const choiceCount = newQuestions.filter(q => q.type === 'choice').length;
                         const inputCount = newQuestions.filter(q => q.type === 'input').length;
                         if (!confirm(`📦 Перевірку пройдено: ${newQuestions.length} питань.\n• З вибором відповіді: ${choiceCount}\n• З введенням відповіді: ${inputCount}\n\nДодати їх до поточної бази?\nПоточні питання та статистика залишаться без змін.`)) return;
