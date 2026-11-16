@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sait-tests-v9';
+const CACHE_NAME = 'sait-tests-v10';
 
 // Список файлов для кэширования. 
 // Если у тебя CSS и JS внутри index.html, достаточно только его и иконок.
