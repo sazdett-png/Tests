@@ -1,5 +1,5 @@
 // Оновлена версія вашого sw.js. Міняйте CACHE_NAME при кожному релізі — саме це запускає запит «Оновити зараз?».
-const CACHE_NAME = 'sait-tests-v11';
+const CACHE_NAME = 'sait-tests-v12';
 const URLS_TO_CACHE = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', (event) => {
