@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#111827">
 <link rel="apple-touch-icon" href="https://i.imgur.com/3ii8kpj.png">
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Electrician Hub — Theory & Practice</title>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
@@ -1186,7 +1186,7 @@ button:active { transform: translateY(1px) scale(.99); }
 .calc-drag-mark { color: #8296b1; font-size: 1rem; line-height: 1; }
 .calc-collapse-btn { display: none; min-width: 31px; height: 31px; padding: 0 7px; border: 1px solid rgba(157,178,207,.2); border-radius: 8px; color: #dce8f8; background: rgba(255,255,255,.06); font-size: 1.1rem; font-weight: 800; line-height: 1; }
 .calc-mini-value { display: none; max-width: 170px; overflow: hidden; color: #f3cc7e; font: 750 .72rem ui-monospace,monospace; text-overflow: ellipsis; white-space: nowrap; }
-#calcModal.calc-floating-mode:not(.hidden) {
+#calcModal.calc-floating-mode {
   display: block !important; position: fixed; inset: 0; z-index: 70; padding: 0 !important;
   overflow: visible !important; background: transparent !important; pointer-events: none;
 }
@@ -1505,8 +1505,7 @@ button:active { transform: translateY(1px) scale(.99); }
 <p class="text-green-400 font-bold text-2xl mb-4" id="fcAnswerText"></p>
 <p class="text-gray-300 text-sm italic bg-gray-900 p-3 rounded hidden mb-6" id="fcExplanationText"></p>
 <div class="flex justify-center space-x-4 mt-4">
-<button class="bg-gray-700 hover:bg-red-900/50 text-red-400 border border-red-800 px-6 py-3 rounded font-bold w-1/2" onclick="recordFlashcard(false, event)">❌ Забув</button>
-<button class="bg-gray-700 hover:bg-green-900/50 text-green-400 border border-green-800 px-6 py-3 rounded font-bold w-1/2" onclick="recordFlashcard(true, event)">✅ Помню</button>
+<button class="bg-gray-700 text-red-400 border border-red-800 px-1 py-3 rounded font-bold flex-1 text-sm" onclick="recordFlashcard(0, event)">❌ Знову</button><button class="bg-gray-700 text-orange-300 border border-orange-800 px-1 py-3 rounded font-bold flex-1 text-sm" onclick="recordFlashcard(1, event)">😐 Важко</button><button class="bg-gray-700 text-green-400 border border-green-800 px-1 py-3 rounded font-bold flex-1 text-sm" onclick="recordFlashcard(2, event)">✅ Добре</button><button class="bg-gray-700 text-sky-300 border border-sky-800 px-1 py-3 rounded font-bold flex-1 text-sm" onclick="recordFlashcard(3, event)">⚡ Легко</button>
 </div>
 </div>
 </div>
@@ -1685,6 +1684,54 @@ button:active { transform: translateY(1px) scale(.99); }
     </div>
 </div></div>
 <script>
+(function(){try{if(localStorage.getItem('quiz_questions')||sessionStorage.getItem('idbTried')||!window.indexedDB)return;sessionStorage.setItem('idbTried','1');window.__idbRestoring=true;var q=indexedDB.open('electrician_hub',1);q.onupgradeneeded=function(){q.result.createObjectStore('kv')};q.onerror=function(){window.__idbRestoring=false};q.onsuccess=function(){var g=q.result.transaction('kv').objectStore('kv').get('snapshot');g.onsuccess=function(){var r=g.result;if(r&&r.snap&&r.snap.quiz_questions){Object.keys(r.snap).forEach(function(k){localStorage.setItem(k,r.snap[k])});location.reload()}else window.__idbRestoring=false};g.onerror=function(){window.__idbRestoring=false}}}catch(e){}})();
+</script>
+<script>
+(function(){
+const st=document.createElement('style');st.textContent='.ap-ov{position:fixed;inset:0;z-index:100000;background:rgba(5,10,20,.7);display:flex;align-items:center;justify-content:center;padding:1rem}.ap-box{width:min(26rem,100%);max-height:85vh;overflow:auto;background:#141e31;border:1px solid rgba(148,163,184,.3);border-radius:1.1rem;padding:1.2rem;color:#edf3fc;box-shadow:0 20px 60px rgba(0,0,0,.5)}.ap-msg{white-space:pre-wrap;line-height:1.45;margin-bottom:1rem}.ap-box input{width:100%;padding:.65rem .8rem;margin-bottom:1rem;border-radius:.7rem;background:#0c1423;border:1px solid rgba(148,163,184,.3);color:#fff}.ap-row{display:flex;gap:.6rem;justify-content:flex-end}.ap-row button{padding:.6rem 1rem}.ap-toast{position:fixed;left:50%;transform:translateX(-50%);z-index:100001;max-width:min(30rem,92vw);background:#1b283e;border:1px solid rgba(245,189,79,.5);color:#edf3fc;padding:.75rem 1rem;border-radius:.9rem;white-space:pre-wrap;box-shadow:0 10px 30px rgba(0,0,0,.4);cursor:pointer}';document.head.appendChild(st);
+function dlg(msg,o){return new Promise(res=>{const ov=document.createElement('div');ov.className='ap-ov';const b=document.createElement('div');b.className='ap-box';b.setAttribute('role','dialog');b.setAttribute('aria-modal','true');const m=document.createElement('div');m.className='ap-msg';m.textContent=msg;b.appendChild(m);let inp;if(o.input){inp=document.createElement('input');inp.type=o.secret?'password':'text';inp.value=o.def||'';inp.autocomplete='off';b.appendChild(inp);}
+const row=document.createElement('div');row.className='ap-row';const prev=document.activeElement;
+function done(v){ov.remove();document.removeEventListener('keydown',kd,true);if(prev&&prev.focus)prev.focus();res(v);}
+function mk(t,cls,f){const x=document.createElement('button');x.type='button';x.className=cls;x.textContent=t;x.onclick=()=>done(f());row.appendChild(x);return x;}
+mk('Скасувати','btn-secondary',()=>o.input?null:false);const ok=mk('OK','btn-primary',()=>o.input?inp.value:true);
+function kd(e){if(e.key==='Escape'){e.preventDefault();e.stopPropagation();done(o.input?null:false);}else if(e.key==='Enter'){e.preventDefault();e.stopPropagation();ok.click();}}
+b.appendChild(row);ov.appendChild(b);document.body.appendChild(ov);document.addEventListener('keydown',kd,true);(inp||ok).focus();});}
+window.appConfirm=m=>dlg(String(m),{});
+window.appPrompt=(m,d,x)=>dlg(String(m),Object.assign({input:1,def:d||''},x||{}));
+window.appAlert=m=>{m=String(m);const t=document.createElement('div');t.className='ap-toast';t.setAttribute('role','status');t.textContent=m;t.style.bottom=(1.2+document.querySelectorAll('.ap-toast').length*4)+'rem';const k=()=>t.remove();t.onclick=k;document.body.appendChild(t);setTimeout(k,Math.min(9000,3000+m.length*40));return Promise.resolve();};
+})();
+// --- crypto vault for admin secrets (AES-GCM + PBKDF2); unlocked copy lives only in memory ---
+const _b64=a=>btoa(String.fromCharCode(...new Uint8Array(a))),_unb=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function _vkey(p,salt){const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(p),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},k,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);}
+async function vaultSeal(o,p){const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));const c=await crypto.subtle.encrypt({name:'AES-GCM',iv},await _vkey(p,salt),new TextEncoder().encode(JSON.stringify(o)));return JSON.stringify({s:_b64(salt),i:_b64(iv),d:_b64(c)});}
+async function vaultOpen(v,p){const o=JSON.parse(v);const d=await crypto.subtle.decrypt({name:'AES-GCM',iv:_unb(o.i)},await _vkey(p,_unb(o.s)),_unb(o.d));return JSON.parse(new TextDecoder().decode(d));}
+async function adminSave(o){
+  if(!(window.crypto&&crypto.subtle)){localStorage.setItem('quiz_admin_settings',JSON.stringify(o));appAlert('⚠️ Шифрування недоступне (потрібен HTTPS). Збережено без шифрування.');return true;}
+  const p=await appPrompt('Задай пароль (мін. 6 символів) для шифрування токена.\nВідновити його неможливо — але токен можна ввести заново.','',{secret:true});
+  if(p===null)return false; if(p.length<6){appAlert('Пароль закороткий');return false;}
+  const p2=await appPrompt('Повтори пароль:','',{secret:true}); if(p!==p2){appAlert('Паролі не збігаються');return false;}
+  localStorage.setItem('quiz_admin_vault',await vaultSeal(o,p));localStorage.removeItem('quiz_admin_settings');return true;}
+async function adminMigrate(){if(!(window.crypto&&crypto.subtle))return;if(await appConfirm('Токен адміна зберігається у відкритому вигляді. Зашифрувати паролем?')){if(await adminSave(adminSettings))appAlert('🔐 Токен зашифровано');}}
+// --- per-question edit stamps (for cloud merge) ---
+const __qSigs=new Map();const qSig=q=>{const{updatedAt,...r}=q;return JSON.stringify(r);};
+function qSigSync(){__qSigs.clear();questions.forEach(q=>__qSigs.set(q.id,qSig(q)));}
+// --- SRS: 4 grades (0 Знову, 1 Важко, 2 Добре, 3 Легко), ease factor, 10-min relearn ---
+const __fcRequeued=new Set();
+function srsUpdate(id,g){const s=srsStats[id]||{interval:0,nextReview:0};let iv=s.interval||0,e=s.ease||2.5;
+  if(g<=0){iv=0;e=Math.max(1.3,e-.2);s.nextReview=Date.now()+10*60000;}
+  else{if(iv===0)iv=g===3?3:1;else if(iv===1)iv=g===1?2:g===2?3:5;else iv=Math.max(iv+1,Math.round(iv*(g===1?1.2:g===2?e:e*1.3)));
+    e=Math.max(1.3,Math.min(3,e+(g===1?-.15:g===3?.15:0)));s.nextReview=Date.now()+iv*864e5;}
+  s.interval=iv;s.ease=e;srsStats[id]=s;}
+// --- IndexedDB mirror, persistence, backup reminder ---
+function _idb(){return new Promise((r,j)=>{const q=indexedDB.open('electrician_hub',1);q.onupgradeneeded=()=>q.result.createObjectStore('kv');q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error);});}
+let _snapT;function scheduleSnapshot(){if(window.__idbRestoring||!window.indexedDB)return;clearTimeout(_snapT);_snapT=setTimeout(async()=>{try{const snap={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if((k.startsWith('quiz_')||k==='app_stats')&&k!=='quiz_admin_settings')snap[k]=localStorage.getItem(k);}const db=await _idb();db.transaction('kv','readwrite').objectStore('kv').put({t:Date.now(),snap},'snapshot');}catch(e){}},1500);}
+async function backupReminder(){try{
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
+  const now=Date.now(),last=+localStorage.getItem('quiz_last_backup')||0,snz=+localStorage.getItem('quiz_backup_snooze')||0;
+  if(!last){localStorage.setItem('quiz_last_backup',String(now));return;}
+  if(now-last<14*864e5||now-snz<3*864e5||answerHistory.length<30)return;
+  if(await appConfirm('Бекап не робився '+Math.floor((now-last)/864e5)+' дн. Дані лежать лише в цьому браузері. Зберегти копію зараз?'))exportFullData();else localStorage.setItem('quiz_backup_snooze',String(now));
+}catch(e){}}
         // BUILD: 2026.11.15-electrician-hub-v8.4.1 — floating study calculator.
         const PUBLIC_GIST_ID = '5ee027de84d344fbe11d2a496246d8ea';
         // Після розгортання Google Apps Script встав сюди URL вебзастосунку, що закінчується на /exec.
@@ -2006,17 +2053,14 @@ button:active { transform: translateY(1px) scale(.99); }
 
         function shuffle(array) { let arr = [...array]; for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
         
-        function saveData() { 
-            localStorage.setItem('quiz_questions', JSON.stringify(questions)); 
-            localStorage.setItem('quiz_mistakes', JSON.stringify(mistakeIds)); 
-            localStorage.setItem('quiz_favorites', JSON.stringify(favoriteIds)); 
-            localStorage.setItem('quiz_deleted_cloud', JSON.stringify(deletedCloudIds)); 
-            localStorage.setItem('quiz_stats', JSON.stringify(quizStats)); 
-            localStorage.setItem('quiz_srs', JSON.stringify(srsStats));
-            localStorage.setItem('quiz_exam_history', JSON.stringify(examHistory));
-            localStorage.setItem('quiz_answer_history', JSON.stringify(answerHistory));
-            localStorage.setItem('quiz_learning_sessions', JSON.stringify(learningSessions));
-            localStorage.setItem('app_stats', JSON.stringify(appStats));
+        function saveData() {
+            questions.forEach(q => { const sg = qSig(q); if (__qSigs.get(q.id) !== sg) { if (__qSigs.has(q.id) || !q.updatedAt) q.updatedAt = Date.now(); __qSigs.set(q.id, sg); } });
+            if (answerHistory.length > 5000) answerHistory.splice(0, answerHistory.length - 5000);
+            if (learningSessions.length > 1000) learningSessions.splice(0, learningSessions.length - 1000);
+            const d = { quiz_questions: questions, quiz_mistakes: mistakeIds, quiz_favorites: favoriteIds, quiz_deleted_cloud: deletedCloudIds, quiz_stats: quizStats, quiz_srs: srsStats, quiz_exam_history: examHistory, quiz_answer_history: answerHistory, quiz_learning_sessions: learningSessions, app_stats: appStats };
+            try { for (const k in d) localStorage.setItem(k, JSON.stringify(d[k])); }
+            catch (e) { console.warn(e); if (!window.__quotaWarned) { window.__quotaWarned = 1; appAlert('⚠️ Не вдалося зберегти дані: пам’ять браузера заповнена. Зроби бекап (Інструменти) і видали зайве.'); } return; }
+            scheduleSnapshot();
         }
 
         const ACTIVE_SESSION_KEY = 'quiz_active_session';
@@ -2058,24 +2102,24 @@ button:active { transform: translateY(1px) scale(.99); }
             panel.innerHTML = `<div class="resume-copy"><span class="resume-kicker">НЕЗАВЕРШЕНА СЕСІЯ</span><strong>${escapeHtml(modeNames[saved.mode] || 'Тестування')} · ${escapeHtml(saved.period || '')}</strong><span>Питання ${saved.currentQIndex + 1} з ${saved.questions.length} · залишилося ${remaining} · відповідей у сесії ${answered}</span></div><div class="resume-actions"><button type="button" class="resume-primary" onclick="resumeSavedSession()">Продовжити →</button><button type="button" class="resume-discard" onclick="discardSavedSession()">Скинути</button></div>`;
             panel.classList.remove('hidden');
         }
-        function discardSavedSession() {
-            if (!confirm('Видалити збережену незавершену сесію? Уже записана статистика відповідей залишиться.')) return;
+        async function discardSavedSession() {
+            if (!await appConfirm('Видалити збережену незавершену сесію? Уже записана статистика відповідей залишиться.')) return;
             localStorage.removeItem(ACTIVE_SESSION_KEY); renderResumeSessionCard();
         }
         function resumeSavedSession() {
             const saved = getSavedSession();
             if (!saved || !Array.isArray(saved.questions) || !saved.questions.length || !Number.isInteger(saved.currentQIndex) || saved.currentQIndex < 0 || saved.currentQIndex >= saved.questions.length) {
-                alert('Не вдалося відновити сесію: збережені дані пошкоджені або неповні.');
+                appAlert('Не вдалося відновити сесію: збережені дані пошкоджені або неповні.');
                 localStorage.removeItem(ACTIVE_SESSION_KEY); renderResumeSessionCard(); return;
             }
-            if (!['quiz','exam','smart','retry','flashcards'].includes(saved.mode)) { alert('Цей тип сесії більше не підтримується.'); return; }
+            if (!['quiz','exam','smart','retry','flashcards'].includes(saved.mode)) { appAlert('Цей тип сесії більше не підтримується.'); return; }
             clearInterval(examInterval);
             currentMode = saved.mode; activePeriod = VALID_PERIODS.includes(saved.period) ? saved.period : activePeriod;
             localStorage.setItem('quiz_active_period', activePeriod);
             const questionById = new Map(questions.map(q => [String(q.id), q]));
             const restoredQuestions = saved.questions.map(item => item && typeof item === 'object' ? item : questionById.get(String(item))).filter(Boolean);
             if (restoredQuestions.length !== saved.questions.length) {
-                alert('Частина питань цієї сесії більше не знайдена в локальній базі. Щоб не відновлювати тест із пропусками, збережену сесію буде скинуто.');
+                appAlert('Частина питань цієї сесії більше не знайдена в локальній базі. Щоб не відновлювати тест із пропусками, збережену сесію буде скинуто.');
                 localStorage.removeItem(ACTIVE_SESSION_KEY); renderResumeSessionCard(); return;
             }
             currentQuizQuestions = restoredQuestions; currentQIndex = saved.currentQIndex; score = Number(saved.score) || 0;
@@ -2097,7 +2141,7 @@ button:active { transform: translateY(1px) scale(.99); }
                     try { processAnswer(!!state.isCorrect, q, state.selectedText || '', savedChoice || null); } finally { isRestoringSession = false; }
                 }
                 if (currentMode === 'exam' && examEndsAt) {
-                    if (examTimeLeft <= 0) { alert('Час іспиту минув, поки застосунок був закритий. Показую результат.'); finishSession(); }
+                    if (examTimeLeft <= 0) { appAlert('Час іспиту минув, поки застосунок був закритий. Показую результат.'); finishSession(); }
                     else { document.getElementById('examTimerDisplay').classList.remove('hidden'); startExamCountdown(); }
                 } else document.getElementById('examTimerDisplay').classList.add('hidden');
             }
@@ -2108,7 +2152,7 @@ button:active { transform: translateY(1px) scale(.99); }
             if (!examEndsAt) return;
             const tick = () => {
                 examTimeLeft = Math.max(0, Math.ceil((examEndsAt - Date.now()) / 1000)); updateExamTimerUI();
-                if (examTimeLeft <= 0) { clearInterval(examInterval); examInterval = null; alert('⏱️ Час вийшов!'); finishSession(); return; }
+                if (examTimeLeft <= 0) { clearInterval(examInterval); examInterval = null; appAlert('⏱️ Час вийшов!'); finishSession(); return; }
                 if (examTimeLeft % 5 === 0) persistActiveSession();
             };
             tick(); if (examTimeLeft > 0) examInterval = setInterval(tick, 1000);
@@ -2140,25 +2184,24 @@ button:active { transform: translateY(1px) scale(.99); }
 
         // --- АДМІНКА & CLOUD SYNC ---
         let adminTaps = 0, adminTapTimeout;
-        function handleAdminTrigger() {
+        async function handleAdminTrigger() {
             adminTaps++; clearTimeout(adminTapTimeout); adminTapTimeout = setTimeout(() => { adminTaps = 0; }, 1500);
-            if (adminTaps >= 5) {
-                adminTaps = 0;
-                const token = prompt("👑 Режим Адміна. Введіть GitHub Token:", adminSettings.token || "");
-                if (token === null) return;
-                const gistId = prompt("Введіть ваш Gist ID:", adminSettings.gistId || PUBLIC_GIST_ID || "");
-                if (gistId === null) return;
-                let submissionAdminKey = adminSettings.submissionAdminKey || '';
-                if (isContributionApiConfigured()) {
-                    const enteredKey = prompt("Ключ модератора Google Apps Script (ADMIN_KEY з setup()):", submissionAdminKey);
-                    if (enteredKey === null) return;
-                    submissionAdminKey = enteredKey.trim();
-                }
-                adminSettings = { token: token.trim(), gistId: gistId.trim(), submissionAdminKey };
-                localStorage.setItem('quiz_admin_settings', JSON.stringify(adminSettings));
-                checkAdminMode();
-                alert("✅ Налаштування адміна збережено!");
+            if (adminTaps < 5) return; adminTaps = 0;
+            const vault = localStorage.getItem('quiz_admin_vault');
+            if (vault && !adminSettings.token) {
+                const p = await appPrompt('🔐 Пароль адміна:', '', { secret: true }); if (p === null) return;
+                try { adminSettings = Object.assign({ token: '', gistId: '', submissionAdminKey: '' }, await vaultOpen(vault, p)); checkAdminMode(); appAlert('🔓 Адмін-режим розблоковано'); }
+                catch (e) { appAlert('Невірний пароль'); }
+                return;
             }
+            const cur = adminSettings;
+            const token = await appPrompt('👑 GitHub Token (fine-grained, доступ лише до Gist):', cur.token, { secret: true }); if (token === null) return;
+            const gistId = await appPrompt('Gist ID:', cur.gistId || PUBLIC_GIST_ID || ''); if (gistId === null) return;
+            let key = cur.submissionAdminKey || '';
+            if (isContributionApiConfigured()) { const k = await appPrompt('Ключ модератора (ADMIN_KEY з setup()):', key, { secret: true }); if (k === null) return; key = k.trim(); }
+            const ns = { token: token.trim(), gistId: gistId.trim(), submissionAdminKey: key };
+            if (!(await adminSave(ns))) return;
+            adminSettings = ns; checkAdminMode(); appAlert('✅ Налаштування адміна збережено');
         }
 
         function checkAdminMode() {
@@ -2296,7 +2339,7 @@ async function autoSyncOnLoad() {
     if (adminSettings && adminSettings.token) return; 
     await performCloudSync(PUBLIC_GIST_ID); 
 }
-        async function forceSyncWithCloud() { if (!adminSettings.gistId) { alert("Спершу налаштуй Gist ID!"); return; } if (confirm("⬇️ Завантажити базу з хмари?\n\n⚠️ УВАГА: Ваші неопубліковані локальні питання або зміни тексту можуть бути затерті хмарною версією!")) { const btn = document.getElementById('forceSyncBtn'); btn.innerText = "⏳..."; let ok = await performCloudSync(adminSettings.gistId); btn.innerText = "⬇️ Завантажити з бази"; if (ok) alert("✅ Базу успішно оновлено з хмари!"); } }
+        async function forceSyncWithCloud() { if (!adminSettings.gistId) { appAlert("Спершу налаштуй Gist ID!"); return; } if (await appConfirm("⬇️ Завантажити базу з хмари?\n\n⚠️ УВАГА: Ваші неопубліковані локальні питання або зміни тексту можуть бути затерті хмарною версією!")) { const btn = document.getElementById('forceSyncBtn'); btn.innerText = "⏳..."; let ok = await performCloudSync(adminSettings.gistId); btn.innerText = "⬇️ Завантажити з бази"; if (ok) appAlert("✅ Базу успішно оновлено з хмари!"); } }
 
         async function performCloudSync(targetGistId) {
             try {
@@ -2314,13 +2357,13 @@ async function autoSyncOnLoad() {
                 }
 
                 let cloudQuestions = JSON.parse(cloudContent);
-                let finalQuestions = cloudQuestions.filter(q => !deletedCloudIds.includes(q.id));
-                finalQuestions = finalQuestions.map(q => { if (!q.period) q.period = '2nd period'; return q; });
+                const localById = new Map(questions.map(q => [q.id, q])); let kept = 0;
+                let finalQuestions = cloudQuestions.filter(q => !deletedCloudIds.includes(q.id)).map(q => { if (!q.period) q.period = '2nd period'; const l = localById.get(q.id); if (l && (l.updatedAt || 0) > (q.updatedAt || 0)) { kept++; return l; } return q; });
 
                 let cloudMap = {}; cloudQuestions.forEach(q => cloudMap[q.id] = true);
                 questions.forEach(localQ => { if (!cloudMap[localQ.id] && localQ.isCustom && !deletedCloudIds.includes(localQ.id)) { finalQuestions.push(localQ); } });
                 
-                questions = finalQuestions; saveData(); updateEditorList();
+                questions = finalQuestions; qSigSync(); saveData(); updateEditorList(); if (kept) appAlert('Збережено локальних правок, новіших за хмарні: ' + kept + '. Опублікуй їх у базу.');
                 if (!document.getElementById('homeScreen').classList.contains('hidden') || !document.getElementById('learnScreen').classList.contains('hidden')) renderCategories();
                 return true;
             } catch(e) { console.warn("Синхронізація не вдалася:", e); return false; }
@@ -2328,7 +2371,7 @@ async function autoSyncOnLoad() {
 
         async function publishToCloud(options = {}) {
             const silent = !!(options && options.silent);
-            if (!adminSettings.token || !adminSettings.gistId) { if (!silent) alert("Немає токена або Gist ID!"); return false; }
+            if (!adminSettings.token || !adminSettings.gistId) { if (!silent) appAlert("Немає токена або Gist ID!"); return false; }
             const btn = document.getElementById('publishToCloudBtn');
             const originalText = btn ? btn.innerText : '☁️ Публікація в базу';
             if (btn) btn.innerText = "⏳ Відправка...";
@@ -2337,11 +2380,11 @@ async function autoSyncOnLoad() {
                 const payload = { files: { 'questions.json': { content: JSON.stringify(cloudReadyQuestions, null, 2) } } };
                 const res = await fetch(`https://api.github.com/gists/${adminSettings.gistId}`, { method: 'PATCH', headers: { 'Accept': 'application/vnd.github.v3+json', 'Authorization': `token ${adminSettings.token}` }, body: JSON.stringify(payload) });
                 if (!res.ok) throw new Error("Помилка відправки (перевірте токен і доступ до Gist)");
-                if (!silent) alert("✅ Базу успішно опубліковано у хмару!");
+                if (!silent) appAlert("✅ Базу успішно опубліковано у хмару!");
                 return true;
             } catch(e) {
                 console.error('Публікація в GitHub Gist не вдалася:', e);
-                if (!silent) alert("❌ Помилка: " + e.message);
+                if (!silent) appAlert("❌ Помилка: " + e.message);
                 return false;
             } finally { if (btn) btn.innerText = originalText; }
         }
@@ -2397,6 +2440,16 @@ async function autoSyncOnLoad() {
             });
         }
 
+        // Admin list goes over POST body: the moderator key never appears in a URL.
+        async function adminListViaPost() {
+            const base = getContributionApiBase();
+            if (!base) throw new Error('Google Apps Script URL ще не налаштовано.');
+            const r = await fetch(base, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body: JSON.stringify({ action: 'list', adminKey: adminSettings.submissionAdminKey }) });
+            const d = await r.json();
+            if (!d || d.ok !== true) throw new Error(d && d.error ? d.error : 'Не вдалося отримати відповідь сервера.');
+            return d;
+        }
+
         function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
         async function getSubmissionStatusWithRetry(submissionId, clientToken) {
@@ -2446,23 +2499,23 @@ async function autoSyncOnLoad() {
             const alreadySubmitted = new Set(getSubmittedQuestionIds());
             const contributedQuestions = questions.filter(q => q && q.isCustom === true && !alreadySubmitted.has(String(q.id)));
             if (contributedQuestions.length === 0) {
-                alert('Немає нових власних питань для відправки. Питання, які вже були подані, не дублюються. Відредагуй питання, щоб надіслати оновлену версію.');
+                appAlert('Немає нових власних питань для відправки. Питання, які вже були подані, не дублюються. Відредагуй питання, щоб надіслати оновлену версію.');
                 return;
             }
 
             if (!isContributionApiConfigured()) {
-                alert('Онлайн-приймальня ще не підключена. Поки що можна створити JSON-файл і передати його автору вручну.');
+                appAlert('Онлайн-приймальня ще не підключена. Поки що можна створити JSON-файл і передати його автору вручну.');
                 await exportQuestionSubmissionFile(contributedQuestions);
                 return;
             }
 
             const batch = contributedQuestions.slice(0, 50);
-            if (contributedQuestions.length > batch.length && !confirm(`Знайдено ${contributedQuestions.length} нових питань. За один раз можна надіслати до 50. Надіслати перші ${batch.length}? Решта залишиться для наступної відправки.`)) return;
+            if (contributedQuestions.length > batch.length && !await appConfirm(`Знайдено ${contributedQuestions.length} нових питань. За один раз можна надіслати до 50. Надіслати перші ${batch.length}? Решта залишиться для наступної відправки.`)) return;
 
-            const authorInput = prompt('Як підписати автора? Введи ім’я або нікнейм (необов’язково):', '');
+            const authorInput = await appPrompt('Як підписати автора? Введи ім’я або нікнейм (необов’язково):', '');
             if (authorInput === null) return;
             const author = authorInput.trim().slice(0, 80) || 'Без імені';
-            const noteInput = prompt('Коментар до пакета (необов’язково):', '');
+            const noteInput = await appPrompt('Коментар до пакета (необов’язково):', '');
             const note = noteInput === null ? '' : noteInput.trim().slice(0, 600);
             const clientToken = getContributionClientToken();
             const submissionId = 'ehsub_' + ((typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID().replace(/-/g, '') : Date.now().toString(36) + Math.random().toString(36).slice(2));
@@ -2483,10 +2536,10 @@ async function autoSyncOnLoad() {
                 const receipt = await getSubmissionStatusWithRetry(submissionId, clientToken);
                 if (receipt.status !== 'pending') throw new Error('Заявку отримано, але її статус не «На перевірці».');
                 markQuestionsAsSubmitted(batch.map(q => q.id));
-                alert(`✅ Питання надіслано на перевірку!\n\nНомер заявки: ${submissionId}\nАвтор: ${author}\nПитань: ${batch.length}\nСтатус: На перевірці.\n\nПісля модерації вони можуть потрапити до спільної бази.`);
+                appAlert(`✅ Питання надіслано на перевірку!\n\nНомер заявки: ${submissionId}\nАвтор: ${author}\nПитань: ${batch.length}\nСтатус: На перевірці.\n\nПісля модерації вони можуть потрапити до спільної бази.`);
             } catch (error) {
                 console.error('Не вдалося підтвердити відправку питань:', error);
-                alert('⚠️ Не вдалося підтвердити отримання заявки. Не натискай відправку багато разів поспіль. Перевір інтернет і спробуй ще раз.\n\n' + (error.message || 'Невідома помилка'));
+                appAlert('⚠️ Не вдалося підтвердити отримання заявки. Не натискай відправку багато разів поспіль. Перевір інтернет і спробуй ще раз.\n\n' + (error.message || 'Невідома помилка'));
             } finally {
                 if (submitBtn) submitBtn.disabled = false;
             }
@@ -2495,7 +2548,7 @@ async function autoSyncOnLoad() {
         async function exportQuestionSubmissionFile(sourceQuestions = null) {
             const contributedQuestions = Array.isArray(sourceQuestions) ? sourceQuestions : questions.filter(q => q && q.isCustom === true);
             if (contributedQuestions.length === 0) {
-                alert('Поки немає власних питань для відправки. Додай їх через редактор або імпортуй список питань.');
+                appAlert('Поки немає власних питань для відправки. Додай їх через редактор або імпортуй список питань.');
                 return;
             }
             const moduleNames = [...new Set(contributedQuestions.map(q => `${q.period || '2nd period'} · ${q.category || 'Без категорії'} → ${q.subCategory || 'Загальні'}`))];
@@ -2510,10 +2563,10 @@ async function autoSyncOnLoad() {
                 link.click();
                 link.remove();
                 setTimeout(() => URL.revokeObjectURL(url), 1500);
-                alert(`Підготовлено ${contributedQuestions.length} питань у ${moduleNames.length} модулях. Надішли цей JSON-файл автору для ручної перевірки.`);
+                appAlert(`Підготовлено ${contributedQuestions.length} питань у ${moduleNames.length} модулях. Надішли цей JSON-файл автору для ручної перевірки.`);
             } catch (error) {
                 console.error('Не вдалося створити пакет питань.', error);
-                alert('Не вдалося створити файл. Спробуй ще раз у сучасному браузері.');
+                appAlert('Не вдалося створити файл. Спробуй ще раз у сучасному браузері.');
             }
         }
 
@@ -2523,14 +2576,14 @@ async function autoSyncOnLoad() {
                 const message = 'Спочатку додай URL розгорнутого Google Apps Script у конфігурацію застосунку.';
                 const status = document.getElementById('submissionQueueStatus');
                 if (status) { status.textContent = message; status.classList.add('error'); }
-                if (!silent) alert(message);
+                if (!silent) appAlert(message);
                 return [];
             }
             if (!adminSettings.submissionAdminKey) {
                 const message = 'Не задано ADMIN_KEY Google Apps Script. Повторно відкрий адмін-режим через п’ять натискань на назву застосунку.';
                 const status = document.getElementById('submissionQueueStatus');
                 if (status) { status.textContent = message; status.classList.add('error'); }
-                if (!silent) alert(message);
+                if (!silent) appAlert(message);
                 return [];
             }
 
@@ -2540,7 +2593,7 @@ async function autoSyncOnLoad() {
             const status = document.getElementById('submissionQueueStatus');
             if (status) { status.textContent = 'Завантаження черги…'; status.classList.remove('error'); }
             try {
-                const data = await contributionApiJsonp({ action: 'list', key: adminSettings.submissionAdminKey });
+                const data = await adminListViaPost();
                 submissionQueueItems = Array.isArray(data.items) ? data.items.map(item => ({ ...item, savedQuestionsJson: JSON.stringify(canonicalSubmissionQuestions(item.questions || [])) })) : [];
                 submissionQueueLoaded = true;
                 renderSubmissionQueue();
@@ -2548,7 +2601,7 @@ async function autoSyncOnLoad() {
                 return submissionQueueItems;
             } catch (error) {
                 if (status) { status.textContent = error.message || 'Помилка завантаження черги.'; status.classList.add('error'); }
-                if (!silent) alert('Не вдалося завантажити чергу: ' + (error.message || 'невідома помилка'));
+                if (!silent) appAlert('Не вдалося завантажити чергу: ' + (error.message || 'невідома помилка'));
                 return [];
             } finally {
                 submissionQueueBusy = false;
@@ -2591,7 +2644,7 @@ async function autoSyncOnLoad() {
                   <div class="submission-question-footer"><span class="submission-save-hint">Правильна відповідь зберігається разом із питанням у черзі.</span><button type="button" class="submission-question-delete" onclick="removeSubmissionQuestion('${sid}',${qi})">Видалити це питання</button></div>
                 </details>`;
             }).join('');
-            const buttons = item.status === 'pending' ? `<div class="submission-editor-toolbar"><button type="button" class="submission-save-btn" onclick="saveSubmissionQuestionEdits('${sid}').catch(error => alert(error.message || 'Не вдалося зберегти зміни.'))">💾 Зберегти зміни</button><button type="button" class="submission-add-question-btn" onclick="addSubmissionQuestion('${sid}')">＋ Додати питання</button><span class="submission-save-hint">Зміни збережуться в Google-таблиці. Лише після цього можна схвалити заявку.</span></div>` : '';
+            const buttons = item.status === 'pending' ? `<div class="submission-editor-toolbar"><button type="button" class="submission-save-btn" onclick="saveSubmissionQuestionEdits('${sid}').catch(error => appAlert(error.message || 'Не вдалося зберегти зміни.'))">💾 Зберегти зміни</button><button type="button" class="submission-add-question-btn" onclick="addSubmissionQuestion('${sid}')">＋ Додати питання</button><span class="submission-save-hint">Зміни збережуться в Google-таблиці. Лише після цього можна схвалити заявку.</span></div>` : '';
             return `<details class="submission-package-details"><summary><span>Переглянути всі ${questions.length} питань та відповіді · ${item.status === 'pending' ? 'можна редагувати' : 'лише перегляд'}</span></summary><div class="submission-editor-root" id="submissionEditor_${sid}" data-submission-id="${sid}"><p class="submission-editor-intro">Відкрий кожне питання, щоб побачити всі варіанти та правильну відповідь. Для CHOICE правильний варіант позначений окремим списком. Для INPUT вказані всі прийняті відповіді.</p>${item.status === 'pending' ? questionEditors : questions.map((q, qi) => {
                 const options = Array.isArray(q.options) ? q.options : [];
                 const correct = q.type === 'choice' ? (options[Number(q.answerIndex)] || 'Не визначено') : options.join(' / ');
@@ -2677,18 +2730,18 @@ async function autoSyncOnLoad() {
             const item = getSubmissionItem(submissionId);
             if (!item || item.status !== 'pending') return;
             try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (_) { item.questions = JSON.parse(JSON.stringify(item.questions || [])); }
-            if (item.questions.length >= 50) { alert('В одній заявці може бути не більше 50 питань.'); return; }
+            if (item.questions.length >= 50) { appAlert('В одній заявці може бути не більше 50 питань.'); return; }
             item.questions.push({ text:'', period:item.questions[0]?.period || '2nd period', type:'choice', options:['',''], answerIndex:0, category:'', subCategory:'', imageUrl:'', explanation:'' });
             item.questionCount = item.questions.length;
             rerenderSubmissionEditor(submissionId, true);
         }
 
-        function removeSubmissionQuestion(submissionId, questionIndex) {
+        async function removeSubmissionQuestion(submissionId, questionIndex) {
             const item = getSubmissionItem(submissionId);
             if (!item || item.status !== 'pending') return;
-            try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (error) { alert(error.message); return; }
-            if (item.questions.length <= 1) { alert('У заявці має залишитися хоча б одне питання.'); return; }
-            if (!confirm(`Видалити питання №${questionIndex + 1} із цієї пропозиції?`)) return;
+            try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (error) { appAlert(error.message); return; }
+            if (item.questions.length <= 1) { appAlert('У заявці має залишитися хоча б одне питання.'); return; }
+            if (!await appConfirm(`Видалити питання №${questionIndex + 1} із цієї пропозиції?`)) return;
             item.questions.splice(questionIndex, 1);
             item.questionCount = item.questions.length;
             rerenderSubmissionEditor(submissionId);
@@ -2697,10 +2750,10 @@ async function autoSyncOnLoad() {
         function addSubmissionOption(submissionId, questionIndex) {
             const item = getSubmissionItem(submissionId);
             if (!item) return;
-            try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (error) { alert(error.message); return; }
+            try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (error) { appAlert(error.message); return; }
             const q = item.questions[questionIndex];
             if (!q || q.type !== 'choice') return;
-            if (q.options.length >= 8) { alert('Максимум 8 варіантів відповіді.'); return; }
+            if (q.options.length >= 8) { appAlert('Максимум 8 варіантів відповіді.'); return; }
             q.options.push('');
             rerenderSubmissionEditor(submissionId);
             const packageDetails = document.querySelector(`#submissionEditor_${submissionSafeDomId(submissionId)}`)?.closest('.submission-package-details');
@@ -2712,10 +2765,10 @@ async function autoSyncOnLoad() {
         function removeSubmissionOption(submissionId, questionIndex, optionIndex) {
             const item = getSubmissionItem(submissionId);
             if (!item) return;
-            try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (error) { alert(error.message); return; }
+            try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (error) { appAlert(error.message); return; }
             const q = item.questions[questionIndex];
             if (!q || q.type !== 'choice') return;
-            if (q.options.length <= 2) { alert('У тесті має залишитися щонайменше два варіанти.'); return; }
+            if (q.options.length <= 2) { appAlert('У тесті має залишитися щонайменше два варіанти.'); return; }
             q.options.splice(optionIndex, 1);
             if (q.answerIndex >= q.options.length) q.answerIndex = q.options.length - 1;
             else if (q.answerIndex > optionIndex) q.answerIndex--;
@@ -2734,7 +2787,7 @@ async function autoSyncOnLoad() {
             const card = root?.querySelectorAll('.submission-question-edit')[questionIndex];
             if (!card) return;
             const oldRenderedType = card.querySelectorAll('.submission-option-input').length ? 'choice' : 'input';
-            try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (error) { alert(error.message); return; }
+            try { item.questions = collectSubmissionEditorQuestions(submissionId); } catch (error) { appAlert(error.message); return; }
             const q = item.questions[questionIndex];
             if (!q) return;
             const targetType = newType === 'input' ? 'input' : 'choice';
@@ -2784,7 +2837,7 @@ async function autoSyncOnLoad() {
 
             const before = item.savedQuestionsJson || JSON.stringify(canonicalSubmissionQuestions(item.questions || []));
             if (before === JSON.stringify(draft)) {
-                if (!silent) alert('Змін немає — заявка вже містить ці питання.');
+                if (!silent) appAlert('Змін немає — заявка вже містить ці питання.');
                 return true;
             }
             await postContributionApi({ action:'update', adminKey:adminSettings.submissionAdminKey, submissionId, questions:draft });
@@ -2794,32 +2847,32 @@ async function autoSyncOnLoad() {
             if (!saved || JSON.stringify(canonicalSubmissionQuestions(saved.questions || [])) !== JSON.stringify(draft)) {
                 throw new Error('Сервер не підтвердив збереження змін. Онови чергу та перевір заявку.');
             }
-            if (!silent) alert(`✅ Збережено ${draft.length} питань у черзі. Тепер їх можна схвалити.`);
+            if (!silent) appAlert(`✅ Збережено ${draft.length} питань у черзі. Тепер їх можна схвалити.`);
             return true;
         }
 
         async function moderateQuestionSubmission(submissionId, decision) {
             let item = submissionQueueItems.find(entry => entry.id === submissionId);
-            if (!item) { alert('Заявку не знайдено. Онови чергу.'); return; }
+            if (!item) { appAlert('Заявку не знайдено. Онови чергу.'); return; }
             if (decision === 'approved') {
                 try {
                     const draft = canonicalSubmissionQuestions(collectSubmissionEditorQuestions(submissionId));
                     const saved = item.savedQuestionsJson || JSON.stringify(canonicalSubmissionQuestions(item.questions || []));
                     if (JSON.stringify(draft) !== saved) {
-                        if (!confirm('Є незбережені правки. Зберегти їх у Google-таблиці перед схваленням?')) return;
+                        if (!await appConfirm('Є незбережені правки. Зберегти їх у Google-таблиці перед схваленням?')) return;
                         await saveSubmissionQuestionEdits(submissionId, true);
                         item = submissionQueueItems.find(entry => entry.id === submissionId);
                     }
                 } catch (error) {
-                    alert('Спочатку виправ питання: ' + (error.message || 'помилка перевірки'));
+                    appAlert('Спочатку виправ питання: ' + (error.message || 'помилка перевірки'));
                     return;
                 }
-                if (!confirm(`Схвалити ${item.questions.length} перевірених питань від «${item.author || 'Без імені'}» та опублікувати їх у спільній базі?`)) return;
+                if (!await appConfirm(`Схвалити ${item.questions.length} перевірених питань від «${item.author || 'Без імені'}» та опублікувати їх у спільній базі?`)) return;
             }
             let reviewNote = '';
             if (decision === 'rejected') {
-                if (!confirm(`Відхилити пропозицію від «${item.author || 'Без імені'}»?`)) return;
-                reviewNote = prompt('Причина відхилення (необов’язково):', '') || '';
+                if (!await appConfirm(`Відхилити пропозицію від «${item.author || 'Без імені'}»?`)) return;
+                reviewNote = await appPrompt('Причина відхилення (необов’язково):', '') || '';
             }
 
             try {
@@ -2832,10 +2885,10 @@ async function autoSyncOnLoad() {
                 if (decision === 'approved') {
                     await publishApprovedSubmissions();
                 } else {
-                    alert('Пропозицію відхилено.');
+                    appAlert('Пропозицію відхилено.');
                 }
             } catch (error) {
-                alert('Не вдалося змінити статус заявки: ' + (error.message || 'невідома помилка'));
+                appAlert('Не вдалося змінити статус заявки: ' + (error.message || 'невідома помилка'));
             }
         }
 
@@ -2850,12 +2903,12 @@ async function autoSyncOnLoad() {
         async function publishApprovedSubmissions() {
             if (submissionPublishBusy) return;
             if (!adminSettings.token || !adminSettings.gistId || !adminSettings.submissionAdminKey) {
-                alert('Для публікації потрібні GitHub Token, Gist ID і ADMIN_KEY Apps Script.');
+                appAlert('Для публікації потрібні GitHub Token, Gist ID і ADMIN_KEY Apps Script.');
                 return;
             }
             if (!submissionQueueLoaded) await refreshSubmissionQueue(true);
             const approved = submissionQueueItems.filter(item => item.status === 'approved');
-            if (!approved.length) { alert('Немає схвалених заявок для публікації.'); return; }
+            if (!approved.length) { appAlert('Немає схвалених заявок для публікації.'); return; }
             submissionPublishBusy = true;
             const status = document.getElementById('submissionQueueStatus');
             if (status) { status.textContent = 'Підготовка схвалених питань до публікації…'; status.classList.remove('error'); }
@@ -2909,11 +2962,11 @@ async function autoSyncOnLoad() {
                 const stillApproved = approved.filter(item => !afterPublish.some(entry => entry.id === item.id && entry.status === 'published'));
                 if (stillApproved.length) throw new Error('GitHub оновлено, але не всі заявки отримали статус «Опубліковано» у таблиці. Натисни оновлення черги; якщо вони лишилися схваленими — повтори публікацію.');
                 const addedTotal = Object.values(addedCounts).reduce((sum, value) => sum + value, 0);
-                alert(`✅ Публікацію завершено.\n\nЗаявок оброблено: ${approved.length}\nНових питань додано: ${addedTotal}\n\nСпільну базу GitHub оновлено.`);
+                appAlert(`✅ Публікацію завершено.\n\nЗаявок оброблено: ${approved.length}\nНових питань додано: ${addedTotal}\n\nСпільну базу GitHub оновлено.`);
             } catch (error) {
                 console.error('Публікація схвалених пропозицій не вдалася:', error);
                 if (status) { status.textContent = error.message || 'Публікація не вдалася.'; status.classList.add('error'); }
-                alert('⚠️ ' + (error.message || 'Не вдалося опублікувати схвалені питання.'));
+                appAlert('⚠️ ' + (error.message || 'Не вдалося опублікувати схвалені питання.'));
                 await refreshSubmissionQueue(true);
             } finally {
                 submissionPublishBusy = false;
@@ -2934,7 +2987,7 @@ async function autoSyncOnLoad() {
             const entryIdComment = 'entry.622718986'; 
 
             const userText = document.getElementById('reportText').value.trim();
-            if (!userText) { alert('Напишіть хоч щось!'); return; }
+            if (!userText) { appAlert('Напишіть хоч щось!'); return; }
 
             const q = currentQuizQuestions[currentQIndex];
             const btn = document.getElementById('sendReportBtn');
@@ -2953,10 +3006,10 @@ async function autoSyncOnLoad() {
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: formData.toString()
                 });
-                alert('✅ Запит надіслано. Google Forms не повертає підтвердження через цей спосіб, тому перевірити фактичне збереження тут неможливо.');
+                appAlert('✅ Запит надіслано. Google Forms не повертає підтвердження через цей спосіб, тому перевірити фактичне збереження тут неможливо.');
                 document.getElementById('reportModal').classList.add('hidden');
             } catch (e) {
-                alert('❌ Помилка відправки. Перевірте з\'єднання.');
+                appAlert('❌ Помилка відправки. Перевірте з\'єднання.');
             } finally {
                 btn.innerText = "Відправити";
             }
@@ -3011,8 +3064,8 @@ async function autoSyncOnLoad() {
             const c = document.getElementById('cheatSheetContent'); c.focus();
             document.execCommand('insertHTML', false, '<table><thead><tr><th>Позначення</th><th>Значення</th><th>Одиниця</th></tr></thead><tbody><tr><td>[символ]</td><td>[опис]</td><td>[одиниця]</td></tr><tr><td>[символ]</td><td>[опис]</td><td>[одиниця]</td></tr></tbody></table><p><br></p>');
         }
-        function resetCheatSheet() { 
-            if(confirm(`Повернути стандартний довідник для ${activePeriod}? Всі ваші особисті записи в цьому періоді будуть видалені.`)) { 
+        async function resetCheatSheet() { 
+            if(await appConfirm(`Повернути стандартний довідник для ${activePeriod}? Всі ваші особисті записи в цьому періоді будуть видалені.`)) { 
                 const def = defaultCheatSheets[activePeriod] || defaultCheatSheets['2nd period'];
                 document.getElementById('cheatSheetContent').innerHTML = sanitizeRichHtml(def); 
                 localStorage.removeItem('quiz_cheatsheet_' + activePeriod); 
@@ -3366,8 +3419,8 @@ async function autoSyncOnLoad() {
             renderExtendedAnalytics();
         }
 
-        function resetAllStatistics() {
-            const confirmed = confirm(
+        async function resetAllStatistics() {
+            const confirmed = await appConfirm(
                 'Скинути ВСЮ особисту статистику на цьому пристрої?\n\n' +
                 'Буде видалено: точність відповідей, кількість правильних/неправильних відповідей, список помилок, інтервальне повторення, історію іспитів, графіки, історію сесій, серію днів та лічильник тестів.\n\n' +
                 'Питання, категорії, обране та довідник залишаться на місці. Дію не можна скасувати.'
@@ -3401,7 +3454,7 @@ async function autoSyncOnLoad() {
             renderCategories();
             updateEditorList();
             renderResumeSessionCard();
-            alert('✅ Статистику скинуто. База питань, обране та довідник не змінені.');
+            appAlert('✅ Статистику скинуто. База питань, обране та довідник не змінені.');
         }
 
         async function exportQuestionSubmission() {
@@ -3415,16 +3468,16 @@ async function autoSyncOnLoad() {
             startMode('quiz');
         }
 
-        function confirmReplacePausedSession() {
+        async function confirmReplacePausedSession() {
             const saved = getSavedSession();
             if (!saved) return true;
-            const proceed = confirm('У тебе є незавершена сесія. Почати нову й замінити її? Натисни «Скасувати», щоб зберегти стару та продовжити її пізніше.');
+            const proceed = await appConfirm('У тебе є незавершена сесія. Почати нову й замінити її? Натисни «Скасувати», щоб зберегти стару та продовжити її пізніше.');
             return proceed;
         }
 
-        function startMode(mode) {
+        async function startMode(mode) {
             clearInterval(examInterval);
-            if (selectedCategories.size === 0) { alert("Виберіть категорію чи модуль!"); return; }
+            if (selectedCategories.size === 0) { appAlert("Виберіть категорію чи модуль!"); return; }
             
             const periodQuestions = questions.filter(q => q.period === activePeriod);
             let pool = [];
@@ -3436,19 +3489,19 @@ async function autoSyncOnLoad() {
             
             if (mode === 'flashcards') {
                 const now = Date.now(); let dueCards = pool.filter(q => !srsStats[q.id] || srsStats[q.id].nextReview <= now);
-                if (dueCards.length > 0) { pool = dueCards; } else { alert("На сьогодні всі картки у цих модулях вивчені! Покажу випадкові для повторення."); }
+                if (dueCards.length > 0) { pool = dueCards; } else { appAlert("На сьогодні всі картки у цих модулях вивчені! Покажу випадкові для повторення."); }
             }
             if (pool.length === 0) return;
-            if (!confirmReplacePausedSession()) return;
+            if (!(await confirmReplacePausedSession())) return;
             currentQuizQuestions = shuffle(pool); initializeTrackedSession(mode);
             document.getElementById('examTimerDisplay').classList.add('hidden'); document.getElementById('quizFeedback').classList.add('hidden');
             if (mode === 'quiz') { showScreen('quizScreen'); loadNextQuestion(); } else { showScreen('flashcardScreen'); loadNextFlashcard(); }
         }
 
-        function startSmartWorkout() {
+        async function startSmartWorkout() {
             clearInterval(examInterval);
             const periodQuestions = questions.filter(q => q.period === activePeriod);
-            if (periodQuestions.length === 0) { alert("У цьому періоді поки немає питань для тренування."); return; }
+            if (periodQuestions.length === 0) { appAlert("У цьому періоді поки немає питань для тренування."); return; }
 
             const weakPool = periodQuestions.filter(q => quizStats[q.id] && quizStats[q.id].w > 0 && quizStats[q.id].w >= quizStats[q.id].c);
             weakPool.sort((a, b) => {
@@ -3485,28 +3538,28 @@ async function autoSyncOnLoad() {
             addFromPool(remainingPool, targetTotal - selected.length);
 
             currentQuizQuestions = shuffle(selected);
-            if (currentQuizQuestions.length === 0) { alert("Не вдалося підготувати питання для тренування."); return; }
-            if (!confirmReplacePausedSession()) return;
+            if (currentQuizQuestions.length === 0) { appAlert("Не вдалося підготувати питання для тренування."); return; }
+            if (!(await confirmReplacePausedSession())) return;
             initializeTrackedSession('smart');
             document.getElementById('examTimerDisplay').classList.add('hidden'); document.getElementById('quizFeedback').classList.add('hidden');
             showScreen('quizScreen'); loadNextQuestion();
         }
 
-        function retryCurrentMistakes() {
+        async function retryCurrentMistakes() {
             if (userMistakes.length === 0) return;
-            if (!confirmReplacePausedSession()) return;
+            if (!(await confirmReplacePausedSession())) return;
             currentQuizQuestions = shuffle(userMistakes.map(m => m.q)); initializeTrackedSession('retry');
             document.getElementById('examTimerDisplay').classList.add('hidden'); document.getElementById('quizFeedback').classList.add('hidden');
             showScreen('quizScreen'); loadNextQuestion();
         }
 
         function openExamSettings() { 
-            if (questions.filter(q => q.period === activePeriod).length === 0) { alert("База питань цього періоду порожня!"); return; } 
+            if (questions.filter(q => q.period === activePeriod).length === 0) { appAlert("База питань цього періоду порожня!"); return; } 
             document.getElementById('examSettingsModal').classList.remove('hidden'); 
         }
         function closeExamSettings() { document.getElementById('examSettingsModal').classList.add('hidden'); }
         
-        function applyExamSettings() {
+        async function applyExamSettings() {
             clearInterval(examInterval);
             let src = document.getElementById('esSource').value, cnt = document.getElementById('esCount').value, hasTimer = document.getElementById('esTimer').checked; examPassTarget = parseInt(document.getElementById('esPass').value);
             
@@ -3516,17 +3569,17 @@ async function autoSyncOnLoad() {
                 if (!selectedCategories.has('all')) {
                     const filterCats = Array.from(selectedCategories).filter(c => c.startsWith('cat|'));
                     if (filterCats.length === 0) {
-                        alert("Спочатку виберіть хоча б один модуль на головному екрані або змініть джерело на «З усієї бази». Екзамен не запущено.");
+                        appAlert("Спочатку виберіть хоча б один модуль на головному екрані або змініть джерело на «З усієї бази». Екзамен не запущено.");
                         return;
                     }
                     pool = periodQuestions.filter(q => filterCats.includes(`cat|${q.category || 'Без категорії'}|${q.subCategory || 'Загальні'}`));
-                    if (pool.length === 0) { alert("В обраних модулях немає питань!"); return; }
+                    if (pool.length === 0) { appAlert("В обраних модулях немає питань!"); return; }
                 }
             }
             pool = shuffle(pool);
             const finalCount = (cnt === 'all') ? pool.length : Math.min(parseInt(cnt, 10) || 0, pool.length);
-            if (finalCount <= 0) { alert("Немає питань для запуску екзамену."); return; }
-            if (!confirmReplacePausedSession()) return;
+            if (finalCount <= 0) { appAlert("Немає питань для запуску екзамену."); return; }
+            if (!(await confirmReplacePausedSession())) return;
             currentQuizQuestions = pool.slice(0, finalCount); initializeTrackedSession('exam'); closeExamSettings();
             if (hasTimer) {
                 examTimeLeft = currentQuizQuestions.length * 120; examEndsAt = Date.now() + examTimeLeft * 1000; document.getElementById('examTimerDisplay').classList.remove('hidden'); updateExamTimerUI();
@@ -3582,6 +3635,11 @@ async function autoSyncOnLoad() {
                 document.getElementById('quizInputText').focus(); const check = () => { const v = document.getElementById('quizInputText').value.trim(); if(v) processAnswer(q.options.some(o => answersMatch(v, o)), q, v, null); };
                 document.getElementById('quizInputSubmitBtn').onclick = check; document.getElementById('quizInputText').addEventListener('keypress', e => { if (e.key === 'Enter') check(); });
             }
+            if (currentMode === 'exam' && currentQIndex < currentQuizQuestions.length - 1) {
+                const d = document.createElement('button'); d.type = 'button'; d.className = 'btn-secondary w-full py-3 rounded mt-3'; d.textContent = '⏭ Відкласти на кінець';
+                d.onclick = () => { currentQuizQuestions.push(currentQuizQuestions.splice(currentQIndex, 1)[0]); currentDraftAnswer = ''; loadNextQuestion(); };
+                optCont.appendChild(d);
+            }
             if (!isRestoringSession) persistActiveSession();
         }
 
@@ -3593,7 +3651,7 @@ async function autoSyncOnLoad() {
                 if (!quizStats[qObj.id]) quizStats[qObj.id] = { c: 0, w: 0 };
                 if (isCorrect) { score++; mistakeIds = mistakeIds.filter(id => id !== qObj.id); quizStats[qObj.id].c++; }
                 else { userMistakes.push({ q: qObj, sel: selText }); if (!mistakeIds.includes(qObj.id)) mistakeIds.push(qObj.id); quizStats[qObj.id].w++; }
-                recordAnswerEvent(qObj, isCorrect);
+                recordAnswerEvent(qObj, isCorrect); if (currentMode !== 'exam') srsUpdate(qObj.id, isCorrect ? 2 : 0);
                 addProgressPoint();
                 saveData();
             }
@@ -3652,14 +3710,14 @@ async function autoSyncOnLoad() {
         function recordFlashcard(isCorrect, e) {
             if (e && e.stopPropagation) e.stopPropagation();
             playAnswerSound(isCorrect);
-            const q = currentQuizQuestions[currentQIndex]; let srs = srsStats[q.id] || { interval: 0, nextReview: 0 };
-            if (isCorrect) { score++; if (srs.interval === 0) srs.interval = 1; else if (srs.interval === 1) srs.interval = 3; else srs.interval = Math.ceil(srs.interval * 2); } else { srs.interval = 0; userMistakes.push({ q: q, sel: "Не згадав" }); }
+            const g = isCorrect === true ? 2 : isCorrect === false ? 0 : isCorrect; isCorrect = g > 0; const q = currentQuizQuestions[currentQIndex];
+            if (isCorrect) { score++; } else { userMistakes.push({ q: q, sel: "Не згадав" }); if (!__fcRequeued.has(q.id)) { __fcRequeued.add(q.id); currentQuizQuestions.push(q); } }
             recordAnswerEvent(q, isCorrect, 'flashcards');
-            addProgressPoint(); srs.nextReview = Date.now() + (srs.interval * 86400000); srsStats[q.id] = srs; saveData(); currentQIndex++; persistActiveSession(); loadNextFlashcard();
+            addProgressPoint(); srsUpdate(q.id, g); saveData(); currentQIndex++; persistActiveSession(); loadNextFlashcard();
         }
 
         function finishSession() {
-            clearInterval(examInterval); examInterval = null; document.getElementById('quizFeedback').classList.add('hidden');
+            clearInterval(examInterval); examInterval = null; __fcRequeued.clear(); document.getElementById('quizFeedback').classList.add('hidden');
             const completedAt = Date.now();
             const answeredCount = currentSessionAnswers.length;
             const finalTotal = currentQuizQuestions.length;
@@ -3762,8 +3820,8 @@ async function autoSyncOnLoad() {
             const cat = document.getElementById('qCategory').value.trim() || 'Без категорії', sub = document.getElementById('qSubCategory').value.trim();
             const txt = document.getElementById('qText').value.trim(), img = document.getElementById('qImage').value.trim(), expl = document.getElementById('qExplanation').value.trim(), type = document.getElementById('qType').value;
             let opts = [];
-            if (type === 'choice') { document.querySelectorAll('.qOptionChoice').forEach(i => { if(i.value.trim()!=='') opts.push(i.value.trim()); }); if (!txt || opts.length < 2) { alert("Введи питання та мін. 2 варіанти!"); return; } }
-            else { opts = document.getElementById('qOptionInput').value.split(',').map(s=>s.trim()).filter(s=>s!==''); if (!txt || opts.length === 0) { alert("Введи питання та мін. 1 вірний варіант!"); return; } }
+            if (type === 'choice') { document.querySelectorAll('.qOptionChoice').forEach(i => { if(i.value.trim()!=='') opts.push(i.value.trim()); }); if (!txt || opts.length < 2) { appAlert("Введи питання та мін. 2 варіанти!"); return; } }
+            else { opts = document.getElementById('qOptionInput').value.split(',').map(s=>s.trim()).filter(s=>s!==''); if (!txt || opts.length === 0) { appAlert("Введи питання та мін. 1 вірний варіант!"); return; } }
             
             let isCustomVal = true;
             if (editingQuestionId) {
@@ -3774,7 +3832,7 @@ async function autoSyncOnLoad() {
             const newQ = { id: editingQuestionId || (Date.now().toString() + Math.floor(Math.random()*1000)), isCustom: isCustomVal, period: per, type: type, category: cat, subCategory: sub, text: txt, imageUrl: img, options: opts, answerIndex: 0, explanation: expl };
             
             if (editingQuestionId) {
-                const idx = questions.findIndex(q => q.id === editingQuestionId); if (idx === -1) { alert('Не вдалося знайти питання. Онови список і спробуй ще раз.'); return; }
+                const idx = questions.findIndex(q => q.id === editingQuestionId); if (idx === -1) { appAlert('Не вдалося знайти питання. Онови список і спробуй ще раз.'); return; }
                 const oldQ = questions[idx], oldType = oldQ.type || 'choice', oldCorrect = oldType === 'choice' ? (oldQ.options || [])[oldQ.answerIndex] : null, newCorrect = newQ.type === 'choice' ? newQ.options[newQ.answerIndex] : null, oldOptionsKey = JSON.stringify([...(oldQ.options || [])].sort()), newOptionsKey = JSON.stringify([...newQ.options].sort());
                 if (oldQ.text !== newQ.text || oldQ.period !== newQ.period || oldType !== newQ.type || oldOptionsKey !== newOptionsKey || oldCorrect !== newCorrect) { pendingQuestionSave = { question: newQ, index: idx, questionId: editingQuestionId }; document.getElementById('questionStatsModal').classList.remove('hidden'); return; }
                 questions[idx] = newQ;
@@ -3796,7 +3854,7 @@ async function autoSyncOnLoad() {
         function closeQuestionStatsModal() { document.getElementById('questionStatsModal').classList.add('hidden'); pendingQuestionSave = null; }
         function confirmQuestionSave(resetStats) {
             if (!pendingQuestionSave) { closeQuestionStatsModal(); return; } const { question, index, questionId } = pendingQuestionSave;
-            if (!questions[index] || questions[index].id !== questionId) { closeQuestionStatsModal(); alert('Питання змінилося або більше не існує. Збереження скасовано.'); return; }
+            if (!questions[index] || questions[index].id !== questionId) { closeQuestionStatsModal(); appAlert('Питання змінилося або більше не існує. Збереження скасовано.'); return; }
             questions[index] = question;
             unmarkSubmittedQuestion(questionId);
             if (resetStats) { delete quizStats[questionId]; delete srsStats[questionId]; mistakeIds = mistakeIds.filter(id => id !== questionId); }
@@ -3806,15 +3864,15 @@ async function autoSyncOnLoad() {
             cancelEdit();
         }
 
-        function deleteQuestion(id) { if(confirm("Точно видалити?")) { questions = questions.filter(q => q.id !== id); favoriteIds = favoriteIds.filter(f => f !== id); if (!deletedCloudIds.includes(id)) { deletedCloudIds.push(id); } saveData(); updateEditorList(); } }
+        async function deleteQuestion(id) { if(await appConfirm("Точно видалити?")) { questions = questions.filter(q => q.id !== id); favoriteIds = favoriteIds.filter(f => f !== id); if (!deletedCloudIds.includes(id)) { deletedCloudIds.push(id); } saveData(); updateEditorList(); } }
 
         function toggleFolder(el) { el.nextElementSibling.classList.toggle('hidden'); }
-        function renameCategoryPrompt(oldName) { let newName = prompt(`Введіть нову назву для головної категорії "${oldName}":`, oldName); if (newName && newName.trim() !== "" && newName !== oldName) { questions.forEach(q => { if ((q.category || 'Без категорії') === oldName) q.category = newName.trim(); }); saveData(); updateEditorList(); } }
-        function deleteCategoryPrompt(oldName) { if (confirm(`⚠️ УВАГА! Ви точно хочете видалити категорію "${oldName}" та ВСІ питання в ній?`)) { questions.forEach(q => { if ((q.category || 'Без категорії') === oldName) { if (!deletedCloudIds.includes(q.id)) deletedCloudIds.push(q.id); } }); questions = questions.filter(q => (q.category || 'Без категорії') !== oldName); saveData(); updateEditorList(); } }
-        function renameSubCategoryPrompt(main, oldSub) { let newSub = prompt(`Введіть нову назву для модуля "${oldSub}":`, oldSub); if (newSub && newSub.trim() !== "" && newSub !== oldSub) { questions.forEach(q => { if ((q.category || 'Без категорії') === main && (q.subCategory || 'Загальні') === oldSub) q.subCategory = newSub.trim(); }); saveData(); updateEditorList(); } }
-        function deleteSubCategoryPrompt(main, oldSub) { if (confirm(`⚠️ УВАГА! Ви точно хочете видалити модуль "${oldSub}" та ВСІ питання в ньому?`)) { questions.forEach(q => { if ((q.category || 'Без категорії') === main && (q.subCategory || 'Загальні') === oldSub) { if (!deletedCloudIds.includes(q.id)) deletedCloudIds.push(q.id); } }); questions = questions.filter(q => !((q.category || 'Без категорії') === main && (q.subCategory || 'Загальні') === oldSub)); saveData(); updateEditorList(); } }
-        function moveSubCategoryPrompt(main, subName) { 
-            let newMain = prompt(`Переміщення модуля "${subName}" з "${main}".\n\nВведіть нову головну категорію (існуючу або нову):`); 
+        async function renameCategoryPrompt(oldName) { let newName = await appPrompt(`Введіть нову назву для головної категорії "${oldName}":`, oldName); if (newName && newName.trim() !== "" && newName !== oldName) { questions.forEach(q => { if ((q.category || 'Без категорії') === oldName) q.category = newName.trim(); }); saveData(); updateEditorList(); } }
+        async function deleteCategoryPrompt(oldName) { if (await appConfirm(`⚠️ УВАГА! Ви точно хочете видалити категорію "${oldName}" та ВСІ питання в ній?`)) { questions.forEach(q => { if ((q.category || 'Без категорії') === oldName) { if (!deletedCloudIds.includes(q.id)) deletedCloudIds.push(q.id); } }); questions = questions.filter(q => (q.category || 'Без категорії') !== oldName); saveData(); updateEditorList(); } }
+        async function renameSubCategoryPrompt(main, oldSub) { let newSub = await appPrompt(`Введіть нову назву для модуля "${oldSub}":`, oldSub); if (newSub && newSub.trim() !== "" && newSub !== oldSub) { questions.forEach(q => { if ((q.category || 'Без категорії') === main && (q.subCategory || 'Загальні') === oldSub) q.subCategory = newSub.trim(); }); saveData(); updateEditorList(); } }
+        async function deleteSubCategoryPrompt(main, oldSub) { if (await appConfirm(`⚠️ УВАГА! Ви точно хочете видалити модуль "${oldSub}" та ВСІ питання в ньому?`)) { questions.forEach(q => { if ((q.category || 'Без категорії') === main && (q.subCategory || 'Загальні') === oldSub) { if (!deletedCloudIds.includes(q.id)) deletedCloudIds.push(q.id); } }); questions = questions.filter(q => !((q.category || 'Без категорії') === main && (q.subCategory || 'Загальні') === oldSub)); saveData(); updateEditorList(); } }
+        async function moveSubCategoryPrompt(main, subName) { 
+            let newMain = await appPrompt(`Переміщення модуля "${subName}" з "${main}".\n\nВведіть нову головну категорію (існуючу або нову):`); 
             if (newMain && newMain.trim() !== "" && newMain.trim() !== main) { 
                 let cnt = 0; 
                 questions.forEach(q => { 
@@ -3825,7 +3883,7 @@ async function autoSyncOnLoad() {
                     } 
                 }); 
                 saveData(); updateEditorList(); 
-                alert(`✅ Модуль успішно переміщено! Оновлено ${cnt} питань.`);
+                appAlert(`✅ Модуль успішно переміщено! Оновлено ${cnt} питань.`);
             } 
         }
 
@@ -3869,7 +3927,7 @@ async function autoSyncOnLoad() {
             document.getElementById('subCategoryList').innerHTML = [...new Set(listToRender.map(q => q.subCategory))].filter(c => c).map(c => `<option value="${escapeHtml(c)}">`).join('');
         }
 
-        function exportFullData() { 
+        function exportFullData() { localStorage.setItem('quiz_last_backup', String(Date.now())); 
             let allCheatSheets = {};
             ['1st period', '2nd period', '3rd period', '4th period'].forEach(p => {
                 allCheatSheets[p] = localStorage.getItem('quiz_cheatsheet_' + p) || defaultCheatSheets[p];
@@ -4099,11 +4157,11 @@ async function autoSyncOnLoad() {
             };
         }
 
-        function importFullData(e) {
+        async function importFullData(e) {
             const f = e.target.files[0];
             if (!f) return;
             const r = new FileReader();
-            r.onload = function(evt) {
+            r.onload = async function(evt) {
                 try {
                     const imp = JSON.parse(evt.target.result);
 
@@ -4112,19 +4170,19 @@ async function autoSyncOnLoad() {
                         const newQuestions = validateQuestionArray(imp, existingIds, true).map(q => ({ ...q, isCustom: true }));
                         const choiceCount = newQuestions.filter(q => q.type === 'choice').length;
                         const inputCount = newQuestions.filter(q => q.type === 'input').length;
-                        if (!confirm(`📦 Перевірку пройдено: ${newQuestions.length} питань.\n• З вибором відповіді: ${choiceCount}\n• З введенням відповіді: ${inputCount}\n\nДодати їх до поточної бази?\nПоточні питання та статистика залишаться без змін.`)) return;
+                        if (!await appConfirm(`📦 Перевірку пройдено: ${newQuestions.length} питань.\n• З вибором відповіді: ${choiceCount}\n• З введенням відповіді: ${inputCount}\n\nДодати їх до поточної бази?\nПоточні питання та статистика залишаться без змін.`)) return;
                         questions = [...newQuestions, ...questions];
                         saveData();
                         const oneOptionCount = newQuestions.filter(q => q.type === 'choice' && q.options.length < 2).length;
                         const extraNote = oneOptionCount ? `\n\n⚠️ ${oneOptionCount} питань мають лише один варіант відповіді. Вони збережені, але їх варто відредагувати й додати варіанти.` : '';
-                        alert(`✅ Успішно додано ${newQuestions.length} питань (choice: ${choiceCount}, input: ${inputCount})!${extraNote}`);
+                        appAlert(`✅ Успішно додано ${newQuestions.length} питань (choice: ${choiceCount}, input: ${inputCount})!${extraNote}`);
                     }
                     else if (isPlainObject(imp) && Array.isArray(imp.questions)) {
                         // Validate the complete backup before asking for confirmation or changing anything.
                         const backup = validateBackupData(imp);
                         const choiceCount = backup.questions.filter(q => q.type === 'choice').length;
                         const inputCount = backup.questions.filter(q => q.type === 'input').length;
-                        if (!confirm(`⚠️ Перевірку повного бекапу пройдено: ${backup.questions.length} питань.\n• З вибором відповіді: ${choiceCount}\n• З введенням відповіді: ${inputCount}\n\nБекап повністю замінить поточну базу, статистику та стрик. Продовжити?`)) return;
+                        if (!await appConfirm(`⚠️ Перевірку повного бекапу пройдено: ${backup.questions.length} питань.\n• З вибором відповіді: ${choiceCount}\n• З введенням відповіді: ${inputCount}\n\nБекап повністю замінить поточну базу, статистику та стрик. Продовжити?`)) return;
 
                         questions = backup.questions;
                         quizStats = backup.quizStats;
@@ -4142,10 +4200,10 @@ async function autoSyncOnLoad() {
                         saveData();
                         const oneOptionCount = backup.questions.filter(q => q.type === 'choice' && q.options.length < 2).length;
                         const extraNote = oneOptionCount ? `\n\n⚠️ ${oneOptionCount} питань мають лише один варіант відповіді. Вони збережені, але їх варто відредагувати й додати варіанти.` : '';
-                        alert(`✅ Повну копію успішно відновлено: ${backup.questions.length} питань (choice: ${choiceCount}, input: ${inputCount})!${extraNote}`);
+                        appAlert(`✅ Повну копію успішно відновлено: ${backup.questions.length} питань (choice: ${choiceCount}, input: ${inputCount})!${extraNote}`);
                     }
                     else {
-                        alert('❌ Невідомий формат файлу. Очікується масив питань або повний бекап.');
+                        appAlert('❌ Невідомий формат файлу. Очікується масив питань або повний бекап.');
                         return;
                     }
 
@@ -4155,12 +4213,12 @@ async function autoSyncOnLoad() {
                     renderCategories();
                     loadCheatSheet();
                 } catch(err) {
-                    alert(`❌ Імпорт скасовано: ${err && err.message ? err.message : 'помилка структури файлу'}.\n\nПоточна база не змінена.`);
+                    appAlert(`❌ Імпорт скасовано: ${err && err.message ? err.message : 'помилка структури файлу'}.\n\nПоточна база не змінена.`);
                 } finally {
                     e.target.value = '';
                 }
             };
-            r.onerror = function() { alert('Не вдалося прочитати вибраний файл.'); e.target.value = ''; };
+            r.onerror = function() { appAlert('Не вдалося прочитати вибраний файл.'); e.target.value = ''; };
             r.readAsText(f);
         }
 
@@ -4535,10 +4593,8 @@ function toggleCalculator(forceOpen) {
             calcUpdateMiniValue();
             calcClampFloatingPosition();
         } else {
-        modal.classList.remove('calc-floating-mode');
-        calcShell.classList.remove('is-collapsed', 'is-dragging');
-        calcResetSecondFunction();
-    }
+            calcShell.classList.remove('is-collapsed', 'is-dragging');
+        }
     } else {
         calcResetSecondFunction();
     }
@@ -4626,7 +4682,7 @@ document.addEventListener('keydown', event => {
     else if (event.key === 'Backspace') { event.preventDefault(); calcDel(); }
 });
 
-        saveData(); checkDailyProgress(); checkAdminMode(); updatePeriodTabsUI(); showScreen('homeScreen'); renderResumeSessionCard(); loadCheatSheet(); initSoundUI(); initSyncUI(); autoSyncOnLoad();
+        qSigSync(); saveData(); checkDailyProgress(); checkAdminMode(); updatePeriodTabsUI(); showScreen('homeScreen'); renderResumeSessionCard(); loadCheatSheet(); initSoundUI(); initSyncUI(); autoSyncOnLoad(); setTimeout(backupReminder, 4000); if (adminSettings.token && localStorage.getItem('quiz_admin_settings')) setTimeout(adminMigrate, 2500);
         window.addEventListener('pagehide', persistActiveSession);
         document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') persistActiveSession(); });
     </script>
@@ -4635,7 +4691,13 @@ document.addEventListener('keydown', event => {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
-        .then((registration) => {
+                .then((registration) => {
+          const hadCtl = !!navigator.serviceWorker.controller; let reloaded = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadCtl && !reloaded) { reloaded = true; location.reload(); } });
+          const offer = async (w) => { if (await appConfirm('Доступна нова версія застосунку. Оновити зараз? (сесію буде збережено)')) w.postMessage('SKIP_WAITING'); };
+          if (registration.waiting && hadCtl) offer(registration.waiting);
+          registration.addEventListener('updatefound', () => { const w = registration.installing; if (w) w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) offer(w); }); });
+          document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') registration.update().catch(() => {}); });
           console.log('Service Worker успешно зарегистрирован. Область:', registration.scope);
         })
         .catch((error) => {
