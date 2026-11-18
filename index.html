@@ -1186,7 +1186,7 @@ button:active { transform: translateY(1px) scale(.99); }
 .calc-drag-mark { color: #8296b1; font-size: 1rem; line-height: 1; }
 .calc-collapse-btn { display: none; min-width: 31px; height: 31px; padding: 0 7px; border: 1px solid rgba(157,178,207,.2); border-radius: 8px; color: #dce8f8; background: rgba(255,255,255,.06); font-size: 1.1rem; font-weight: 800; line-height: 1; }
 .calc-mini-value { display: none; max-width: 170px; overflow: hidden; color: #f3cc7e; font: 750 .72rem ui-monospace,monospace; text-overflow: ellipsis; white-space: nowrap; }
-#calcModal.calc-floating-mode {
+#calcModal.calc-floating-mode:not(.hidden) {
   display: block !important; position: fixed; inset: 0; z-index: 70; padding: 0 !important;
   overflow: visible !important; background: transparent !important; pointer-events: none;
 }
@@ -1235,6 +1235,54 @@ button:active { transform: translateY(1px) scale(.99); }
 @media (prefers-reduced-motion: reduce) { #calcModal.calc-floating-mode > .calc-shell { animation: none; } }
 
 </style>
+<style id="ehNeon">
+/* Electrician Hub: "щиток" look for question + exam screens. Palette: bus #070b14, panel #0b1322, conduit #22304a, live #ffd23f, ground #3ddc97, fault #ff5d6c */
+#quizScreen{--live:#ffd23f;--bus:#070b14;--panel:#0b1322;--conduit:#22304a;--ink:#e8eefb;--mute:#8fa0c4;--ground:#3ddc97;--fault:#ff5d6c}
+#quizScreen .question-panel{background:var(--panel)!important;border:1px solid var(--conduit)!important;border-radius:18px!important;box-shadow:inset 0 1px 0 rgba(255,210,63,.35),0 18px 50px rgba(0,0,0,.45)!important}
+#quizScreen .study-toolbar{background:var(--panel);border:1px solid var(--conduit);border-radius:14px}
+#quizQuestionText{font-size:clamp(1.2rem,2.6vw,1.65rem);line-height:1.4;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+#quizProgress,#quizCurrentStats{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.78rem;color:var(--mute);background:transparent;border-color:var(--conduit)}
+#examTimerDisplay{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:.06em;background:#1a1405!important;color:var(--live)!important;border-color:#6b5410!important;animation:none!important;box-shadow:0 0 14px rgba(255,210,63,.18)}
+/* live-wire progress: glowing fill with a spark at its head */
+div:has(> #quizProgressBar),div:has(> #fcProgressBar){background:var(--conduit)!important;overflow:visible!important;height:6px!important}
+#quizProgressBar,#fcProgressBar{position:relative;height:6px!important;background:linear-gradient(90deg,#b8860b,var(--live))!important;box-shadow:0 0 12px rgba(255,210,63,.55)}
+#quizProgressBar::after,#fcProgressBar::after{content:"";position:absolute;right:-4px;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;background:#fff6c9;box-shadow:0 0 10px 3px rgba(255,210,63,.8)}
+/* answer options as labelled breakers */
+#quizOptions{counter-reset:opt}
+#quizOptions > button:not(#quizInputSubmitBtn){counter-increment:opt;display:flex;align-items:center;gap:.9rem;min-height:3.6rem;padding:.8rem 1rem;font-size:1.05rem;line-height:1.35;color:var(--ink);background:var(--bus);border:1px solid var(--conduit);border-radius:14px;transition:border-color .15s,background .15s,box-shadow .15s}
+#quizOptions > button:not(#quizInputSubmitBtn)::before{content:counter(opt,upper-alpha);flex:none;display:grid;place-items:center;width:2rem;height:2rem;border-radius:8px;font:700 .85rem ui-monospace,Menlo,Consolas,monospace;color:var(--live);background:rgba(255,210,63,.08);border:1px solid rgba(255,210,63,.35)}
+#quizOptions > button:not(#quizInputSubmitBtn):not(:disabled):hover{border-color:var(--live);background:#0e1830;box-shadow:0 0 0 1px rgba(255,210,63,.25),0 0 18px rgba(255,210,63,.12)}
+#quizOptions > button.ring-yellow-400{border-color:var(--live);background:rgba(255,210,63,.08);box-shadow:0 0 0 1px var(--live),0 0 20px rgba(255,210,63,.2)}
+#quizOptions > button.ring-yellow-400::before{background:var(--live);color:var(--bus)}
+#quizOptions > button.bg-green-600{border-color:var(--ground)!important;background:rgba(61,220,151,.1)!important;box-shadow:0 0 18px rgba(61,220,151,.2);opacity:1!important}
+#quizOptions > button.bg-green-600::before{background:var(--ground);color:var(--bus);border-color:var(--ground)}
+#quizOptions > button.bg-red-600{border-color:var(--fault)!important;background:rgba(255,93,108,.1)!important;box-shadow:0 0 18px rgba(255,93,108,.2);opacity:1!important}
+#quizOptions > button.bg-red-600::before{background:var(--fault);color:var(--bus);border-color:var(--fault)}
+#quizOptions > button:disabled:not(.bg-green-600):not(.bg-red-600){opacity:.5}
+#quizInputText{background:var(--bus)!important;border:1px solid var(--live)!important;border-radius:14px!important;color:var(--ink)}
+#quizInputText:focus{box-shadow:0 0 0 3px rgba(255,210,63,.2)}
+/* exam navigation row */
+#quizOptions > div .btn-secondary{background:transparent;border:1px solid var(--conduit);color:var(--mute);border-radius:12px}
+#quizOptions > div .btn-secondary:hover{border-color:var(--live);color:var(--ink)}
+#quizScreen .btn-primary,.ap-box .btn-primary{background:var(--live);color:var(--bus);border-radius:12px;box-shadow:0 0 0 1px rgba(255,210,63,.5),0 6px 22px rgba(255,210,63,.18)}
+#quizFeedback{background:var(--bus)!important;border:1px solid var(--conduit)!important;border-left:3px solid var(--live)!important}
+.ap-box{border-top:1px solid rgba(255,210,63,.45)}
+#quizScreen button:focus-visible,#quizScreen input:focus-visible,.ap-box button:focus-visible{outline:2px solid var(--live);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){#quizOptions > button,.progress-bar{transition:none!important}}
+</style>
+<style id="ehHome">
+/* Home: actions first, hero last and compact */
+#homeScreen .resume-session-panel{order:-2}
+#homeScreen .home-shortcuts{order:-1}
+#homeScreen .welcome-card{order:1}
+#homeScreen .home-shortcut-card{min-height:96px}
+#homeScreen .home-shortcut-card strong{font-size:1.05rem}
+@media (max-width:640px){
+  #homeScreen .welcome-card{padding:16px 18px!important;min-height:0!important}
+  #homeScreen .welcome-copy p{display:none}
+  #homeScreen .welcome-copy h2{font-size:1.1rem;margin:0}
+}
+</style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
 <!-- ЗУМ КАРТИНОК -->
@@ -1271,19 +1319,19 @@ button:active { transform: translateY(1px) scale(.99); }
     </button>
     <!-- КНОПКА КАЛЬКУЛЯТОРА -->
     <button class="status-pill reference-quick-btn" id="calcToggleBtn" type="button" onclick="toggleCalculator()" title="Відкрити калькулятор">
-        <span class="quick-ref-icon">🖩</span><span class="hidden md:inline">Кальк</span>
+        <span class="quick-ref-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01M8.5 15h.01M12 15h.01M15.5 15h.01M8.5 18h.01M12 18h.01"/></svg></span><span class="hidden md:inline">Кальк</span>
     </button>
     <button class="status-pill" id="soundToggleBtn" type="button" onclick="toggleSound()" title="Звук увімкнений — натисніть, щоб вимкнути" aria-label="Вимкнути звук" aria-pressed="true"><span id="soundIcon" aria-hidden="true">🔊</span> <span>Звук</span></button>
-    <span class="build-stamp">VERSION 8.4</span>
+    <span class="build-stamp">VERSION 8.9</span>
 </div></header><div class="app-content" id="appContent"><div class="home-dashboard" id="homeScreen"><section class="welcome-card"><div class="welcome-copy"><span class="welcome-kicker">ELECTRICIAN · STUDY WORKSPACE</span><h2>Питання, модулі та довідник</h2><p>Матеріали з електричної теорії, електричних кіл і систем керування.</p></div><div aria-hidden="true" class="welcome-art"><div class="welcome-art-icon">⚡</div><span>DC · AC · RLC · CONTROLS</span></div></section><section aria-live="polite" class="resume-session-panel hidden" id="resumeSessionPanel"></section><div class="home-stats" id="homeStats">
 <div class="metric-card metric-streak">
 <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Поточна серія</p>
-<p class="text-xl md:text-2xl font-bold text-orange-500">🔥 <span id="streakCount">0</span> днів</p>
+<p class="text-xl md:text-2xl font-bold text-orange-500"><span id="streakCount">0</span> днів</p>
 
 </div>
 <div class="metric-card metric-tests">
 <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Пройдено тестів</p>
-<p class="text-xl md:text-2xl font-bold text-blue-400">📝 <span id="totalTestsCompleted">0</span></p>
+<p class="text-xl md:text-2xl font-bold text-blue-400"><span id="totalTestsCompleted">0</span></p>
 </div>
 </div>
 <section class="home-shortcuts" aria-label="Швидкий запуск">
@@ -1735,7 +1783,7 @@ function examNavigator() {
   const info = document.createElement('div'); info.className = 'ap-msg'; info.textContent = `Відповіли: ${done} з ${qs.length} · позначено 🚩: ${fl}\nНатисни номер, щоб перейти до питання.`; box.appendChild(info);
   const grid = document.createElement('div'); grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(2.6rem,1fr));gap:.4rem;margin-bottom:1rem';
   qs.forEach((q, i) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = (examFlags.has(String(q.id)) ? '🚩' : '') + (i + 1);
-    const ans = !!examAnswers[q.id]; b.style.cssText = `padding:.5rem 0;border-radius:.5rem;font-weight:700;border:2px solid ${i === currentQIndex ? '#facc15' : 'transparent'};background:${ans ? '#166534' : '#374151'};color:#fff`;
+    const ans = !!examAnswers[q.id]; b.style.cssText = `padding:.5rem 0;border-radius:.6rem;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;border:1px solid ${i === currentQIndex ? '#ffd23f' : ans ? '#3ddc97' : '#22304a'};background:${ans ? '#10291c' : '#0b1322'};color:${ans ? '#9ff0c6' : '#aab8d6'};box-shadow:${i === currentQIndex ? '0 0 12px rgba(255,210,63,.4)' : 'none'}`;
     b.onclick = () => { ov.remove(); currentQIndex = i; loadNextQuestion(); }; grid.appendChild(b); });
   box.appendChild(grid);
   const row = document.createElement('div'); row.className = 'ap-row';
@@ -1779,7 +1827,7 @@ async function backupReminder(){try{
   if(now-last<14*864e5||now-snz<3*864e5||answerHistory.length<30)return;
   if(await appConfirm('Бекап не робився '+Math.floor((now-last)/864e5)+' дн. Дані лежать лише в цьому браузері. Зберегти копію зараз?'))exportFullData();else localStorage.setItem('quiz_backup_snooze',String(now));
 }catch(e){}}
-        // BUILD: 2026.11.15-electrician-hub-v8.4.1 — floating study calculator.
+        // BUILD: 2026.11.17-electrician-hub-v8.9.2 — calculator close fix in study mode.
         const PUBLIC_GIST_ID = '5ee027de84d344fbe11d2a496246d8ea';
         // Після розгортання Google Apps Script встав сюди URL вебзастосунку, що закінчується на /exec.
         const CONTRIBUTION_API_URL = 'https://script.google.com/macros/s/AKfycbyQhg1nQMNYOEKL9UFXcLDqwVsUcUZr_6u4K_QSKPfB1q-ETs39eOhLpho2wifbFMNXLQ/exec';
@@ -4652,7 +4700,17 @@ function toggleCalculator(forceOpen) {
             calcShell.classList.remove('is-collapsed', 'is-dragging');
         }
     } else {
+        // Important: remove floating mode as well as adding .hidden.
+        // The floating-mode display rule must never keep a closed calculator visible.
         calcResetSecondFunction();
+        modal.classList.remove('calc-floating-mode');
+        calcShell.classList.remove('is-collapsed', 'is-dragging');
+        calcShell.style.removeProperty('left');
+        calcShell.style.removeProperty('top');
+        calcShell.style.removeProperty('right');
+        calcShell.style.removeProperty('bottom');
+        calcShell.setAttribute('aria-modal', 'true');
+        calcDragState = null;
     }
 }
 
