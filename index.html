@@ -1322,7 +1322,7 @@ div:has(> #quizProgressBar),div:has(> #fcProgressBar){background:var(--conduit)!
         <span class="quick-ref-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01M8.5 15h.01M12 15h.01M15.5 15h.01M8.5 18h.01M12 18h.01"/></svg></span><span class="hidden md:inline">Кальк</span>
     </button>
     <button class="status-pill" id="soundToggleBtn" type="button" onclick="toggleSound()" title="Звук увімкнений — натисніть, щоб вимкнути" aria-label="Вимкнути звук" aria-pressed="true"><span id="soundIcon" aria-hidden="true">🔊</span> <span>Звук</span></button>
-    <span class="build-stamp">VERSION 8.9</span>
+    <span class="build-stamp">VERSION 8.9.3</span>
 </div></header><div class="app-content" id="appContent"><div class="home-dashboard" id="homeScreen"><section class="welcome-card"><div class="welcome-copy"><span class="welcome-kicker">ELECTRICIAN · STUDY WORKSPACE</span><h2>Питання, модулі та довідник</h2><p>Матеріали з електричної теорії, електричних кіл і систем керування.</p></div><div aria-hidden="true" class="welcome-art"><div class="welcome-art-icon">⚡</div><span>DC · AC · RLC · CONTROLS</span></div></section><section aria-live="polite" class="resume-session-panel hidden" id="resumeSessionPanel"></section><div class="home-stats" id="homeStats">
 <div class="metric-card metric-streak">
 <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Поточна серія</p>
@@ -1792,17 +1792,30 @@ function examNavigator() {
   row.append(c, sb); box.appendChild(row); ov.appendChild(box); document.body.appendChild(ov);
 }
 async function examSubmit(force) {
-  const un = currentQuizQuestions.filter(q => !examAnswers[q.id]).length;
-  if (!force && !(await appConfirm(un ? `Без відповіді: ${un} з ${currentQuizQuestions.length} (рахуються як помилки). Здати іспит?` : 'Здати іспит?'))) return;
-  document.querySelectorAll('.ap-ov').forEach(o => o.remove());
-  currentQuizQuestions.forEach(q => {
-    const a = examAnswers[q.id], ok = !!(a && a.ok), sel = a ? a.sel : 'Без відповіді';
-    if (!quizStats[q.id]) quizStats[q.id] = { c: 0, w: 0 };
-    if (ok) { score++; mistakeIds = mistakeIds.filter(id => id !== q.id); quizStats[q.id].c++; }
-    else { userMistakes.push({ q: q, sel: sel }); if (!mistakeIds.includes(q.id)) mistakeIds.push(q.id); quizStats[q.id].w++; }
-    recordAnswerEvent(q, ok); addProgressPoint();
-  });
-  currentQIndex = currentQuizQuestions.length; saveData(); finishSession();
+  if (sessionFinalized || examSubmitInProgress || currentMode !== 'exam') return;
+  examSubmitInProgress = true;
+  try {
+    const un = currentQuizQuestions.filter(q => !examAnswers[q.id]).length;
+    if (!force) {
+      const confirmed = await appConfirm(un ? `Без відповіді: ${un} з ${currentQuizQuestions.length} (рахуються як помилки). Здати іспит?` : 'Здати іспит?');
+      // If the timer expired while the confirmation dialog was open, submit anyway.
+      const timerExpired = !!(examEndsAt && Date.now() >= examEndsAt);
+      if (!confirmed && !timerExpired) return;
+    }
+    document.querySelectorAll('.ap-ov').forEach(o => o.remove());
+    currentQuizQuestions.forEach(q => {
+      const a = examAnswers[q.id], ok = !!(a && a.ok), sel = a ? a.sel : 'Без відповіді';
+      if (!quizStats[q.id]) quizStats[q.id] = { c: 0, w: 0 };
+      if (ok) { score++; mistakeIds = mistakeIds.filter(id => id !== q.id); quizStats[q.id].c++; }
+      else { userMistakes.push({ q: q, sel: sel }); if (!mistakeIds.includes(q.id)) mistakeIds.push(q.id); quizStats[q.id].w++; }
+      recordAnswerEvent(q, ok); addProgressPoint();
+    });
+    currentQIndex = currentQuizQuestions.length;
+    saveData();
+    finishSession();
+  } finally {
+    examSubmitInProgress = false;
+  }
 }
 // --- Exam readiness + module heatmap (stats screen) ---
 function renderReadiness() {
@@ -1827,7 +1840,7 @@ async function backupReminder(){try{
   if(now-last<14*864e5||now-snz<3*864e5||answerHistory.length<30)return;
   if(await appConfirm('Бекап не робився '+Math.floor((now-last)/864e5)+' дн. Дані лежать лише в цьому браузері. Зберегти копію зараз?'))exportFullData();else localStorage.setItem('quiz_backup_snooze',String(now));
 }catch(e){}}
-        // BUILD: 2026.11.17-electrician-hub-v8.9.2 — calculator close fix in study mode.
+        // BUILD: 2026.11.17-electrician-hub-v8.9.3 — session integrity, backup and rapid-input safeguards.
         const PUBLIC_GIST_ID = '5ee027de84d344fbe11d2a496246d8ea';
         // Після розгортання Google Apps Script встав сюди URL вебзастосунку, що закінчується на /exec.
         const CONTRIBUTION_API_URL = 'https://script.google.com/macros/s/AKfycbyQhg1nQMNYOEKL9UFXcLDqwVsUcUZr_6u4K_QSKPfB1q-ETs39eOhLpho2wifbFMNXLQ/exec';
@@ -2144,6 +2157,9 @@ async function backupReminder(){try{
         let editingQuestionId = null, pendingQuestionSave = null, currentMode = 'quiz', examInterval = null, examTimeLeft = 0, examPassTarget = 70;
         let currentAnswerState = null, currentDraftAnswer = '', currentSessionAnswers = [], sessionStartedAt = 0, examEndsAt = null, isRestoringSession = false;
         let examAnswers = {}, examFlags = new Set();
+        // Prevent duplicate grading/completion from rapid taps or timer/submit races.
+        let sessionFinalized = false, examSubmitInProgress = false;
+        let lastQuestionAdvanceAt = 0, lastFlashcardGradeAt = 0;
         let statsRangeDays = 30;
         let returnToQuizAfterEdit = false;
 
@@ -2164,10 +2180,11 @@ async function backupReminder(){try{
             const saved = readStoredJSON(ACTIVE_SESSION_KEY, null);
             return saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : null;
         }
-        function clearSavedSession() { localStorage.removeItem(ACTIVE_SESSION_KEY); renderResumeSessionCard(); }
+        function clearSavedSession() { localStorage.removeItem(ACTIVE_SESSION_KEY); scheduleSnapshot(); renderResumeSessionCard(); }
         function initializeTrackedSession(mode) {
             currentMode = mode; currentQIndex = 0; score = 0; userMistakes = [];
             currentAnswerState = null; currentDraftAnswer = ''; currentSessionAnswers = []; sessionStartedAt = Date.now(); examEndsAt = null; examTimeLeft = 0; examAnswers = {}; examFlags = new Set();
+            sessionFinalized = false; examSubmitInProgress = false; lastQuestionAdvanceAt = 0; lastFlashcardGradeAt = 0;
             localStorage.removeItem(ACTIVE_SESSION_KEY);
         }
         function recordAnswerEvent(q, isCorrect, mode = currentMode) {
@@ -2200,7 +2217,7 @@ async function backupReminder(){try{
         }
         async function discardSavedSession() {
             if (!await appConfirm('Видалити збережену незавершену сесію? Уже записана статистика відповідей залишиться.')) return;
-            localStorage.removeItem(ACTIVE_SESSION_KEY); renderResumeSessionCard();
+            localStorage.removeItem(ACTIVE_SESSION_KEY); scheduleSnapshot(); renderResumeSessionCard();
         }
         function resumeSavedSession() {
             const saved = getSavedSession();
@@ -2210,6 +2227,7 @@ async function backupReminder(){try{
             }
             if (!['quiz','exam','smart','retry','flashcards'].includes(saved.mode)) { appAlert('Цей тип сесії більше не підтримується.'); return; }
             clearInterval(examInterval);
+            sessionFinalized = false; examSubmitInProgress = false; lastQuestionAdvanceAt = 0; lastFlashcardGradeAt = 0;
             currentMode = saved.mode; activePeriod = VALID_PERIODS.includes(saved.period) ? saved.period : activePeriod;
             localStorage.setItem('quiz_active_period', activePeriod);
             const questionById = new Map(questions.map(q => [String(q.id), q]));
@@ -2237,7 +2255,7 @@ async function backupReminder(){try{
                     try { processAnswer(!!state.isCorrect, q, state.selectedText || '', savedChoice || null); } finally { isRestoringSession = false; }
                 }
                 if (currentMode === 'exam' && examEndsAt) {
-                    if (examTimeLeft <= 0) { appAlert('Час іспиту минув, поки застосунок був закритий. Показую результат.'); finishSession(); }
+                    if (examTimeLeft <= 0) { appAlert('Час іспиту минув, поки застосунок був закритий. Зараховую збережені відповіді та показую результат.'); examSubmit(true); }
                     else { document.getElementById('examTimerDisplay').classList.remove('hidden'); startExamCountdown(); }
                 } else document.getElementById('examTimerDisplay').classList.add('hidden');
             }
@@ -3545,6 +3563,8 @@ async function autoSyncOnLoad() {
             sessionStartedAt = 0;
             examEndsAt = null;
             currentMode = 'quiz';
+            sessionFinalized = true; examSubmitInProgress = false;
+            lastQuestionAdvanceAt = 0; lastFlashcardGradeAt = 0;
 
             saveData();
             renderStatsScreen();
@@ -3786,7 +3806,12 @@ async function autoSyncOnLoad() {
             }
         }
 
-        function nextQuestion() { document.getElementById('quizFeedback').classList.add('hidden'); currentAnswerState = null; currentDraftAnswer = ''; currentQIndex++; loadNextQuestion(); }
+        function nextQuestion() {
+            const now = Date.now();
+            if (now - lastQuestionAdvanceAt < 350 || currentQIndex >= currentQuizQuestions.length) return;
+            lastQuestionAdvanceAt = now;
+            document.getElementById('quizFeedback').classList.add('hidden'); currentAnswerState = null; currentDraftAnswer = ''; currentQIndex++; loadNextQuestion();
+        }
 
         function loadNextFlashcard() {
             if (currentQIndex >= currentQuizQuestions.length) { finishSession(); return; }
@@ -3813,6 +3838,9 @@ async function autoSyncOnLoad() {
 
         function recordFlashcard(isCorrect, e) {
             if (e && e.stopPropagation) e.stopPropagation();
+            const now = Date.now();
+            if (now - lastFlashcardGradeAt < 350 || currentQIndex >= currentQuizQuestions.length) return;
+            lastFlashcardGradeAt = now;
             playAnswerSound(isCorrect);
             const g = isCorrect === true ? 2 : isCorrect === false ? 0 : isCorrect; isCorrect = g > 0; const q = currentQuizQuestions[currentQIndex];
             if (isCorrect) { score++; } else { userMistakes.push({ q: q, sel: "Не згадав" }); if (!__fcRequeued.has(q.id)) { __fcRequeued.add(q.id); currentQuizQuestions.push(q); } }
@@ -3821,6 +3849,8 @@ async function autoSyncOnLoad() {
         }
 
         function finishSession() {
+            if (sessionFinalized || !currentQuizQuestions.length) return;
+            sessionFinalized = true;
             clearInterval(examInterval); examInterval = null; __fcRequeued.clear(); document.getElementById('quizFeedback').classList.add('hidden');
             const completedAt = Date.now();
             const answeredCount = currentSessionAnswers.length;
@@ -4031,13 +4061,48 @@ async function autoSyncOnLoad() {
             document.getElementById('subCategoryList').innerHTML = [...new Set(listToRender.map(q => q.subCategory))].filter(c => c).map(c => `<option value="${escapeHtml(c)}">`).join('');
         }
 
-        function exportFullData() { localStorage.setItem('quiz_last_backup', String(Date.now())); 
-            let allCheatSheets = {};
-            ['1st period', '2nd period', '3rd period', '4th period'].forEach(p => {
-                allCheatSheets[p] = localStorage.getItem('quiz_cheatsheet_' + p) || defaultCheatSheets[p];
-            });
-            const dataToSave = { questions: questions, cheatSheets: allCheatSheets, quizStats: quizStats, mistakeIds: mistakeIds, favoriteIds: favoriteIds, srsStats: srsStats, examHistory: examHistory, answerHistory: answerHistory, learningSessions: learningSessions, appStats: appStats };
-            const dl = document.createElement('a'); dl.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToSave))); dl.setAttribute("download", "electrician_quiz_FULL_backup.json"); dl.click(); 
+        function exportFullData() {
+            try {
+                // Save the exact current position/draft before packaging the backup.
+                persistActiveSession();
+                const allCheatSheets = {};
+                VALID_PERIODS.forEach(period => {
+                    allCheatSheets[period] = localStorage.getItem('quiz_cheatsheet_' + period) || defaultCheatSheets[period] || '';
+                });
+                const dataToSave = {
+                    backupVersion: 2,
+                    exportedAt: new Date().toISOString(),
+                    activePeriod,
+                    activeSession: getSavedSession(),
+                    questions,
+                    deletedCloudIds,
+                    cheatSheets: allCheatSheets,
+                    quizStats,
+                    mistakeIds,
+                    favoriteIds,
+                    srsStats,
+                    examHistory,
+                    answerHistory,
+                    learningSessions,
+                    appStats
+                };
+                const blob = new Blob([JSON.stringify(dataToSave, null, 2)], { type: 'application/json;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const dateStamp = new Date().toISOString().slice(0, 10);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `electrician_hub_backup_${dateStamp}.json`;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 30000);
+                try { localStorage.setItem('quiz_last_backup', String(Date.now())); } catch (_) {}
+                appAlert('✅ Резервну копію підготовлено. Вона містить питання, статистику, шпаргалки, позначки видалених хмарних питань і незавершену сесію. Адмінські секрети навмисно не експортуються.');
+            } catch (error) {
+                console.error('Backup export failed:', error);
+                appAlert('❌ Не вдалося створити резервну копію. Перевір вільне місце та спробуй ще раз.');
+            }
         }
 
         const VALID_PERIODS = ['1st period', '2nd period', '3rd period', '4th period'];
@@ -4199,6 +4264,51 @@ async function autoSyncOnLoad() {
             };
             const importedMistakes = validateIdList(imp.mistakeIds, 'mistakeIds');
             const importedFavorites = validateIdList(imp.favoriteIds, 'favoriteIds');
+            const importedDeletedCloudIds = validateIdList(imp.deletedCloudIds, 'deletedCloudIds');
+            const importedActivePeriod = imp.activePeriod === undefined ? activePeriod : imp.activePeriod;
+            if (!VALID_PERIODS.includes(importedActivePeriod)) throw new Error('activePeriod має містити 1st period, 2nd period, 3rd period або 4th period.');
+
+            const importedActiveSession = (() => {
+                const raw = imp.activeSession;
+                if (raw === undefined || raw === null) return null;
+                if (!isPlainObject(raw)) throw new Error('activeSession має бути об’єктом або null.');
+                const allowedModes = ['quiz', 'exam', 'smart', 'retry', 'flashcards'];
+                if (!allowedModes.includes(raw.mode)) throw new Error('Невідомий тип незавершеної сесії в бекапі.');
+                if (!Array.isArray(raw.questions) || raw.questions.length === 0 || raw.questions.length > 5000) throw new Error('Некоректний список питань незавершеної сесії.');
+                const knownIds = new Set(importedQuestions.map(q => String(q.id)));
+                const sessionIds = raw.questions.map(id => String(id));
+                if (sessionIds.some(id => !id || !knownIds.has(id))) throw new Error('Незавершена сесія посилається на питання, яких немає в цьому бекапі.');
+                if (!Number.isInteger(raw.currentQIndex) || raw.currentQIndex < 0 || raw.currentQIndex >= sessionIds.length) throw new Error('Некоректна позиція незавершеної сесії.');
+                if (!Number.isFinite(raw.startedAt) || raw.startedAt <= 0) throw new Error('Некоректний час початку незавершеної сесії.');
+                const period = raw.period === undefined ? importedActivePeriod : raw.period;
+                if (!VALID_PERIODS.includes(period)) throw new Error('Некоректний період незавершеної сесії.');
+                const sessionAnswerEvents = raw.currentSessionAnswers === undefined ? [] : raw.currentSessionAnswers;
+                if (!Array.isArray(sessionAnswerEvents) || sessionAnswerEvents.some(item => !isPlainObject(item) || typeof item.questionId !== 'string' || !knownIds.has(item.questionId) || typeof item.category !== 'string' || typeof item.subCategory !== 'string' || typeof item.correct !== 'boolean')) throw new Error('Некоректна історія відповідей незавершеної сесії.');
+                const sessionMistakes = raw.userMistakes === undefined ? [] : raw.userMistakes;
+                if (!Array.isArray(sessionMistakes) || sessionMistakes.some(item => !isPlainObject(item) || !knownIds.has(String(item.questionId)) || typeof item.sel !== 'string')) throw new Error('Некоректний список помилок незавершеної сесії.');
+                const rawExamAnswers = raw.examAnswers === undefined ? {} : raw.examAnswers;
+                if (!isPlainObject(rawExamAnswers) || Object.entries(rawExamAnswers).some(([id, item]) => !sessionIds.includes(String(id)) || !isPlainObject(item) || typeof item.sel !== 'string' || typeof item.ok !== 'boolean')) throw new Error('Некоректні відповіді іспиту в незавершеній сесії.');
+                const flags = raw.examFlags === undefined ? [] : raw.examFlags;
+                if (!Array.isArray(flags) || flags.some(id => !sessionIds.includes(String(id)))) throw new Error('Некоректні позначки питань в незавершеній сесії.');
+                const answerState = raw.currentAnswerState;
+                if (answerState !== null && answerState !== undefined && (!isPlainObject(answerState) || !sessionIds.includes(String(answerState.questionId)) || typeof answerState.isCorrect !== 'boolean' || typeof answerState.selectedText !== 'string')) throw new Error('Некоректна поточна відповідь у незавершеній сесії.');
+                const examEnds = raw.examEndsAt === null || raw.examEndsAt === undefined ? null : raw.examEndsAt;
+                if (examEnds !== null && (!Number.isFinite(examEnds) || examEnds <= 0)) throw new Error('Некоректний час завершення іспиту в незавершеній сесії.');
+                const passTarget = raw.examPassTarget === undefined ? 70 : raw.examPassTarget;
+                if (!Number.isFinite(passTarget) || passTarget < 0 || passTarget > 100) throw new Error('Некоректний прохідний бал незавершеного іспиту.');
+                return {
+                    version: 1, mode: raw.mode, period, questions: sessionIds, currentQIndex: raw.currentQIndex,
+                    score: Number.isFinite(raw.score) && raw.score >= 0 ? Math.floor(raw.score) : 0,
+                    userMistakes: sessionMistakes.map(item => ({ questionId: String(item.questionId), sel: item.sel })),
+                    currentAnswerState: answerState || null,
+                    currentDraftAnswer: typeof raw.currentDraftAnswer === 'string' ? raw.currentDraftAnswer : '',
+                    currentSessionAnswers: sessionAnswerEvents,
+                    startedAt: raw.startedAt,
+                    savedAt: Number.isFinite(raw.savedAt) ? raw.savedAt : Date.now(),
+                    examPassTarget: passTarget, examEndsAt: examEnds, examAnswers: rawExamAnswers,
+                    examFlags: [...new Set(flags.map(String))]
+                };
+            })();
 
             const importedSrs = imp.srsStats === undefined ? {} : imp.srsStats;
             if (!isPlainObject(importedSrs)) throw new Error('srsStats має бути об’єктом.');
@@ -4249,6 +4359,9 @@ async function autoSyncOnLoad() {
 
             return {
                 questions: importedQuestions,
+                activePeriod: importedActivePeriod,
+                activeSession: importedActiveSession,
+                deletedCloudIds: importedDeletedCloudIds,
                 quizStats: importedQuizStats,
                 mistakeIds: importedMistakes,
                 favoriteIds: importedFavorites,
@@ -4288,7 +4401,11 @@ async function autoSyncOnLoad() {
                         const inputCount = backup.questions.filter(q => q.type === 'input').length;
                         if (!await appConfirm(`⚠️ Перевірку повного бекапу пройдено: ${backup.questions.length} питань.\n• З вибором відповіді: ${choiceCount}\n• З введенням відповіді: ${inputCount}\n\nБекап повністю замінить поточну базу, статистику та стрик. Продовжити?`)) return;
 
+                        clearInterval(examInterval); examInterval = null;
                         questions = backup.questions;
+                        activePeriod = backup.activePeriod;
+                        localStorage.setItem('quiz_active_period', activePeriod);
+                        deletedCloudIds = backup.deletedCloudIds;
                         quizStats = backup.quizStats;
                         mistakeIds = backup.mistakeIds;
                         favoriteIds = backup.favoriteIds;
@@ -4296,7 +4413,12 @@ async function autoSyncOnLoad() {
                         examHistory = backup.examHistory;
                         answerHistory = backup.answerHistory;
                         learningSessions = backup.learningSessions;
-                        localStorage.removeItem(ACTIVE_SESSION_KEY);
+                        currentQuizQuestions = []; currentQIndex = 0; score = 0; userMistakes = [];
+                        currentSessionAnswers = []; currentAnswerState = null; currentDraftAnswer = ''; sessionStartedAt = 0; examEndsAt = null;
+                        currentMode = 'quiz'; sessionFinalized = true; examSubmitInProgress = false;
+                        lastQuestionAdvanceAt = 0; lastFlashcardGradeAt = 0;
+                        if (backup.activeSession) localStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(backup.activeSession));
+                        else localStorage.removeItem(ACTIVE_SESSION_KEY);
                         appStats = backup.appStats;
                         if (backup.cheatSheets) {
                             Object.entries(backup.cheatSheets).forEach(([period, content]) => localStorage.setItem('quiz_cheatsheet_' + period, content));
@@ -4315,6 +4437,7 @@ async function autoSyncOnLoad() {
                     checkDailyProgress();
                     updatePeriodTabsUI();
                     renderCategories();
+                    renderResumeSessionCard();
                     loadCheatSheet();
                 } catch(err) {
                     appAlert(`❌ Імпорт скасовано: ${err && err.message ? err.message : 'помилка структури файлу'}.\n\nПоточна база не змінена.`);
