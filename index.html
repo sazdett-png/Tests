@@ -1722,6 +1722,53 @@ function srsUpdate(id,g){const s=srsStats[id]||{interval:0,nextReview:0};let iv=
   else{if(iv===0)iv=g===3?3:1;else if(iv===1)iv=g===1?2:g===2?3:5;else iv=Math.max(iv+1,Math.round(iv*(g===1?1.2:g===2?e:e*1.3)));
     e=Math.max(1.3,Math.min(3,e+(g===1?-.15:g===3?.15:0)));s.nextReview=Date.now()+iv*864e5;}
   s.interval=iv;s.ease=e;srsStats[id]=s;}
+// --- Exam: free navigation, changeable answers, graded only on submit ---
+function examStore(isCorrect, q, sel) {
+  examAnswers[q.id] = { sel: String(sel ?? ''), ok: !!isCorrect }; currentDraftAnswer = '';
+  if (currentQIndex < currentQuizQuestions.length - 1) { currentQIndex++; loadNextQuestion(); } else { persistActiveSession(); loadNextQuestion(); examNavigator(); }
+}
+function examNavigator() {
+  document.querySelectorAll('.ap-ov').forEach(o => o.remove());
+  const qs = currentQuizQuestions, ov = document.createElement('div'); ov.className = 'ap-ov';
+  const box = document.createElement('div'); box.className = 'ap-box'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true');
+  const done = qs.filter(q => examAnswers[q.id]).length, fl = qs.filter(q => examFlags.has(String(q.id))).length;
+  const info = document.createElement('div'); info.className = 'ap-msg'; info.textContent = `Відповіли: ${done} з ${qs.length} · позначено 🚩: ${fl}\nНатисни номер, щоб перейти до питання.`; box.appendChild(info);
+  const grid = document.createElement('div'); grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(2.6rem,1fr));gap:.4rem;margin-bottom:1rem';
+  qs.forEach((q, i) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = (examFlags.has(String(q.id)) ? '🚩' : '') + (i + 1);
+    const ans = !!examAnswers[q.id]; b.style.cssText = `padding:.5rem 0;border-radius:.5rem;font-weight:700;border:2px solid ${i === currentQIndex ? '#facc15' : 'transparent'};background:${ans ? '#166534' : '#374151'};color:#fff`;
+    b.onclick = () => { ov.remove(); currentQIndex = i; loadNextQuestion(); }; grid.appendChild(b); });
+  box.appendChild(grid);
+  const row = document.createElement('div'); row.className = 'ap-row';
+  const c = document.createElement('button'); c.type = 'button'; c.className = 'btn-secondary'; c.textContent = 'Повернутись'; c.onclick = () => ov.remove();
+  const sb = document.createElement('button'); sb.type = 'button'; sb.className = 'btn-primary'; sb.textContent = '✅ Здати іспит'; sb.onclick = () => examSubmit(false);
+  row.append(c, sb); box.appendChild(row); ov.appendChild(box); document.body.appendChild(ov);
+}
+async function examSubmit(force) {
+  const un = currentQuizQuestions.filter(q => !examAnswers[q.id]).length;
+  if (!force && !(await appConfirm(un ? `Без відповіді: ${un} з ${currentQuizQuestions.length} (рахуються як помилки). Здати іспит?` : 'Здати іспит?'))) return;
+  document.querySelectorAll('.ap-ov').forEach(o => o.remove());
+  currentQuizQuestions.forEach(q => {
+    const a = examAnswers[q.id], ok = !!(a && a.ok), sel = a ? a.sel : 'Без відповіді';
+    if (!quizStats[q.id]) quizStats[q.id] = { c: 0, w: 0 };
+    if (ok) { score++; mistakeIds = mistakeIds.filter(id => id !== q.id); quizStats[q.id].c++; }
+    else { userMistakes.push({ q: q, sel: sel }); if (!mistakeIds.includes(q.id)) mistakeIds.push(q.id); quizStats[q.id].w++; }
+    recordAnswerEvent(q, ok); addProgressPoint();
+  });
+  currentQIndex = currentQuizQuestions.length; saveData(); finishSession();
+}
+// --- Exam readiness + module heatmap (stats screen) ---
+function renderReadiness() {
+  let host = document.getElementById('statsReadiness');
+  if (!host) { host = document.createElement('div'); host.id = 'statsReadiness'; host.style.margin = '1rem 0'; const a = document.getElementById('statsRecentModules'), p = a && a.parentElement; if (p && p.parentElement) p.parentElement.insertBefore(host, p); else document.getElementById('statsScreen').appendChild(host); }
+  const qs = questions.filter(q => q.period === activePeriod), mods = new Map();
+  qs.forEach(q => { const k = (q.category || 'Без категорії') + ' · ' + (q.subCategory || 'Загальні'); const m = mods.get(k) || { n: 0, ok: 0, seen: 0 }; m.n++; const st = quizStats[q.id]; if (st && st.c + st.w > 0) { m.seen++; if (st.c > st.w) m.ok++; } mods.set(k, m); });
+  const tot = qs.length, ok = [...mods.values()].reduce((a, m) => a + m.ok, 0), seen = [...mods.values()].reduce((a, m) => a + m.seen, 0);
+  if (!tot) { host.innerHTML = ''; return; }
+  const col = p => p >= examPassTarget ? '#16a34a' : p >= 40 ? '#d97706' : '#b91c1c', pct = Math.round(ok / tot * 100);
+  const cells = [...mods.entries()].map(([k, m]) => ({ k, m, p: Math.round(m.ok / m.n * 100) })).sort((a, b) => a.p - b.p).map(({ k, m, p }) =>
+    `<div style="background:${col(p)}22;border:1px solid ${col(p)};border-radius:.6rem;padding:.5rem .6rem"><div style="font-size:.75rem;opacity:.9">${escapeHtml(k)}</div><b>${p}%</b> <span style="font-size:.7rem;opacity:.7">${m.ok}/${m.n} · бачив ${m.seen}</span></div>`).join('');
+  host.innerHTML = `<div style="border:1px solid ${col(pct)};border-radius:.9rem;padding:1rem;background:${col(pct)}18"><div style="font-size:.8rem;opacity:.8">ГОТОВНІСТЬ ДО ІСПИТУ · ${escapeHtml(activePeriod)}</div><div style="font-size:2rem;font-weight:800;color:${col(pct)}">${pct}%</div><div style="font-size:.8rem;opacity:.8">Опановано ${ok} із ${tot} питань · переглянуто ${seen}. Прохідний бал: ${examPassTarget}%.</div><div style="font-size:.72rem;opacity:.6;margin-top:.3rem">Опановане питання: відповідей «вірно» більше, ніж «невірно». Ще не бачені питання рахуються як невідомі.</div></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr));gap:.5rem;margin-top:.7rem">${cells}</div><button type="button" class="btn-primary" style="width:100%;margin-top:.7rem;padding:.7rem;border-radius:.6rem" onclick="startSmartWorkout()">🧠 Тренувати слабкі теми</button>`;
+}
 // --- IndexedDB mirror, persistence, backup reminder ---
 function _idb(){return new Promise((r,j)=>{const q=indexedDB.open('electrician_hub',1);q.onupgradeneeded=()=>q.result.createObjectStore('kv');q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error);});}
 let _snapT;function scheduleSnapshot(){if(window.__idbRestoring||!window.indexedDB)return;clearTimeout(_snapT);_snapT=setTimeout(async()=>{try{const snap={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if((k.startsWith('quiz_')||k==='app_stats')&&k!=='quiz_admin_settings')snap[k]=localStorage.getItem(k);}const db=await _idb();db.transaction('kv','readwrite').objectStore('kv').put({t:Date.now(),snap},'snapshot');}catch(e){}},1500);}
@@ -2048,6 +2095,7 @@ async function backupReminder(){try{
         let currentQIndex = 0, score = 0, userMistakes = [];
         let editingQuestionId = null, pendingQuestionSave = null, currentMode = 'quiz', examInterval = null, examTimeLeft = 0, examPassTarget = 70;
         let currentAnswerState = null, currentDraftAnswer = '', currentSessionAnswers = [], sessionStartedAt = 0, examEndsAt = null, isRestoringSession = false;
+        let examAnswers = {}, examFlags = new Set();
         let statsRangeDays = 30;
         let returnToQuizAfterEdit = false;
 
@@ -2071,7 +2119,7 @@ async function backupReminder(){try{
         function clearSavedSession() { localStorage.removeItem(ACTIVE_SESSION_KEY); renderResumeSessionCard(); }
         function initializeTrackedSession(mode) {
             currentMode = mode; currentQIndex = 0; score = 0; userMistakes = [];
-            currentAnswerState = null; currentDraftAnswer = ''; currentSessionAnswers = []; sessionStartedAt = Date.now(); examEndsAt = null; examTimeLeft = 0;
+            currentAnswerState = null; currentDraftAnswer = ''; currentSessionAnswers = []; sessionStartedAt = Date.now(); examEndsAt = null; examTimeLeft = 0; examAnswers = {}; examFlags = new Set();
             localStorage.removeItem(ACTIVE_SESSION_KEY);
         }
         function recordAnswerEvent(q, isCorrect, mode = currentMode) {
@@ -2085,7 +2133,7 @@ async function backupReminder(){try{
             const session = {
                 version: 1, mode: currentMode, period: activePeriod, questions: currentQuizQuestions.map(q => String(q.id)), currentQIndex, score,
                 userMistakes: userMistakes.map(m => ({ questionId: String(m.q.id), sel: m.sel })), currentAnswerState, currentDraftAnswer, currentSessionAnswers, startedAt: sessionStartedAt, savedAt: Date.now(),
-                examPassTarget, examEndsAt
+                examPassTarget, examEndsAt, examAnswers, examFlags: Array.from(examFlags)
             };
             try { localStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(session)); }
             catch (error) { console.warn('Не вдалося зберегти поточну сесію.', error); }
@@ -2126,7 +2174,7 @@ async function backupReminder(){try{
             userMistakes = Array.isArray(saved.userMistakes) ? saved.userMistakes.map(m => ({ q: m.q || questionById.get(String(m.questionId)), sel: m.sel || '' })).filter(m => m.q) : [];
             currentSessionAnswers = Array.isArray(saved.currentSessionAnswers) ? saved.currentSessionAnswers : [];
             currentAnswerState = saved.currentAnswerState || null; currentDraftAnswer = typeof saved.currentDraftAnswer === 'string' ? saved.currentDraftAnswer : ''; sessionStartedAt = Number(saved.startedAt) || Date.now();
-            examPassTarget = Number(saved.examPassTarget) || 70; examEndsAt = Number(saved.examEndsAt) || null;
+            examPassTarget = Number(saved.examPassTarget) || 70; examEndsAt = Number(saved.examEndsAt) || null; examAnswers = (saved.examAnswers && typeof saved.examAnswers === 'object') ? saved.examAnswers : {}; examFlags = new Set(Array.isArray(saved.examFlags) ? saved.examFlags : []);
             examTimeLeft = examEndsAt ? Math.max(0, Math.ceil((examEndsAt - Date.now()) / 1000)) : 0;
             updatePeriodTabsUI();
             document.getElementById('quizFeedback').classList.add('hidden');
@@ -2152,7 +2200,7 @@ async function backupReminder(){try{
             if (!examEndsAt) return;
             const tick = () => {
                 examTimeLeft = Math.max(0, Math.ceil((examEndsAt - Date.now()) / 1000)); updateExamTimerUI();
-                if (examTimeLeft <= 0) { clearInterval(examInterval); examInterval = null; appAlert('⏱️ Час вийшов!'); finishSession(); return; }
+                if (examTimeLeft <= 0) { clearInterval(examInterval); examInterval = null; appAlert('⏱️ Час вийшов!'); examSubmit(true); return; }
                 if (examTimeLeft % 5 === 0) persistActiveSession();
             };
             tick(); if (examTimeLeft > 0) examInterval = setInterval(tick, 1000);
@@ -3248,6 +3296,7 @@ async function autoSyncOnLoad() {
             return minutes ? `${minutes} хв ${remainder} с` : `${remainder} с`;
         }
         function renderExtendedAnalytics() {
+            try { renderReadiness(); } catch (e) { console.warn(e); }
             const now = new Date(); const start = new Date(now); start.setHours(0,0,0,0); start.setDate(start.getDate() - statsRangeDays + 1);
             const periodEvents = answerHistory.filter(item => item.period === activePeriod && item.ts >= start.getTime() && item.ts <= now.getTime());
             const periodSessions = learningSessions.filter(item => item.period === activePeriod && item.date >= start.getTime() && item.date <= now.getTime());
@@ -3609,7 +3658,7 @@ async function autoSyncOnLoad() {
         }
 
         function loadNextQuestion() {
-            if (currentQIndex >= currentQuizQuestions.length) { finishSession(); return; }
+            if (currentQIndex >= currentQuizQuestions.length) { if (currentMode === 'exam') { currentQIndex = currentQuizQuestions.length - 1; examNavigator(); return; } finishSession(); return; }
             const q = currentQuizQuestions[currentQIndex], type = q.type || 'choice';
             document.getElementById('quizProgressBar').style.width = ((currentQIndex + 1) / currentQuizQuestions.length * 100) + '%';
             document.getElementById('quizProgress').innerText = `Питання ${currentQIndex + 1}/${currentQuizQuestions.length} (${q.category || 'Без категорії'})`;
@@ -3635,15 +3684,22 @@ async function autoSyncOnLoad() {
                 document.getElementById('quizInputText').focus(); const check = () => { const v = document.getElementById('quizInputText').value.trim(); if(v) processAnswer(q.options.some(o => answersMatch(v, o)), q, v, null); };
                 document.getElementById('quizInputSubmitBtn').onclick = check; document.getElementById('quizInputText').addEventListener('keypress', e => { if (e.key === 'Enter') check(); });
             }
-            if (currentMode === 'exam' && currentQIndex < currentQuizQuestions.length - 1) {
-                const d = document.createElement('button'); d.type = 'button'; d.className = 'btn-secondary w-full py-3 rounded mt-3'; d.textContent = '⏭ Відкласти на кінець';
-                d.onclick = () => { currentQuizQuestions.push(currentQuizQuestions.splice(currentQIndex, 1)[0]); currentDraftAnswer = ''; loadNextQuestion(); };
-                optCont.appendChild(d);
+            if (currentMode === 'exam') {
+                const sv = examAnswers[q.id];
+                if (sv) { optCont.querySelectorAll('button').forEach(bt => { if (bt.innerText === sv.sel) bt.classList.add('ring-2', 'ring-yellow-400'); }); const ti = document.getElementById('quizInputText'); if (ti && !ti.value) ti.value = sv.sel; }
+                const bar = document.createElement('div'); bar.className = 'flex gap-2 mt-4';
+                const mk = (txt, fn) => { const bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn-secondary flex-1 py-3 rounded text-sm'; bt.textContent = txt; bt.onclick = fn; bar.appendChild(bt); return bt; };
+                mk('◀', () => { if (currentQIndex > 0) { currentQIndex--; loadNextQuestion(); } });
+                const fl = mk(examFlags.has(String(q.id)) ? '🚩 Знято' : '🏳️ Позначити', () => { const k = String(q.id); examFlags.has(k) ? examFlags.delete(k) : examFlags.add(k); fl.textContent = examFlags.has(k) ? '🚩 Знято' : '🏳️ Позначити'; persistActiveSession(); });
+                mk('🧭 Усі питання', examNavigator);
+                mk('▶', () => { if (currentQIndex < currentQuizQuestions.length - 1) { currentQIndex++; loadNextQuestion(); } else examNavigator(); });
+                optCont.appendChild(bar);
             }
             if (!isRestoringSession) persistActiveSession();
         }
 
         function processAnswer(isCorrect, qObj, selText, btnEl) {
+            if (currentMode === 'exam' && !isRestoringSession) { examStore(isCorrect, qObj, selText); return; }
             const restoring = isRestoringSession;
             if (!restoring) {
                 currentDraftAnswer = ''; 
